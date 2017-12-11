@@ -1,0 +1,5 @@
+Australia,12
+France|10
+USA,10
+Germany,22
+NoCountry,12

@@ -1,0 +1,8 @@
+numExecutors =
+executorMemory =
+controllerRAM =
+numPartitions =
+
+partitionByColumn =
+lowerBound =
+upperBound =

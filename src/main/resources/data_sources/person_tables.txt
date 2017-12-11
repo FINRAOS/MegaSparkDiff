@@ -1,0 +1,9 @@
+connection = jdbc
+
+driver = org.hsqldb.jdbc.JDBCDriver
+url = jdbc:hsqldb:hsql://127.0.0.1:9001/testDb
+user = SA
+password =
+
+@shraddha : (select * from Persons1 where personid=2)
+@carlos : (select * from Persons1 Where personid=1)

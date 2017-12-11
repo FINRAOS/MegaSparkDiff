@@ -1,0 +1,7 @@
+connection = file
+
+cloudpass.blahblahbla = pffft
+more.cloudpass.stuff = nope
+
+@s3_loc_1 : s3://asdfadsfasdfas
+@s3_loc_2 : s3://zxcvzxcvzxcvvv

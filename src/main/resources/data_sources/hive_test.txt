@@ -1,0 +1,4 @@
+connection = hive
+
+@v6 : select * from version_six
+@v9 : select * from version_nine
