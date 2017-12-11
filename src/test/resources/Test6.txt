@@ -1,5 +1,0 @@
-Apple,5,10,Green
-Banana,4,8,Yellow
-Orange,2,9,Blue
-Kiwi,8,7,Fuzzy-Green
-Watermelon,3,11,Green

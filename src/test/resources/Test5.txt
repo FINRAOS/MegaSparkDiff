@@ -1,5 +1,0 @@
-Mango,1,3,Orangey
-Papaya,190534,4,I forget
-Strawberry,5,10,Acne
-Plum,8261,6,Purple
-Tomato,0,0,Red

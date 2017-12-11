@@ -1,9 +1,0 @@
-connection = jdbc
-
-driver = net.sourceforge.jtds.jdbc.Driver
-url = jdbc:jtds:sybase://10.33.34.12:4074/
-user = reporter
-password = reporter
-
-@test_table : select * from table_name
-@another_table : select * from
