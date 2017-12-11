@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+    <title>MegaSparkDiff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+	<link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-touch-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-touch-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/icons/apple-touch-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/icons/apple-touch-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-touch-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-touch-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180x180.png">
+	<link rel="icon" type="image/png" href="icons/favicon-32x32.png" sizes="32x32">
+	<link rel="icon" type="image/png" href="icons/android-chrome-192x192.png" sizes="192x192">
+	<link rel="icon" type="image/png" href="icons/favicon-96x96.png" sizes="96x96">
+	<link rel="icon" type="image/png" href="icons/favicon-16x16.png" sizes="16x16">
+	<link rel="manifest" href="/icons/manifest.json">
+	<link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#5bbad5">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-TileImage" content="/icons/mstile-144x144.png">
+	<meta name="theme-color" content="#ffffff">
+
+
+
+    <!-- Le styles -->
+	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      
+      .navbar-inverse .navbar-nav>li>a {
+		color: black;
+	  }
+	  
+	  .navbar-inverse {
+	  	background-image: linear-gradient(to bottom,#f7d207 0,#867e26 100%);
+	  	background-color: #f7d207;
+	  	border-color: #497649;
+	  }
+	  .navbar-inverse .navbar-brand {
+		color: #000000;
+	}
+	
+	
+	  .navbar-inverse .navbar-nav>.active>a {
+		background-image: linear-gradient(to bottom,#bbab22 0,#867e26 100%);
+		background-color: #497649;
+		filter: #497649;
+	  }
+	  
+	  .navbar-inverse .navbar-nav>.active>a:hover {
+		background-image: linear-gradient(to bottom,#bbab22 0,#867e26 100%);
+		background-color: #497649;
+		filter: #497649;
+	  }
+	  
+	  .navbar-inverse .navbar-nav>.active>a:focus {
+		background-image: linear-gradient(to bottom,#bbab22 0,#867e26 100%);
+		background-color: #497649;
+		filter: #497649;
+	  }
+	  
+	  .navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
+		background-color: #003D00;
+	  }
+	  
+		.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+			color: black;
+		background-color: #497649;
+		}
+		
+		.navbar-inverse .navbar-nav .open .dropdown-menu>li>a:hover, .navbar-inverse .navbar-nav .open .dropdown-menu>li>a:focus{	
+		background-image: linear-gradient(to bottom,#f5f5f5 0,#e8e8e8 100%);
+			color: black;
+		}
+		
+		
+		.navbar-inverse .navbar-nav .open .dropdown-menu>li>a{
+			color: black;
+		}
+		
+		.navbar-inverse .navbar-nav .open .dropdown-menu>.active>a, .navbar-inverse .navbar-nav 
+		.open .dropdown-menu>.active>a:hover, .navbar-inverse .navbar-nav .open 
+		.dropdown-menu>.active>a:focus{
+			background-color: #19A319;
+			background-image: linear-gradient(to bottom,#19A319 0,#19A319 100%);
+			filter: #19A319;
+		}
+		
+		.navbar-nav .open .dropdown-menu{
+		background-color: #000000;
+		}
+	
+	.dropdown-menu>.active>a, .dropdown-menu>.active>a:hover, .dropdown-menu>.active>a:focus {
+		background-color: #19A319;
+		background-image: linear-gradient(to bottom,#19A319 0,#19A319 100%);
+		filter: #19A319;
+		}	
+		
+
+    </style>
+
+
+
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-74839639-1', 'auto');
+		ga('send', 'pageview');
+
+	</script>
+
+
+
+  </head>
+
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+          	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          		<span class="sr-only">Toggle navigation</span>
+            	<span class="icon-bar"></span>
+            	<span class="icon-bar"></span>
+            	<span class="icon-bar"></span>
+          	</button>
+          	<span class="navbar-brand">MegaSparkDiff</span>
+          </div>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="./index.html#"><b> MegaSparkDiff</b></a></li>
+              <li><a href="https://bitbucket.finra.org/projects/TAP/repos/mega-spark-diff/browse/readme.md" target="_blank" >Documentation </a></li>
+              <li><a href="./apidocs/index.html" target="_blank" >Java API Doc</a></li>
+                <li><a href="./scaladocs/index.html" target="_blank" >SCALA API Doc</a></li>
+<!--              <li><a href="./contribute.html">Development</a></li> -->
+              <li><a href="https://bitbucket.finra.org/projects/TAP/repos/mega-spark-diff/browse/about.md?at=refs%2Fheads%2Fgh-pages" target="_blank" >About</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+
+    </div>
+
+
+	<div class="jumbotron">
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="container">
+        <img src="img/megaSparkDiffLogo.png" style="width: 50%; height: 50%"/><br/><br/><br/>
+      <!--   <p>Extensible Java framework allowing you to define tests in Domain Specific Language of the Application Under Test.</p>
+        <p><strong>Domain experts</strong> define DSL and tests.</p>
+        <p><strong>Technical experts</strong> implement DSL in Java, using a Command pattern.</p>  -->
+        <p>A Spark-based data comparison tool at scale which facilitates software development engineers to compare a plethora of pair combinations of possible data sources. Multiple execution modes in multiple environments enable the user to generate a diff report as a Java/Scala-friendly DataFrame or as a file for future use. Comes with out of the box SparkFactory and SparkCompare tools.</p>
+
+        <p>
+        	<table>
+        		<tbody>
+        			<tr>
+        				<td><a href="https://bitbucket.finra.org/projects/TAP/repos/mega-spark-diff/browse/readme.md"  target="_blank" class="btn btn-primary btn-lg">Learn more »</a></td>
+        				<td></td>
+        			</tr>
+        		</tbody>
+        	</table>
+        </p>
+        <p><a href="https://bitbucket.finra.org/projects/TAP/repos/mega-spark-diff/browse" target="_blank" class="btn btn-success btn-lg" onClick="_gaq.push(['_trackEvent', 'Visit', 'MegaSparkDiff Home to GitHub Project Home']);">View project on GitHub »</a></p>
+        <p><a href="#" target="_blank" class="btn btn-warning btn-lg" onClick="_gaq.push(['_trackEvent', 'Visit', 'MegaSparkDiff Home to Latest Release 1.0']);">Latest Release 1.0 »</a></p>
+      </div>
+    </div>
+
+	<div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-4">
+          <h3><i class="fa fa-server"></i> Flexible Execution Evnrionment</h3>
+          <p>Execute MegaSparkDiff locally or on an EMR</p>
+        </div>
+        <div class="col-md-4">
+          <h3><i class="fa fa-random"></i> Configurable Sources</h3>
+          <p>Compare data sets coming from any two Spark-compatible sources</p>
+        </div>
+        <div class="col-md-4">
+          <h3><i class="fa fa-balance-scale"></i> Run at scale</h3>
+          <p>Execute one EMR to run comparison at scale on massive data</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <h3><i class="fa fa-laptop"></i> Multiple Execution Modes</h3>
+          <p>Execute MegaSparkDiff as either a Maven dependency or as a standalone comparator</p>
+        </div>
+        <div class="col-md-4">
+          <h3><i class="fa fa-gift"></i> Extra Standalone Functionality</h3>
+          <p>Comes with out of the box SparkFactory and SparkComparator</p>
+       </div>
+        <!--<div class="col-md-4">-->
+          <!--<h3><i class="fa fa-users"></i> Open Source</h3>-->
+          <!--<p> This project is developed and maintained by the Open Source community on <a href="https://github.com/FINRAOS" target="_blank" ><b>GitHub</b></a>. You can use MegaSparkDiff for free and easily extend it for your needs.</p>-->
+        <!--</div>-->
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>MegaSparkDiff projects are released under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" ><b>Apache License 2.0</b></a></p>
+        <p>&copy; Copyright MegaSparkDiff Contributors</p>
+      </footer>
+    </div> <!-- /container -->
+
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./js/jquery.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+</body></html>
+
