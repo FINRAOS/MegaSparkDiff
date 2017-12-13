@@ -1,7 +1,4 @@
 <h1>MegaSparkDiff</h1>
-
-    MegaSparkDiff is an open source tool that helps you compare any pair
-    combinations of the following
     
     MegaSparkDiff is an open source tool that helps you compare any pair
     combination of data sets that are of the following types: 
