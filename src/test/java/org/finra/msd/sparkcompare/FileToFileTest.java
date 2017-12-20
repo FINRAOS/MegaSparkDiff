@@ -42,6 +42,10 @@ public class FileToFileTest extends BaseJunitForSparkCompare
                 getResource(fileName2 + ".txt").getPath();
         AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file2Path,"table2");
 
+        //will do a coalese to 1 partition since we are comparing small data in this unit tests
+        leftAppleTable.getDataFrame().coalesce(1);
+        rightAppleTable.getDataFrame().coalesce(1);
+
         return SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable);
     }
 
@@ -61,7 +65,7 @@ public class FileToFileTest extends BaseJunitForSparkCompare
     }
 
     @Test
-    public void testCompareCompletelyDifferent()
+    public void testCompareCompletelyDifferentFiles()
     {
         Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test4","Test5");
 
@@ -71,8 +75,8 @@ public class FileToFileTest extends BaseJunitForSparkCompare
                     "  Instead, found " + pair.getLeft().count() + ".");
 
         pair.getLeft().show();
-        if (pair.getRight().count() != 5)
-            Assert.fail("Expected 5 differences coming from right table." +
+        if (pair.getRight().count() != 4)
+            Assert.fail("Expected 4 differences coming from right table." +
                     "  Instead, found " + pair.getRight().count() + ".");
     }
 
@@ -97,13 +101,15 @@ public class FileToFileTest extends BaseJunitForSparkCompare
         Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test4","Test1");
 
         //the expectation is that table1 is a complete subset of table2
-        if (pair.getLeft().count() != 0)
+        Long leftCount = pair.getLeft().count();
+        Long rightCount = pair.getRight().count();
+        if (leftCount != 0)
             Assert.fail("Expected 0 differences coming from left table." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + leftCount + ".");
 
-        if (pair.getRight().count() != 5)
-            Assert.fail("Expected 5 differences coming from right table." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+        if (rightCount != 4)
+            Assert.fail("Expected 4 differences coming from right table." +
+                    "  Instead, found " + rightCount + ".");
     }
 
     @Test

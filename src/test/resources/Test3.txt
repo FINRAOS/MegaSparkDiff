@@ -3,7 +3,7 @@ Banana,4,8,Yellow
 Orange,2,-9,Blue
 Kiwi,8,7,Fuzzy-Green
 Watermelon,3,11,Green
-Mango,1,3,Orangey
+Mango,6,12,Yellow
 Papaya,190534,4,I remember now
 Strawberry,5,10,Acne
 Plum,8261,6,Purple

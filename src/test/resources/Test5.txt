@@ -1,4 +1,4 @@
-Mango,1,3,Orangey
+Mango,6,12,Yellow
 Papaya,190534,4,I forget
 Strawberry,5,10,Acne
 Plum,8261,6,Purple

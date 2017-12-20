@@ -91,7 +91,7 @@ public class MemoryDbHsql {
                     "insert into Test1 values('Orange', 2, 9, 'Blue') ",
                     "insert into Test1 values('Kiwi', 8, 7, 'Fuzzy-Green') ",
                     "insert into Test1 values('Watermelon', 3, 11, 'Green') ",
-                    "insert into Test1 values('Mango', 1, 3, 'Orangey') ",
+                    "insert into Test1 values('Mango', 6, 12, 'Yellow') ",
                     "insert into Test1 values('Papaya', 190534, 4, 'I forget') ",
                     "insert into Test1 values('Strawberry', 5, 10, 'Acne') ",
                     "insert into Test1 values('Plum', 8261, 6, 'Purple') ",
@@ -102,7 +102,7 @@ public class MemoryDbHsql {
                     "insert into Test2 values('Orange', 2, 9, 'Blue') ",
                     "insert into Test2 values('Kiwi', 8, 7, 'Fuzzy-Green') ",
                     "insert into Test2 values('Watermelon', 3, 11, 'Green') ",
-                    "insert into Test2 values('Mango', 1, 3, 'Orangey') ",
+                    "insert into Test2 values('Mango', 6, 12, 'Yellow') ",
                     "insert into Test2 values('Papaya', 190534, 4, 'I forget') ",
                     "insert into Test2 values('Strawberry', 5, 10, 'Acne') ",
                     "insert into Test2 values('Plum', 8261, 6, 'Purple') ",
@@ -113,7 +113,7 @@ public class MemoryDbHsql {
                     "insert into Test3 values('Orange', 2, -9, 'Blue') ", //diff
                     "insert into Test3 values('Kiwi', 8, 7, 'Fuzzy-Green') ",
                     "insert into Test3 values('Watermelon', 3, 11, 'Green') ",
-                    "insert into Test3 values('Mango', 1, 3, 'Orangey') ",
+                    "insert into Test3 values('Mango', 6, 12, 'Yellow') ",
                     "insert into Test3 values('Papaya', 190534, 4, 'I remember now') ", //diff
                     "insert into Test3 values('Strawberry', 5, 10, 'Acne') ",
                     "insert into Test3 values('Plum', 8261, 6, 'Purple') ",
@@ -125,7 +125,7 @@ public class MemoryDbHsql {
                     "insert into Test4 values('Kiwi', 8, 7, 'Fuzzy-Green') ",
                     "insert into Test4 values('Watermelon', 3, 11, 'Green') ",
 
-                    "insert into Test5 values('Mango', 1, 3, 'Orangey') ",
+                    "insert into Test5 values('Mango', 6, 12, 'Yellow') ",
                     "insert into Test5 values('Papaya', 190534, 4, 'I forget') ",
                     "insert into Test5 values('Strawberry', 5, 10, 'Acne') ",
                     "insert into Test5 values('Plum', 8261, 6, 'Purple') ",
