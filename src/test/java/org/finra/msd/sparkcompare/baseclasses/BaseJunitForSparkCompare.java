@@ -12,13 +12,18 @@ public class BaseJunitForSparkCompare {
     @BeforeClass
     public static void setUpClass() {
         SparkFactory.initializeSparkLocalMode("local[*]");
-        MemoryDbHsql.getInstance().initializeMemoryDB();
-        MemoryDbHsql.getInstance().stageTablesAndTestData();
+
+        if (MemoryDbHsql.getInstance().getState() != 1 )
+        {
+            MemoryDbHsql.getInstance().initializeMemoryDB();
+            MemoryDbHsql.getInstance().stageTablesAndTestData();
+        }
     }
 
     @AfterClass
     public static void tearDownClass() {
         SparkFactory.stopSparkContext();
-        MemoryDbHsql.getInstance().shutdownMemoryDb();
+        //TODO: need to implement a better way to close in memory DB
+        //MemoryDbHsql.getInstance().shutdownMemoryDb();
     }
 }

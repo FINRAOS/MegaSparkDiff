@@ -42,25 +42,21 @@ public class FileToFileTest extends BaseJunitForSparkCompare
                 getResource(fileName2 + ".txt").getPath();
         AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file2Path,"table2");
 
-        //will do a coalese to 1 partition since we are comparing small data in this unit tests
-        leftAppleTable.getDataFrame().coalesce(1);
-        rightAppleTable.getDataFrame().coalesce(1);
-
         return SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable);
     }
 
     @Test
-    public void testCompareEqualTables()
+    public void testCompareEqualFiles()
     {
         Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test1","Test2");
 
         //the expectation is that both tables are equal
         if (pair.getLeft().count() != 0)
-            Assert.fail("Expected 0 differences coming from left table." +
+            Assert.fail("Expected 0 differences coming from left file." +
                     "  Instead, found " + pair.getLeft().count() + ".");
 
         if (pair.getRight().count() != 0)
-            Assert.fail("Expected 0 differences coming from right table." +
+            Assert.fail("Expected 0 differences coming from right file." +
                     "  Instead, found " + pair.getRight().count() + ".");
     }
 

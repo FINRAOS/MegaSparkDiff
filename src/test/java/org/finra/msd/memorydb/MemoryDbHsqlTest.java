@@ -35,7 +35,7 @@ public class MemoryDbHsqlTest {
 
         MemoryDbHsql.getInstance().shutdownMemoryDb();
         int state = MemoryDbHsql.getInstance().getState();
-        if (state != 8)
+        if (state != 16)
         {
             Logger log = Logger.getLogger(this.getClass().getName());
             log.info("Memory HQL DB state was " + state);

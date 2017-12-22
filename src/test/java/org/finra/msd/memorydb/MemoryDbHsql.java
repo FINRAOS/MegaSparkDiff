@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.TimeUnit;
 
 public class MemoryDbHsql {
 
@@ -52,6 +53,10 @@ public class MemoryDbHsql {
 
     public int getState()
     {
+        if (hsqlDbServer == null)
+        {
+            return 0; //meaning the server is not created yet
+        }
         return hsqlDbServer.getState();
     }
 
@@ -141,7 +146,15 @@ public class MemoryDbHsql {
 
     public void shutdownMemoryDb()
     {
-        hsqlDbServer.stop();
+        hsqlDbServer.shutdown();
+        while (hsqlDbServer.getState() != 16)
+        {
+            try {
+                TimeUnit.MILLISECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

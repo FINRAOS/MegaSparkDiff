@@ -6,4 +6,4 @@ user = reporter
 password = reporter
 
 @test_table : select * from table_name
-@another_table : select * from
+@another_table : select * from another_table
