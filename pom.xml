@@ -71,7 +71,7 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>2.11.8</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <!--Apache Spark Core import-->
@@ -79,7 +79,7 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>
             <version>2.2.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <!--Spark SQL-->
@@ -87,14 +87,14 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.11</artifactId>
             <version>2.2.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_2.11</artifactId>
             <version>2.2.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <!-- ******************************** TEST DEPENDENCIES ************************************** -->
@@ -202,43 +202,6 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                            <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <manifestEntries>
-                                        <Main-Class>org.finra.msd.launcher.Launcher</Main-Class>
-                                    </manifestEntries>
-                                </transformer>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer">
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <!--<plugin>-->
