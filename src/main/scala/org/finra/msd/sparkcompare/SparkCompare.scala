@@ -140,9 +140,17 @@ object SparkCompare {
   private def compareSchemaDataFrames(left: DataFrame, leftViewName: String
                                       , right: DataFrame, rightViewName: String): Pair[DataFrame, DataFrame] = {
     //make sure that column names match in both dataFrames
-    if (!left.columns.sameElements(right.columns)) {
-      println("column names were different")
-      throw new Exception("Column Names Did Not Match")
+    val leftColumns = left.columns.clone()
+    val rightColumns = right.columns.clone()
+
+    for (i <- 0 to leftColumns.length - 1) {
+      leftColumns(i) = leftColumns(i).toUpperCase()
+      rightColumns(i) = rightColumns(i).toUpperCase()
+    }
+
+    if (!leftColumns.sameElements(rightColumns)) {
+      throw new Exception("Column Names Did Not Match\n" +
+        "column names were different\nLeft: " + left.columns.mkString(",") + "\nRight:" + right.columns.mkString(","))
     }
 
     val leftCols = left.columns.mkString(",")
