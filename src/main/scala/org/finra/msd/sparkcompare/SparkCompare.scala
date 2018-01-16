@@ -16,6 +16,9 @@
 
 package org.finra.msd.sparkcompare
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths, StandardOpenOption}
+
 import org.apache.commons.lang3.tuple.{ImmutablePair, Pair}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs._
@@ -23,8 +26,7 @@ import org.apache.spark.sql._
 import org.finra.msd.containers.AppleTable
 import org.finra.msd.enums.SourceType
 import org.finra.msd.sparkfactory.SparkFactory
-import java.nio.file.{Paths, Files, StandardOpenOption}
-import java.nio.charset.{StandardCharsets}
+
 import scala.collection.JavaConverters._
 
 /**
@@ -45,54 +47,52 @@ object SparkCompare {
   def compareFiles(file1Location: String, file2Location: String): Pair[DataFrame, DataFrame] = {
     val left: DataFrame = SparkFactory.parallelizeTextFile(file1Location)
     val right: DataFrame = SparkFactory.parallelizeTextFile(file2Location)
-    return compareFlatDataFrames(left , right)
+    return compareFlatDataFrames(left, right)
   }
 
   /**
     * Compares two data sources and stores results locally
     *
-    * @param file1Location path to source1 data
-    * @param file2Location path to source2 data
-    * @param outputDirectory path where the comparison results have to be redirected
+    * @param file1Location    path to source1 data
+    * @param file2Location    path to source2 data
+    * @param outputDirectory  path where the comparison results have to be redirected
     * @param singleFileOutput a boolean variable to denote the number of output files to be one or more than one
     */
-  def compareFileSaveResults(file1Location: String, file2Location: String , outputDirectory: String ,
-                             singleFileOutput: Boolean) : Unit= {
-    val resultPair: Pair[DataFrame, DataFrame] = compareFiles(file1Location,file2Location)
-    saveResultsToDisk(resultPair.getLeft , resultPair.getRight , outputDirectory , singleFileOutput)
+  def compareFileSaveResults(file1Location: String, file2Location: String, outputDirectory: String,
+                             singleFileOutput: Boolean): Unit = {
+    val resultPair: Pair[DataFrame, DataFrame] = compareFiles(file1Location, file2Location)
+    saveResultsToDisk(resultPair.getLeft, resultPair.getRight, outputDirectory, singleFileOutput)
   }
 
   /**
     * Performs comparison between two custom source data types that were created from the actual source data details
     *
-    * @param left Custom table for source1
-    * @param right Custom table for source2
-    * @param outputDirectory path where the comparison results have to be redirected
+    * @param left             Custom table for source1
+    * @param right            Custom table for source2
+    * @param outputDirectory  path where the comparison results have to be redirected
     * @param singleFileOutput a boolean variable to denote the number of output files to be one or more than one
     */
-  def compareAppleTablesSaveResults(left: AppleTable , right: AppleTable , outputDirectory: String , singleFileOutput: Boolean) :Unit = {
-    val result: Pair[DataFrame, DataFrame] = compareAppleTables(left,right)
-    saveResultsToDisk(result.getLeft , result.getRight , outputDirectory , singleFileOutput)
+  def compareAppleTablesSaveResults(left: AppleTable, right: AppleTable, outputDirectory: String, singleFileOutput: Boolean): Unit = {
+    val result: Pair[DataFrame, DataFrame] = compareAppleTables(left, right)
+    saveResultsToDisk(result.getLeft, result.getRight, outputDirectory, singleFileOutput)
   }
 
   /**
     * Performs schema based comparison irrespective of source data types
     *
-    * @param left Custom table for source1
+    * @param left  Custom table for source1
     * @param right Custom table for source2
     * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
     *         the right parameter has values in RDD2 but not in RDD1
     */
-  def compareAppleTables(left: AppleTable, right: AppleTable) :Pair[DataFrame, DataFrame] = {
+  def compareAppleTables(left: AppleTable, right: AppleTable): Pair[DataFrame, DataFrame] = {
     //if both are HIVE or JDBC then its a schema compare
-    if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC)
-      {
-        if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC)
-          {
-            //DO A SCHEMA COMPARE even if one is HIVE and the other is JDBC
-            return compareSchemaDataFrames(left.dataFrame , left.tempViewName,right.dataFrame , right.tempViewName)
-          }
+    if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC) {
+      if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC) {
+        //DO A SCHEMA COMPARE even if one is HIVE and the other is JDBC
+        return compareSchemaDataFrames(left.dataFrame, left.tempViewName, right.dataFrame, right.tempViewName)
       }
+    }
 
     //Means one of them is not a schema data source and will flatten one of them
     var flatLeft: DataFrame = left.dataFrame
@@ -100,24 +100,24 @@ object SparkCompare {
 
     //if one of the inputs has no schema then will flatten it using the delimiter
     if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC)
-      flatLeft = SparkFactory.flattenDataFrame(left.dataFrame , left.delimiter)
+      flatLeft = SparkFactory.flattenDataFrame(left.dataFrame, left.delimiter)
 
     if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC)
-      flatRight = SparkFactory.flattenDataFrame(right.dataFrame , right.delimiter)
+      flatRight = SparkFactory.flattenDataFrame(right.dataFrame, right.delimiter)
 
     //COMPARE flatLeft to flatRight
-    return compareFlatDataFrames(flatLeft , flatRight)
+    return compareFlatDataFrames(flatLeft, flatRight)
   }
 
   /**
     * Compares two single-column DataFrames
     *
-    * @param left a dataframe generated form custom table for source1
+    * @param left  a dataframe generated form custom table for source1
     * @param right a dataframe generated form custom table for source2
     * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
     *         the right parameter has values in RDD2 but not in RDD1
     */
-  private def compareFlatDataFrames(left: DataFrame , right: DataFrame) :Pair[DataFrame, DataFrame] = {
+  private def compareFlatDataFrames(left: DataFrame, right: DataFrame): Pair[DataFrame, DataFrame] = {
     val leftGrouped: DataFrame = left.groupBy("values").count()
     val rightGrouped: DataFrame = right.groupBy("values").count()
 
@@ -130,28 +130,27 @@ object SparkCompare {
 
   /**
     *
-    * @param left dataframe containing source1 data
-    * @param leftViewName temporary table name of source1
-    * @param right dataframe containing source2 data
+    * @param left          dataframe containing source1 data
+    * @param leftViewName  temporary table name of source1
+    * @param right         dataframe containing source2 data
     * @param rightViewName temporary table name of source2
     * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
     *         the right parameter has values in RDD2 but not in RDD1
     */
-  private def compareSchemaDataFrames(left: DataFrame , leftViewName: String
-                              , right: DataFrame , rightViewName: String) :Pair[DataFrame, DataFrame] = {
+  private def compareSchemaDataFrames(left: DataFrame, leftViewName: String
+                                      , right: DataFrame, rightViewName: String): Pair[DataFrame, DataFrame] = {
     //make sure that column names match in both dataFrames
-    if (!left.columns.sameElements(right.columns))
-      {
-        println("column names were different")
-        throw new Exception("Column Names Did Not Match")
-      }
+    if (!left.columns.sameElements(right.columns)) {
+      println("column names were different")
+      throw new Exception("Column Names Did Not Match")
+    }
 
     val leftCols = left.columns.mkString(",")
     val rightCols = right.columns.mkString(",")
 
     //group by all columns in both data frames
-    val groupedLeft = left.sqlContext.sql("select " + leftCols + " , count(*) as recordRepeatCount from " +  leftViewName + " group by " + leftCols )
-    val groupedRight = left.sqlContext.sql("select " + rightCols + " , count(*) as recordRepeatCount from " +  rightViewName + " group by " + rightCols )
+    val groupedLeft = left.sqlContext.sql("select " + leftCols + " , count(*) as recordRepeatCount from " + leftViewName + " group by " + leftCols)
+    val groupedRight = left.sqlContext.sql("select " + rightCols + " , count(*) as recordRepeatCount from " + rightViewName + " group by " + rightCols)
 
     //do the except/subtract command
     val inLnotinR = groupedLeft.except(groupedRight).toDF()
@@ -163,28 +162,26 @@ object SparkCompare {
   /**
     * Stores comparison results locally
     *
-    * @param leftResult a dataframe which contains the values in RDD1 and not in RDD2
-    * @param rightResult a dataframe which contains the values in RDD2 and not in RDD1
+    * @param leftResult      a dataframe which contains the values in RDD1 and not in RDD2
+    * @param rightResult     a dataframe which contains the values in RDD2 and not in RDD1
     * @param outputDirectory location where the comparison results are to be stored
-    * @param singleFile a boolean variable to denote the number of output files to be one or more than one
+    * @param singleFile      a boolean variable to denote the number of output files to be one or more than one
     */
-  private def saveResultsToDisk(leftResult: DataFrame , rightResult: DataFrame,
-                                outputDirectory: String , singleFile: Boolean) :Unit =
-  {
+  private def saveResultsToDisk(leftResult: DataFrame, rightResult: DataFrame,
+                                outputDirectory: String, singleFile: Boolean): Unit = {
     var left: DataFrame = leftResult
     var right: DataFrame = rightResult
 
 
-    if (singleFile)
-    {
+    if (singleFile) {
       left = leftResult.coalesce(1)
       right = rightResult.coalesce(1)
     }
 
     // Write the symmetric difference to their own output directories
-    val header : Boolean = true
-    left.write.format("com.databricks.spark.csv").option("header", header + "").option("delimiter","\t").mode("overwrite").save(outputDirectory + "/inLeftNotInRight")
-    right.write.format("com.databricks.spark.csv").option("header", header + "").option("delimiter","\t").mode("overwrite").save(outputDirectory + "/inRightNotInLeft")
+    val header: Boolean = true
+    left.write.format("com.databricks.spark.csv").option("header", header + "").option("delimiter", "\t").mode("overwrite").save(outputDirectory + "/inLeftNotInRight")
+    right.write.format("com.databricks.spark.csv").option("header", header + "").option("delimiter", "\t").mode("overwrite").save(outputDirectory + "/inRightNotInLeft")
 
     /*val niceData1 = nicelyFormatDF(left)
     val niceData2 = nicelyFormatDF(right)
@@ -214,9 +211,9 @@ object SparkCompare {
   }
 
   private def nicelyFormatDF(dataFrame: DataFrame): String = {
-    
-    var nice : String = ""
-    if(dataFrame.collect().length == 0)
+
+    var nice: String = ""
+    if (dataFrame.collect().length == 0)
       return nice
     else {
       val maxCols = new Array[Int](dataFrame.first().length)
@@ -266,23 +263,21 @@ object SparkCompare {
     * @param isHeaderRow checks if it has column names or not
     * @return Formatted comparison results
     */
-  private def nicelyFormatFile(fileContent : String, isHeaderRow : Boolean): String = {
+  private def nicelyFormatFile(fileContent: String, isHeaderRow: Boolean): String = {
     // Set up 2D array that stores the file contents in tabular format
-    val lineSplit : Array[String] = fileContent.split("\n")
-    val table : Array[Array[String]] = new Array[Array[String]](lineSplit.length)
+    val lineSplit: Array[String] = fileContent.split("\n")
+    val table: Array[Array[String]] = new Array[Array[String]](lineSplit.length)
     for (i <- lineSplit.indices)
       table(i) = lineSplit(i).split("\t")
 
     // Pad table entries so that each column is of the same length
-    for (j <- table(0).indices)
-    {
+    for (j <- table(0).indices) {
       var maxColLength = 0
       for (i <- table.indices)
         if (table(i)(j).length() > maxColLength)
           maxColLength = table(i)(j).length()
 
-      for (i <- table.indices)
-      {
+      for (i <- table.indices) {
         val padAmount = maxColLength - table(i)(j).length()
         for (s <- 0 until padAmount)
           table(i)(j) += " "
@@ -291,24 +286,23 @@ object SparkCompare {
     }
 
     // Output the data nicely now that it's spaced evenly
-    var nice : String = ""
-    for (i <- table.indices)
-    {
-      var row : String = ""
+    var nice: String = ""
+    for (i <- table.indices) {
+      var row: String = ""
       for (j <- table(i).indices)
         row += "│" + table(i)(j)
       row += "│"
 
       // Special row for marking the top, header, and bottom of nice table output
-      val baseSpecial : String = row.substring(1,row.length()-1).replaceAll("[^│]","─")
+      val baseSpecial: String = row.substring(1, row.length() - 1).replaceAll("[^│]", "─")
       if (i == 0)
-        nice += "┌" + baseSpecial.replaceAll("│","┬") + "┐\n"
+        nice += "┌" + baseSpecial.replaceAll("│", "┬") + "┐\n"
       nice += row + "\n" // Output row
       if (i == 0 && isHeaderRow)
-        nice += "├" + baseSpecial.replaceAll("│","┼") + "┤\n"
+        nice += "├" + baseSpecial.replaceAll("│", "┼") + "┤\n"
 
       if (i == table.length - 1)
-        nice += "└" + baseSpecial.replaceAll("│","┴") + "┘\n"
+        nice += "└" + baseSpecial.replaceAll("│", "┴") + "┘\n"
     }
 
     return nice
@@ -327,9 +321,9 @@ object SparkCompare {
     var fName: String = ""
     val list = hdfs.listFiles(new Path(path), true)
 
-    while(list.hasNext()) {
+    while (list.hasNext()) {
       val tmp = list.next().getPath.getName()
-      if(tmp.contains(".csv"))
+      if (tmp.contains(".csv"))
         fName = tmp
     }
     return fName
@@ -341,7 +335,7 @@ object SparkCompare {
     * @param filePath location of the file generated by spark
     * @return a string containing file data
     */
-  private def read(filePath:String): String = {
+  private def read(filePath: String): String = {
     val data = Files.readAllLines(Paths.get(filePath), StandardCharsets.UTF_8).asScala.mkString("", "\n", "")
     return data
   }
@@ -353,7 +347,7 @@ object SparkCompare {
     * @param contents comparison results
     * @return
     */
-  private def write(filePath:String, contents:String) = {
+  private def write(filePath: String, contents: String) = {
     Files.write(Paths.get(filePath), contents.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND)
   }
 
