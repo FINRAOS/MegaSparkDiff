@@ -96,17 +96,17 @@ object SparkCompare {
 
     //Means one of them is not a schema data source and will flatten one of them
     var flatLeft: DataFrame = left.dataFrame
-    var flatright: DataFrame = right.dataFrame
+    var flatRight: DataFrame = right.dataFrame
 
     //if one of the inputs has no schema then will flatten it using the delimiter
     if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC)
       flatLeft = SparkFactory.flattenDataFrame(left.dataFrame , left.delimiter)
 
     if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC)
-      flatright = SparkFactory.flattenDataFrame(right.dataFrame , right.delimiter)
+      flatRight = SparkFactory.flattenDataFrame(right.dataFrame , right.delimiter)
 
     //COMPARE flatLeft to flatRight
-    return compareFlatDataFrames(flatLeft , flatright)
+    return compareFlatDataFrames(flatLeft , flatRight)
   }
 
   /**
