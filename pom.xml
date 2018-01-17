@@ -7,7 +7,7 @@
     <groupId>org.finra.megasparkdiff</groupId>
     <artifactId>mega-spark-diff</artifactId>
     <version>0.1</version>
-    <!--<packaging>pom</packaging>-->
+    <packaging>jar</packaging>
 
     <name>Mega Spark Diff Parent POM</name>
     <description>A diff analysis tool that compares data sets at scale of various types and can be executed in CLOUD or locally</description>
@@ -17,7 +17,12 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-
+    <url>http://github.com/FINRAOS/MegaSparkDiff</url>
+    <scm>
+        <connection>scm:git:http://github.com/FINRAOS/MegaSparkDiff</connection>
+        <developerConnection>scm:git:http://github.com/FINRAOS/MegaSparkDiff</developerConnection>
+        <url>http://github.com/FINRAOS/MegaSparkDiff</url>
+    </scm>
     <developers>
         <developer>
             <id>aosama</id>
@@ -42,29 +47,6 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
-    <!--<profiles>-->
-        <!--<profile>-->
-            <!--<id>release</id>-->
-            <!--<build>-->
-                <!--<plugins>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.apache.maven.plugins</groupId>-->
-                        <!--<artifactId>maven-gpg-plugin</artifactId>-->
-                        <!--<version>1.6</version>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<id>sign-artifacts</id>-->
-                                <!--<phase>verify</phase>-->
-                                <!--<goals>-->
-                                    <!--<goal>sign</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                    <!--</plugin>-->
-                <!--</plugins>-->
-            <!--</build>-->
-        <!--</profile>-->
-    <!--</profiles>-->
 
     <dependencies>
 
@@ -125,12 +107,6 @@
             <version>2.4.0</version>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-dependency-plugin -->
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>3.0.2</version>
-        </dependency>
 
         <!--JUnit-->
         <dependency>
@@ -144,6 +120,48 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/allDependencies</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.1</version>
@@ -200,10 +218,6 @@
             </plugin>
 
             <plugin>
-               <!-- <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.12.1</version>-->
-
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.1</version>
                 <executions>
