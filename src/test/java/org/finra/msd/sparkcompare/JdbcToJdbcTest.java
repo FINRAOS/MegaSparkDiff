@@ -56,7 +56,7 @@ public class JdbcToJdbcTest extends BaseJunitForSparkCompare
             Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Persons1","Test1");
         } catch (Exception e) {
             failed = true;
-            if (!e.getMessage().equals("Column Names Did Not Match"))
+            if (!e.getMessage().contains("Column Names Did Not Match"))
                 Assert.fail("Failed for the wrong reason");
         }
 
