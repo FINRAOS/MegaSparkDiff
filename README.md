@@ -15,7 +15,7 @@ How to Use form Within a Java or SCALA Project
 <dependency>
     <groupId>org.finra.megasparkdiff</groupId>
     <artifactId>mega-spark-diff</artifactId>
-    <version>0.1</version>
+    <version>0.1.2</version>
 </dependency>
 ```
 
