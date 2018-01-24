@@ -137,7 +137,7 @@ object SparkCompare {
     * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
     *         the right parameter has values in RDD2 but not in RDD1
     */
-  private def compareSchemaDataFrames(left: DataFrame , leftViewName: String
+   def compareSchemaDataFrames(left: DataFrame , leftViewName: String
                               , right: DataFrame , rightViewName: String) :Pair[DataFrame, DataFrame] = {
     //make sure that column names match in both dataFrames
     if (!left.columns.sameElements(right.columns))
