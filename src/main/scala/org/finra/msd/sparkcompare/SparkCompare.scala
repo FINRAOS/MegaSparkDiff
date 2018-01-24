@@ -214,7 +214,7 @@ object SparkCompare {
   }
 
   private def nicelyFormatDF(dataFrame: DataFrame): String = {
-    
+
     var nice : String = ""
     if(dataFrame.collect().length == 0)
       return nice
