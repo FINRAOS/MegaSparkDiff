@@ -1,2 +1,4 @@
 language: java
 script: mvn package
+after_success:
+  - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
