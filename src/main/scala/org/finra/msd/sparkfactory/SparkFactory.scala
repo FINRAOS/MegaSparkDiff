@@ -50,11 +50,12 @@ object SparkFactory {
     *                 you can specify "local[1]" this means spark will use 1 core only. Alternatively you can specify
     *                 "local[*]" this means spark will figure out how many cores you have and will use them all.
     */
-  def initializeSparkLocalMode(numCores: String , logLevel :String): Unit = {
+  def initializeSparkLocalMode(numCores: String , logLevel :String , defaultPartitions :String): Unit = {
     conf = new SparkConf().setAppName("megasparkdiff")
       .setMaster(numCores)
       .set("spark.driver.host", "localhost")
       .set("spark.ui.enabled","false") //disable spark UI
+      .set("spark.sql.shuffle.partitions",defaultPartitions)
     sparkSession = SparkSession.builder.config(conf).getOrCreate()
     sparkSession.sparkContext.setLogLevel(logLevel)
   }

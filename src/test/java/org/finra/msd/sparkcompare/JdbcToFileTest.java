@@ -64,7 +64,7 @@ public class JdbcToFileTest extends BaseJunitForSparkCompare
     @Test
     public void testCompareJDBCTableToTextFile()
     {
-        SparkFactory.initializeSparkLocalMode("local[*]" , "WARN");
+        SparkFactory.initializeSparkLocalMode("local[*]" , "WARN" , "1");
 
         AppleTable leftAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
