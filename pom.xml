@@ -198,7 +198,7 @@
 
     <profiles>
         <profile>
-            <id>release</id>
+            <id>mavencentral</id>
             <build>
                 <plugins>
                     <plugin>
