@@ -28,6 +28,18 @@ public class MemoryDbHsqlTest {
     {
         MemoryDbHsql.getInstance().initializeMemoryDB();
 
+        //todo: this should be fixed, the target was to give HSQLDB some time to start
+
+        try {
+            if (MemoryDbHsql.getInstance().getState() != 1)
+            {
+                Thread.sleep(5000);
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         if (MemoryDbHsql.getInstance().getState() != 1)
         {
             Assert.fail("server was not running");
