@@ -16,19 +16,15 @@
 
 package org.finra.msd.sparkcompare
 
+import java.lang
+
 import org.apache.commons.lang3.tuple.{ImmutablePair, Pair}
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs._
 import org.apache.spark.sql._
 import org.finra.msd.containers.AppleTable
 import org.finra.msd.enums.SourceType
 import org.finra.msd.sparkfactory.SparkFactory
-import java.nio.file.{Files, Paths, StandardOpenOption}
-import java.nio.charset.StandardCharsets
-
 import org.finra.msd.outputwriters.OutputWriter
 
-import scala.collection.JavaConverters._
 
 /**
   * Contains comparison related operations
@@ -163,7 +159,21 @@ object SparkCompare {
     return new ImmutablePair[DataFrame, DataFrame](inLnotinR, inRnotinL)
   }
 
+  /**
+    * Performs schema based comparison irrespective of source data types
+    *
+    * @param left Custom table for LeftSource
+    * @param right Custom table for RightSource
+    * @return a pair containing the count in left and right
+    */
+  def compareAppleTablesCount(left: AppleTable, right: AppleTable) :Pair[lang.Long,lang.Long] = {
 
+    val leftCount = left.dataFrame.count()
+    val rightCount = right.dataFrame.count()
 
+    val countsPair = new ImmutablePair[lang.Long, lang.Long](leftCount, rightCount)
+
+    return countsPair
+  }
 
 }
