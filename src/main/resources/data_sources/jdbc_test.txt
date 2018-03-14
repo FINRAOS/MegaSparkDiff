@@ -1,9 +1,9 @@
 connection = jdbc
 
-driver = net.sourceforge.jtds.jdbc.Driver
-url = jdbc:jtds:sybase://10.33.34.12:4074/
-user = reporter
-password = reporter
+driver = org.hsqldb.jdbc.JDBCDriver
+url = jdbc:hsqldb:hsql://127.0.0.1:9001/testDb
+user = username
+password = password
 
 @test_table : select * from table_name
 @another_table : select * from another_table

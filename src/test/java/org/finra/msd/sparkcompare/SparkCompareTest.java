@@ -182,6 +182,30 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
             Assert.fail("Failed to write to output file");
     }
 
+    @Test
+    public void testCompareCoutnsFronJDBCAppleTablesWithDifference()
+    {
+        AppleTable leftAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
+                "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
+                "SA",
+                "",
+                "(select * from Persons1)", "table1");
+
+
+        AppleTable rightAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
+                "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
+                "SA",
+                "",
+                "(select * from test1)", "table2");
+
+        Pair<Long, Long> pair = SparkCompare.compareAppleTablesCount(leftAppleTable, rightAppleTable);
+
+        //the expectation is that the counts are different
+        if (pair.getLeft() == pair.getRight())
+        {
+            Assert.fail("expected counts to be different");
+        }
+    }
 
     private void cleanOutputDirectory(String subdir)
     {

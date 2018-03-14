@@ -32,7 +32,6 @@ public class SparkFactoryTest extends BaseJunitForSparkCompare {
                 "SA",
                 "",
                 "(select * from Persons1)", "table1");
-
         appleTable.getDataFrame().show();
         if (appleTable.getDataFrame().count() == 0)
         {
