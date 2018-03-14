@@ -23,8 +23,11 @@ import org.apache.spark.sql._
 import org.finra.msd.containers.AppleTable
 import org.finra.msd.enums.SourceType
 import org.finra.msd.sparkfactory.SparkFactory
-import java.nio.file.{Paths, Files, StandardOpenOption}
-import java.nio.charset.{StandardCharsets}
+import java.nio.file.{Files, Paths, StandardOpenOption}
+import java.nio.charset.StandardCharsets
+
+import org.finra.msd.outputwriters.OutputWriter
+
 import scala.collection.JavaConverters._
 
 /**
@@ -59,7 +62,7 @@ object SparkCompare {
   def compareFileSaveResults(file1Location: String, file2Location: String , outputDirectory: String ,
                              singleFileOutput: Boolean) : Unit= {
     val resultPair: Pair[DataFrame, DataFrame] = compareFiles(file1Location,file2Location)
-    saveResultsToDisk(resultPair.getLeft , resultPair.getRight , outputDirectory , singleFileOutput)
+    OutputWriter.saveResultsToDisk(resultPair.getLeft , resultPair.getRight , outputDirectory , singleFileOutput)
   }
 
   /**
@@ -72,7 +75,7 @@ object SparkCompare {
     */
   def compareAppleTablesSaveResults(left: AppleTable , right: AppleTable , outputDirectory: String , singleFileOutput: Boolean) :Unit = {
     val result: Pair[DataFrame, DataFrame] = compareAppleTables(left,right)
-    saveResultsToDisk(result.getLeft , result.getRight , outputDirectory , singleFileOutput)
+    OutputWriter.saveResultsToDisk(result.getLeft , result.getRight , outputDirectory , singleFileOutput)
   }
 
   /**
@@ -160,33 +163,7 @@ object SparkCompare {
     return new ImmutablePair[DataFrame, DataFrame](inLnotinR, inRnotinL)
   }
 
-  /**
-    * Stores comparison results locally
-    *
-    * @param leftResult a dataframe which contains the values in RDD1 and not in RDD2
-    * @param rightResult a dataframe which contains the values in RDD2 and not in RDD1
-    * @param outputDirectory location where the comparison results are to be stored
-    * @param singleFile a boolean variable to denote the number of output files to be one or more than one
-    */
-  private def saveResultsToDisk(leftResult: DataFrame , rightResult: DataFrame,
-                                outputDirectory: String , singleFile: Boolean) :Unit =
-  {
-    var left: DataFrame = leftResult
-    var right: DataFrame = rightResult
 
-
-    if (singleFile)
-    {
-      left = leftResult.coalesce(1)
-      right = rightResult.coalesce(1)
-    }
-
-    // Write the symmetric difference to their own output directories
-    val header : Boolean = true
-    left.write.format("com.databricks.spark.csv").option("header", header + "").option("delimiter","\t").mode("overwrite").save(outputDirectory + "/inLeftNotInRight")
-    right.write.format("com.databricks.spark.csv").option("header", header + "").option("delimiter","\t").mode("overwrite").save(outputDirectory + "/inRightNotInLeft")
-
-  }
 
 
 }
