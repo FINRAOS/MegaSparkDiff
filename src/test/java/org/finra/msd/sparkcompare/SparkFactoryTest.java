@@ -38,4 +38,22 @@ public class SparkFactoryTest extends BaseJunitForSparkCompare {
             Assert.fail("dataset was empty");
         }
     }
+
+    @Test
+    public void parrallelizeSqlQueryWithPartitioning()
+    {
+        AppleTable rightAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
+                "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
+                "SA",
+                "",
+                "(select * from Test1 )", "my_partition_test" , scala.Option.empty() , "Price"
+        ,"0" , "200000" ,"2");
+
+
+        if (rightAppleTable.getDataFrame().rdd().getNumPartitions() != 2)
+        {
+            Assert.fail("expected 2 partitions but received " + rightAppleTable.getDataFrame().rdd().getNumPartitions());
+        }
+
+    }
 }
