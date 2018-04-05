@@ -1,0 +1,3 @@
+some refrigerator,some brand 1;refrigerator;1000.00;250.00;2017-06-01
+some washer,some brand 2;washer;5000.00;500.00;2017-01-17
+some dryer,some brand 3;dryer;2500.00;500.00;2017-04-23
