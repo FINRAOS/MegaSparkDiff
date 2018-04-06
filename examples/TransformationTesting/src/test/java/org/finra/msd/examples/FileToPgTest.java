@@ -1,4 +1,4 @@
-package org.finra.msd.sample;
+package org.finra.msd.examples;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -18,7 +18,7 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.finra.msd.containers.AppleTable;
-import org.finra.msd.sample.db.PostgresDatabase;
+import org.finra.msd.examples.db.PostgresDatabase;
 import org.finra.msd.sparkcompare.SparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.junit.After;
@@ -56,7 +56,8 @@ public class FileToPgTest {
 
     // Parallelize the source text file
     AppleTable leftTable = SparkFactory
-        .parallelizeTextSource(FileToPgTest.class.getResource("/sample/appliance_source.txt").getPath(),
+        .parallelizeTextSource(FileToPgTest.class.getResource(
+            "/appliance_source.txt").getPath(),
             "appliance_left");
 
     // Parallelize the target data

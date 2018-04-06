@@ -1,4 +1,4 @@
-package org.finra.msd.sample.db;
+package org.finra.msd.examples.db;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -43,7 +43,7 @@ public class PostgresDatabase {
     PostgresConfig config = new PostgresConfig(
         () -> "9.6.3-1",
         new Net(),
-        new Storage("sample"),
+        new Storage("src/test/resources/sample"),
         new Timeout(),
         new Credentials("username", "password"));
 
@@ -66,7 +66,8 @@ public class PostgresDatabase {
   public static void setUp() throws IOException, SQLException {
     try (Connection conn = DriverManager.getConnection(url, properties)) {
       try (Statement stmt = conn.createStatement()) {
-        stmt.executeUpdate(Resources.toString(Resources.getResource("sample/pg_db.sql"), Charsets.UTF_8));
+        stmt.executeUpdate(Resources.toString(Resources.getResource(
+            "pg_db.sql"), Charsets.UTF_8));
       }
     }
   }

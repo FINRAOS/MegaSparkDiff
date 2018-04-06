@@ -1,4 +1,4 @@
-package org.finra.msd.sample;
+package org.finra.msd.examples;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -10,8 +10,8 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.types.DataTypes;
 import org.finra.msd.containers.AppleTable;
-import org.finra.msd.sample.db.H2Database;
-import org.finra.msd.sample.db.PostgresDatabase;
+import org.finra.msd.examples.db.PostgresDatabase;
+import org.finra.msd.examples.db.H2Database;
 import org.finra.msd.sparkcompare.SparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.junit.After;

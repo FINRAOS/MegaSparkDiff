@@ -1,4 +1,4 @@
-package org.finra.msd.sample.db;
+package org.finra.msd.examples.db;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -28,7 +28,8 @@ public class H2Database {
   public static void setUp() throws IOException, SQLException {
     try (Connection conn = DriverManager.getConnection(url, properties)) {
       try (Statement stmt = conn.createStatement()) {
-        stmt.executeUpdate(Resources.toString(Resources.getResource("sample/h2_db.sql"), Charsets.UTF_8));
+        stmt.executeUpdate(Resources.toString(Resources.getResource(
+            "h2_db.sql"), Charsets.UTF_8));
       }
     }
   }
