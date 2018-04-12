@@ -56,9 +56,9 @@ object SparkCompare {
     * @param singleFileOutput a boolean variable to denote the number of output files to be one or more than one
     */
   def compareFileSaveResults(file1Location: String, file2Location: String , outputDirectory: String ,
-                             singleFileOutput: Boolean) : Unit= {
+                             singleFileOutput: Boolean , delimiter :String) : Unit= {
     val resultPair: Pair[DataFrame, DataFrame] = compareFiles(file1Location,file2Location)
-    OutputWriter.saveResultsToDisk(resultPair.getLeft , resultPair.getRight , outputDirectory , singleFileOutput)
+    OutputWriter.saveResultsToDisk(resultPair.getLeft , resultPair.getRight , outputDirectory , singleFileOutput , delimiter)
   }
 
   /**
@@ -69,9 +69,9 @@ object SparkCompare {
     * @param outputDirectory path where the comparison results have to be redirected
     * @param singleFileOutput a boolean variable to denote the number of output files to be one or more than one
     */
-  def compareAppleTablesSaveResults(left: AppleTable , right: AppleTable , outputDirectory: String , singleFileOutput: Boolean) :Unit = {
+  def compareAppleTablesSaveResults(left: AppleTable , right: AppleTable , outputDirectory: String , singleFileOutput: Boolean , delimiter :String) :Unit = {
     val result: Pair[DataFrame, DataFrame] = compareAppleTables(left,right)
-    OutputWriter.saveResultsToDisk(result.getLeft , result.getRight , outputDirectory , singleFileOutput)
+    OutputWriter.saveResultsToDisk(result.getLeft , result.getRight , outputDirectory , singleFileOutput , delimiter)
   }
 
   /**

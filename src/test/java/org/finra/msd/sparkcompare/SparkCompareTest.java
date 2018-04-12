@@ -74,7 +74,7 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
 
         String testLoc = "file_test";
         cleanOutputDirectory("/" + testLoc);
-        SparkCompare.compareFileSaveResults(file1Path,file2Path,outputDirectory + "/" + testLoc, true);
+        SparkCompare.compareFileSaveResults(file1Path,file2Path,outputDirectory + "/" + testLoc, true , ",");
 
         File outputFile = new File(outputDirectory + "/" + testLoc);
         if (!outputFile.exists())
@@ -175,7 +175,7 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
         AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file1Path,"table2");
         cleanOutputDirectory("/" + testLoc);
         SparkCompare.compareAppleTablesSaveResults(leftAppleTable, rightAppleTable
-                , outputDirectory + "/" + testLoc, true);
+                , outputDirectory + "/" + testLoc, true , ",");
 
         File outputFile = new File(outputDirectory + "/" + testLoc);
         if (!outputFile.exists())
