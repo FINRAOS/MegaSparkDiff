@@ -42,12 +42,13 @@ public class Launcher {
         AppleTable leftAppleTable = generateAppleTable(sv1, values.getData1(),"table1");
         AppleTable rightAppleTable = generateAppleTable(sv2, values.getData2(),"table2");
 
+
         /** Compare tables and save output to file **/
         SparkCompare.compareAppleTablesSaveResults(
                 leftAppleTable,
                 rightAppleTable,
                 values.getOutputDirectory(),
-                true);
+                true , values.getDelimiter());
         SparkFactory.stopSparkContext();
     }
 
