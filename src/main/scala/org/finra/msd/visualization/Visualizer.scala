@@ -90,19 +90,19 @@ object Visualizer {
           rows.map {
             row =>
               s"<tr>" +
-                s"${ row.map {c =>
-                  if(c.contains("<==>")) {
-                    val lr: Array[String] = c.split("<==>")
+                s"${ row.map (c =>
+                                if(c.contains("<==>")) {
+                                    val lr: Array[String] = c.split("<==>")
 
-                    s"<td>" +
-                      s"<span class='spanBlue'>${lr(0)}</span>" +
-                      s"</td>"
-                  } else {
-                    s"<td>" +
-                      s"<span class='spanBlue'>${c}</span>" +
-                      s"</td>"
-                  }
-                }}</tr>"
+                                    s"<td>" +
+                                    s"<span class='spanBlue'>${lr(0)}</span>" +
+                                    s"</td>"
+                                } else {
+                                    s"<td>" +
+                                    s"<span class='spanBlue'>${c}</span>" +
+                                          s"</td>"
+                                }
+                )}</tr>"
           }
         } else if(visualResultType == VisualResultType.RIGHT) {
           rows.map {
@@ -125,7 +125,7 @@ object Visualizer {
         } else{
           rows.map {
             row =>
-              s"<tr>${row.map {c => {
+              s"<tr>${row.map (c => {
                 if(c.contains("<==>")){
                   val lr: Array[String] = c.split("<==>")
                   s"<td>" +
@@ -135,7 +135,7 @@ object Visualizer {
                 } else {
                   s"<td>${c}</td>"
                 }
-              }}}</tr>"
+              })}</tr>"
           }
         }
       }
