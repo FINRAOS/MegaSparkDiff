@@ -48,6 +48,7 @@ public class MemoryDbHsql {
         hsqlDbServer.setDatabaseName(0, "testDb");
         hsqlDbServer.setDatabasePath(0, "mem:testDb");
         hsqlDbServer.setPort(9001); // this is the default port
+        hsqlDbServer.setSilent(true);
         hsqlDbServer.start();
     }
 

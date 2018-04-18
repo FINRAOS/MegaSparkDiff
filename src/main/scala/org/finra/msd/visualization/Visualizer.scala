@@ -16,7 +16,7 @@ object Visualizer {
     * @param composite_key_strs
     * @return a template string
     */
-  def generateVisualizerTemplate(left: DataFrame, right: DataFrame, composite_key_strs: Seq[String]): String = {
+  def generateVisualizerTemplate(left: DataFrame, right: DataFrame, composite_key_strs: Seq[String] , maxRecords: Integer = 1000): String = {
     var visualizerTemplate: String = "really?"
 
     try{
@@ -26,7 +26,7 @@ object Visualizer {
                     "Please specify primary/composite key"));
       require(isValidKey(composite_key_strs), throw new InValidKeyException("One or more keys is empty or null"))
 
-      val headerRows = generateHeadersRows(left, right, composite_key_strs);
+      val headerRows = generateHeadersRows(left, right, composite_key_strs , maxRecords);
 
       val header = headerRows._1;
       val rows = headerRows._2;
@@ -90,7 +90,7 @@ object Visualizer {
           rows.map {
             row =>
               s"<tr>" +
-                s"${row.map {c =>
+                s"${ row.map {c =>
                   if(c.contains("<==>")) {
                     val lr: Array[String] = c.split("<==>")
 
@@ -168,7 +168,7 @@ object Visualizer {
     * @param composite_key_strs: a sequence of columns to make up a composite key
     * @return a tuple containing header, rows and visualResultType
     */
-  def generateHeadersRows(left: DataFrame, right: DataFrame, composite_key_strs: Seq[String]) : (Seq[String], Seq[Seq[String]], VisualResultType) = {
+  def generateHeadersRows(left: DataFrame, right: DataFrame, composite_key_strs: Seq[String] , maxRecords: Integer ) = {
     var vrt: VisualResultType = null
     var tempDf: DataFrame = left
 
@@ -200,7 +200,7 @@ object Visualizer {
     }
 
     //get all rows from DataFrame
-    val data = joinedRdd.collect()
+    val data: Array[Row] = joinedRdd.take(maxRecords)
 
     val header = joinedRdd.schema.fieldNames.toSeq
     val rows: Seq[Seq[String]] = data.map {row =>
@@ -221,10 +221,6 @@ object Visualizer {
     * @return
     */
   def mapHelper(value: String): Column = {
-    if(SparkFactory.sparkSession == null) {
-      SparkFactory.initializeSparkContext()
-    }
-
     val x = SparkFactory.sparkSession
 
     require(x != null, throw new SparkSessionNullException("Spark Session is null"))
