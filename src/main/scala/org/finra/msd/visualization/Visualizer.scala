@@ -26,11 +26,11 @@ object Visualizer {
         "Please specify primary/composite key"));
       require(isValidKey(compositeKeyStrs), throw new InValidKeyException("One or more keys is empty or null"))
 
-      val headerRows = generateHeadersRows(left, right, compositeKeyStrs, maxRecords);
+      val headersRows = generateHeadersRows(left, right, compositeKeyStrs, maxRecords);
 
-      val header = headerRows._1;
-      val rows = headerRows._2;
-      val visualResultType = headerRows._3;
+      val headers = headersRows._1;
+      val rows = headersRows._2;
+      val visualResultType = headersRows._3;
 
       visualizerTemplate = s"""
       <!DOCTYPE html>
@@ -83,53 +83,53 @@ object Visualizer {
       <body>
         <table>
           <tr>
-            ${header.map(h => s"<th>${h}</th>").mkString}
+            ${headers.map(header => s"<th>${header}</th>").mkString}
           </tr>
           ${
           if(visualResultType == VisualResultType.LEFT) {
             rows.map(row =>
-              s"<tr>${row.map(c =>
-                if(c.contains("<==>")) {
-                  val lr: Array[String] = c.split("<==>")
+              s"<tr>${row.map(cell =>
+                if(cell.contains("<==>")) {
+                  val leftRightVals: Array[String] = cell.split("<==>")
 
                   "<td>" +
-                    s"<span class='spanBlue'>${lr(0)}</span>" +
+                    s"<span class='spanBlue'>${leftRightVals(0)}</span>" +
                     "</td>"
                 } else {
                   "<td>" +
-                    s"<span class='spanBlue'>${c}</span>" +
+                    s"<span class='spanBlue'>${cell}</span>" +
                     "</td>"
                 }
               ).mkString}</tr>"
             ).mkString
           } else if(visualResultType == VisualResultType.RIGHT) {
             rows.map(row =>
-              s"<tr>${row.map(c =>
-                if(c.contains("<==>")) {
-                  val lr: Array[String] = c.split("<==>")
+              s"<tr>${row.map(cell =>
+                if(cell.contains("<==>")) {
+                  val leftRightVals: Array[String] = cell.split("<==>")
 
                   "<td>" +
-                    s"<span class='spanRed'>${lr(1)}</span>" +
+                    s"<span class='spanRed'>${leftRightVals(1)}</span>" +
                     "</td>"
                 } else {
                   "<td>" +
-                    s"<span class='spanRed'>${c}</span>" +
+                    s"<span class='spanRed'>${cell}</span>" +
                     "</td>"
                 }
               ).mkString}</tr>"
             ).mkString
           } else{
             rows.map(row =>
-              s"<tr>${row.map (c => {
-                if(c.contains("<==>")){
-                  val lr: Array[String] = c.split("<==>")
+              s"<tr>${row.map (cell => {
+                if(cell.contains("<==>")){
+                  val leftRightVals: Array[String] = cell.split("<==>")
 
                   "<td>" +
-                    s"<span class='spanBlue'>${if(lr(0) == "") "(empty)" else lr(0)}</span></br>" +
-                    s"<span class='spanRed'>${if(lr(1) == "") "(empty)" else lr(1)}</span>" +
+                    s"<span class='spanBlue'>${if(leftRightVals(0) == "") "(empty)" else leftRightVals(0)}</span></br>" +
+                    s"<span class='spanRed'>${if(leftRightVals(1) == "") "(empty)" else leftRightVals(1)}</span>" +
                     "</td>"
                 } else {
-                  s"<td>${c}</td>"
+                  s"<td>${cell}</td>"
                 }
               }).mkString}</tr>"
             ).mkString
@@ -169,7 +169,7 @@ object Visualizer {
     val upperCaseLeft = left.toDF(left.columns.map(_.toUpperCase): _*)
     val upperCaseRight = right.toDF(right.columns.map(_.toUpperCase): _*)
 
-    var vrt: VisualResultType = null
+    var visualResultType: VisualResultType = null
     var tempDf: DataFrame = upperCaseLeft
 
     //if left is empty, visualResultType = VisualResultType.RIGHT
@@ -177,13 +177,13 @@ object Visualizer {
     //if neither is empty, visualResultType = VisualResultType.BOTH
     //if both are empty, no need to call visualize method???
     if(upperCaseLeft.count() == 0) {
-      vrt = VisualResultType.RIGHT;
+      visualResultType = VisualResultType.RIGHT;
       tempDf = upperCaseRight;
     } else if(upperCaseRight.count() == 0) {
-      vrt = VisualResultType.LEFT;
+      visualResultType = VisualResultType.LEFT;
       tempDf = upperCaseLeft;
     } else {
-      vrt = VisualResultType.BOTH;
+      visualResultType = VisualResultType.BOTH;
     }
 
     val caseTransformedKeys = compositeKeyStrs.map(k => k.toUpperCase)
@@ -203,7 +203,7 @@ object Visualizer {
     //get all rows from DataFrame
     val data: Array[Row] = joinedRdd.take(maxRecords)
 
-    val header: Seq[String] = joinedRdd.schema.fieldNames.toSeq.map(h => h.toUpperCase)
+    val headers: Seq[String] = joinedRdd.schema.fieldNames.toSeq.map(header => header.toUpperCase)
     val rows: Seq[Seq[String]] = data.map {row =>
       row.toSeq.map { cell =>
         val str = cell match {
@@ -213,7 +213,7 @@ object Visualizer {
       }: Seq[String]
     }
 
-    (header, rows, vrt)
+    (headers, rows, visualResultType)
   }
 
   /**
@@ -245,8 +245,8 @@ object Visualizer {
   def isValidKey(composite_key_strs: Seq[String]): Boolean = {
     var flag: Boolean = true;
 
-    composite_key_strs.foreach(k => {
-      if(k == null || k.isEmpty) {
+    composite_key_strs.foreach(key => {
+      if(key == null || key.isEmpty) {
         flag = false;
       }
     })
