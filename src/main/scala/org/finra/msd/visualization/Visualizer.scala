@@ -189,10 +189,10 @@ object Visualizer {
     val caseTransformedKeys = compositeKeyStrs.map(k => k.toUpperCase)
     val compositeKeysCol = caseTransformedKeys.map(c => col(c)).toList
     val nonKeyCols = tempDf.columns.filter(c => !caseTransformedKeys.contains(c)).toList
-    var joinedRdd:DataFrame = null
+    var joinedDf:DataFrame = null
 
     try{
-      joinedRdd = upperCaseLeft.as("l")
+      joinedDf = upperCaseLeft.as("l")
         .join(upperCaseRight.as("r"), caseTransformedKeys, "full_outer")
         .select(compositeKeysCol:::nonKeyCols.map(mapHelper):_*)
     } catch {
@@ -201,9 +201,9 @@ object Visualizer {
     }
 
     //get all rows from DataFrame
-    val data: Array[Row] = joinedRdd.take(maxRecords)
+    val data: Array[Row] = joinedDf.take(maxRecords)
 
-    val headers: Seq[String] = joinedRdd.schema.fieldNames.toSeq.map(header => header.toUpperCase)
+    val headers: Seq[String] = joinedDf.schema.fieldNames.toSeq.map(header => header.toUpperCase)
     val rows: Seq[Seq[String]] = data.map {row =>
       row.toSeq.map { cell =>
         val str = cell match {
