@@ -13,20 +13,20 @@ object Visualizer {
     *
     * @param left
     * @param right
-    * @param composite_key_strs
+    * @param compositeKeyStrs
     * @return a template string
     */
-  def generateVisualizerTemplate(left: DataFrame, right: DataFrame, composite_key_strs: Seq[String] , maxRecords: Integer = 1000): String = {
+  def generateVisualizerTemplate(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String] , maxRecords: Integer = 1000): String = {
     var visualizerTemplate: String = "really?"
 
     try{
       require(left != null, throw new DataFrameNullException("Left table is null"));
       require(right != null, throw new DataFrameNullException("Right table is null"));
-      require(composite_key_strs != null && !composite_key_strs.isEmpty, throw new JoinKeysNullException(
-                    "Please specify primary/composite key"));
-      require(isValidKey(composite_key_strs), throw new InValidKeyException("One or more keys is empty or null"))
+      require(compositeKeyStrs != null && !compositeKeyStrs.isEmpty, throw new JoinKeysNullException(
+        "Please specify primary/composite key"));
+      require(isValidKey(compositeKeyStrs), throw new InValidKeyException("One or more keys is empty or null"))
 
-      val headerRows = generateHeadersRows(left, right, composite_key_strs , maxRecords);
+      val headerRows = generateHeadersRows(left, right, compositeKeyStrs, maxRecords);
 
       val header = headerRows._1;
       val rows = headerRows._2;
@@ -47,7 +47,7 @@ object Visualizer {
             max-width: 1024px;
             border:1px solid black;
             padding: 5px;
-            text-align: center
+            text-align: center;
           }
 
           th, td {
@@ -76,73 +76,69 @@ object Visualizer {
           }
 
           .spanRed {
-            color: red
+            color: red;
           }
         </style>
       </head>
       <body>
-      <table>
-        <tr>
-          ${header.map(h => s"<th>${h}</th>").mkString}
-        </tr>
-        ${
-        if(visualResultType == VisualResultType.LEFT) {
-          rows.map {
-            row =>
-              s"<tr>" +
-                s"${ row.map (c =>
-                                if(c.contains("<==>")) {
-                                    val lr: Array[String] = c.split("<==>")
+        <table>
+          <tr>
+            ${header.map(h => s"<th>${h}</th>").mkString}
+          </tr>
+          ${
+          if(visualResultType == VisualResultType.LEFT) {
+            rows.map(row =>
+              s"<tr>${row.map(c =>
+                if(c.contains("<==>")) {
+                  val lr: Array[String] = c.split("<==>")
 
-                                    s"<td>" +
-                                    s"<span class='spanBlue'>${lr(0)}</span>" +
-                                    s"</td>"
-                                } else {
-                                    s"<td>" +
-                                    s"<span class='spanBlue'>${c}</span>" +
-                                          s"</td>"
-                                }
-                )}</tr>"
-          }
-        } else if(visualResultType == VisualResultType.RIGHT) {
-          rows.map {
-            row =>
-              s"<tr>" +
-                s"${row.map {c =>
-                  if(c.contains("<==>")) {
-                    val lr: Array[String] = c.split("<==>")
+                  "<td>" +
+                    s"<span class='spanBlue'>${lr(0)}</span>" +
+                    "</td>"
+                } else {
+                  "<td>" +
+                    s"<span class='spanBlue'>${c}</span>" +
+                    "</td>"
+                }
+              ).mkString}</tr>"
+            ).mkString
+          } else if(visualResultType == VisualResultType.RIGHT) {
+            rows.map(row =>
+              s"<tr>${row.map(c =>
+                if(c.contains("<==>")) {
+                  val lr: Array[String] = c.split("<==>")
 
-                    s"<td>" +
-                      s"<span class='spanRed'>${lr(1)}</span>" +
-                      s"</td>"
-                  } else {
-                    s"<td>" +
-                      s"<span class='spanRed'>${c}</span>" +
-                      s"</td>"
-                  }
-                }}</tr>"
-          }
-        } else{
-          rows.map {
-            row =>
+                  "<td>" +
+                    s"<span class='spanRed'>${lr(1)}</span>" +
+                    "</td>"
+                } else {
+                  "<td>" +
+                    s"<span class='spanRed'>${c}</span>" +
+                    "</td>"
+                }
+              ).mkString}</tr>"
+            ).mkString
+          } else{
+            rows.map(row =>
               s"<tr>${row.map (c => {
                 if(c.contains("<==>")){
                   val lr: Array[String] = c.split("<==>")
-                  s"<td>" +
+
+                  "<td>" +
                     s"<span class='spanBlue'>${if(lr(0) == "") "(empty)" else lr(0)}</span></br>" +
                     s"<span class='spanRed'>${if(lr(1) == "") "(empty)" else lr(1)}</span>" +
-                    s"</td>"
+                    "</td>"
                 } else {
                   s"<td>${c}</td>"
                 }
-              })}</tr>"
+              }).mkString}</tr>"
+            ).mkString
           }
         }
-      }
         </table>
-        </body>
-        </html>
-        """
+      </body>
+      </html>
+      """
     } catch {
       case ex: DataFrameNullException => visualizerTemplate = "Error message: " + ex.getMessage
       case ex: JoinKeysNullException => visualizerTemplate = "Error message: " + ex.getMessage
@@ -165,35 +161,40 @@ object Visualizer {
     *   3 - both are not empty
     * @param left
     * @param right
-    * @param composite_key_strs: a sequence of columns to make up a composite key
+    * @param compositeKeyStrs: a sequence of columns to make up a composite key
     * @return a tuple containing header, rows and visualResultType
     */
-  def generateHeadersRows(left: DataFrame, right: DataFrame, composite_key_strs: Seq[String] , maxRecords: Integer ) = {
+  def generateHeadersRows(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String] , maxRecords: Integer ) = {
+    //convert column names to uppercase
+    val upperCaseLeft = left.toDF(left.columns.map(_.toUpperCase): _*)
+    val upperCaseRight = right.toDF(right.columns.map(_.toUpperCase): _*)
+
     var vrt: VisualResultType = null
-    var tempDf: DataFrame = left
+    var tempDf: DataFrame = upperCaseLeft
 
     //if left is empty, visualResultType = VisualResultType.RIGHT
     //if right is empty, visualResultType = VisualResultType.LEFT
     //if neither is empty, visualResultType = VisualResultType.BOTH
     //if both are empty, no need to call visualize method???
-    if(left.count() == 0) {
+    if(upperCaseLeft.count() == 0) {
       vrt = VisualResultType.RIGHT;
-      tempDf = right;
-    } else if(right.count() == 0) {
+      tempDf = upperCaseRight;
+    } else if(upperCaseRight.count() == 0) {
       vrt = VisualResultType.LEFT;
-      tempDf = left;
+      tempDf = upperCaseLeft;
     } else {
       vrt = VisualResultType.BOTH;
     }
 
-    val composite_keys_col = composite_key_strs.map(c => col(c)).toList
-    val non_key_cols = tempDf.columns.filter(c => !composite_key_strs.contains(c)).toList
+    val caseTransformedKeys = compositeKeyStrs.map(k => k.toUpperCase)
+    val compositeKeysCol = caseTransformedKeys.map(c => col(c)).toList
+    val nonKeyCols = tempDf.columns.filter(c => !caseTransformedKeys.contains(c)).toList
     var joinedRdd:DataFrame = null
 
     try{
-      joinedRdd = left.as("l")
-        .join(right.as("r"), composite_key_strs, "full_outer")
-        .select(composite_keys_col:::non_key_cols.map(mapHelper):_*)
+      joinedRdd = upperCaseLeft.as("l")
+        .join(upperCaseRight.as("r"), caseTransformedKeys, "full_outer")
+        .select(compositeKeysCol:::nonKeyCols.map(mapHelper):_*)
     } catch {
       case ex: SparkSessionNullException => throw new SparkSessionNullException(ex.getMessage);
       case ex: Exception => throw new ColumnNullException(ex.getMessage)
@@ -202,7 +203,7 @@ object Visualizer {
     //get all rows from DataFrame
     val data: Array[Row] = joinedRdd.take(maxRecords)
 
-    val header = joinedRdd.schema.fieldNames.toSeq
+    val header: Seq[String] = joinedRdd.schema.fieldNames.toSeq.map(h => h.toUpperCase)
     val rows: Seq[Seq[String]] = data.map {row =>
       row.toSeq.map { cell =>
         val str = cell match {
