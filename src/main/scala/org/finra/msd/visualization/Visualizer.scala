@@ -40,11 +40,12 @@ object Visualizer {
           body {
             font: 15px Lato, sans-serif;
             font-weight: lighter;
+            transform: scale(1) !important;
           }
 
           table, tr, th, td {
             margin: 0 auto;
-            max-width: 1024px;
+            max-width: 95%;
             border:1px solid black;
             padding: 5px;
             text-align: center;
