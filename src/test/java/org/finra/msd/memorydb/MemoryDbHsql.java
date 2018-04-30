@@ -88,6 +88,20 @@ public class MemoryDbHsql {
                         "           Ripeness INT,\n" +
                         "           Color VARCHAR(255));");
 
+            String[] fruitEnhancedTables = {"Test6","Test7"};
+            for(String table : fruitEnhancedTables) {
+                stmt.execute("CREATE TABLE " + table +  "(\n" +
+                        "           Fruit VARCHAR(255),\n" +
+                        "           Price DOUBLE,\n" +
+                        "           Ripeness INT,\n" +
+                        "           Color VARCHAR(255),\n" +
+                        "           Date DATE, \n" +
+                        "           TimeStamp TIMESTAMP, \n" +
+                        "           Status BOOLEAN, \n" +
+                        "           BValues BLOB, \n" +
+                        "           CValues CLOB);");
+            }
+
             String[] personRecords = {
                     "insert into Persons1 values(1,'Garcia', 'Carlos', 'lives somewhere', 'Rockville') ",
                     "insert into Persons1 values(2,'Patel', 'Shraddha', 'lives somewhere', 'Maryland') ",
@@ -135,8 +149,21 @@ public class MemoryDbHsql {
                     "insert into Test5 values('Papaya', 190534, 4, 'I forget') ",
                     "insert into Test5 values('Strawberry', 5, 10, 'Acne') ",
                     "insert into Test5 values('Plum', 8261, 6, 'Purple') ",
-                    "insert into Test5 values('Tomato', 0, 0, 'Red') "
+                    "insert into Test5 values('Tomato', 0, 0, 'Red') ",
+
+                    "insert into Test6 values('Mango', 6.45, 12, 'Yellow', '2017-05-20', '2017-05-20 10:22:10', FALSE, X'01FF', 'clob')",
+                    "insert into Test6 values('Papaya', 190534.12, 4, 'I forget', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
+                    "insert into Test6 values('Kiwi', 8.83, 7, 'Fuzzy-Green', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
+                    "insert into Test6 values('Watermelon', null, 11, null, '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
+
+                    "insert into Test7 values('Mango', 6.11, 12, '', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
+                    "insert into Test7 values('Papaya', 190534.12, 4, 'I forget', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
+                    "insert into Test7 values('Strawberry', 5.89, 10, 'Acne', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
+                    "insert into Test7 values('Plum', 8261.05, 6, 'Purple', '2017-05-20', '2017-05-20 10:22:10', FALSE, X'01FF', 'clob')",
+                    "insert into Test7 values('Tomato', 0.9, 0, 'Red', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
+                    "insert into Test7 values('Watermelon', null, 11, null, '2017-05-21', '2017-05-21 8:10:18', FALSE, X'01FF', 'clob')",
             };
+
             for (String record : personRecords)
                 stmt.executeUpdate(record);
 
