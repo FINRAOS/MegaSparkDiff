@@ -95,8 +95,8 @@ public class MemoryDbHsql {
                         "           Price DOUBLE,\n" +
                         "           Ripeness INT,\n" +
                         "           Color VARCHAR(255),\n" +
-                        "           Date DATE, \n" +
-                        "           TimeStamp TIMESTAMP, \n" +
+                        "           ImportDate DATE, \n" +
+                        "           ImportTimeStamp TIMESTAMP, \n" +
                         "           Status BOOLEAN, \n" +
                         "           BValues BLOB, \n" +
                         "           CValues CLOB);");

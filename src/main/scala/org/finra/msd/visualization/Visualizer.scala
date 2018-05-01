@@ -13,12 +13,15 @@ object Visualizer {
     *
     * @param left
     * @param right
-    * @param compositeKeyStrs
+    * @param compositeKeyStrs: a sequence of strings used as keys to do full outer join. Case does not matter.
+    * @param maxRecords
     * @return a template string
     */
-  def generateVisualizerTemplate(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String] , maxRecords: Integer = 1000): String = {
+  def generateVisualizerTemplate(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String],
+                                 maxRecords: Integer = 1000): String = {
+
     var visualizerTemplate: String = "really?"
-    var maxRecordsCopy = 1000;
+    var maxRecordsCopy: Integer = 1000;
 
     try{
       require(left != null, throw new DataFrameNullException("Left dataframe is null"));
@@ -28,19 +31,20 @@ object Visualizer {
       require(isValidKey(compositeKeyStrs), throw new InValidKeyException("One or more keys is empty or null"))
 
       //handler invalid maxRecords
-      if(maxRecords <= 0) {
-        maxRecordsCopy = 1000;
+      if(maxRecords > 0) {
+        maxRecordsCopy = maxRecords;
       }
 
       //if both dataframes are empty, then no need to do full outer join
       if(left.count() == 0 && right.count() == 0) {
         visualizerTemplate = "No mismatches are found";
       } else {
-        val headersRows = generateHeadersRows(left, right, compositeKeyStrs, maxRecordsCopy);
+        val headersRows: (Seq[String], Seq[Seq[String]], VisualResultType) =
+                generateHeadersRows(left, right, compositeKeyStrs, maxRecordsCopy);
 
-        val headers = headersRows._1;
-        val rows = headersRows._2;
-        val visualResultType = headersRows._3;
+        val headers: Seq[String] = headersRows._1;
+        val rows: Seq[Seq[String]] = headersRows._2;
+        val visualResultType: VisualResultType = headersRows._3;
 
         visualizerTemplate = s"""
           <!DOCTYPE html>
@@ -157,13 +161,16 @@ object Visualizer {
     *   3 - both are not empty
     * @param left
     * @param right
-    * @param compositeKeyStrs: a sequence of columns to make up a composite key
+    * @param compositeKeyStrs
+    * @param maxRecords
     * @return a tuple containing header, rows and visualResultType
     */
-  def generateHeadersRows(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String] , maxRecords: Integer ) = {
+  def generateHeadersRows(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String] , maxRecords: Integer )
+                            : (Seq[String], Seq[Seq[String]], VisualResultType)= {
+
     //convert column names to uppercase
-    val upperCaseLeft = left.toDF(left.columns.map(_.toUpperCase): _*)
-    val upperCaseRight = right.toDF(right.columns.map(_.toUpperCase): _*)
+    val upperCaseLeft: DataFrame = left.toDF(left.columns.map(_.toUpperCase): _*)
+    val upperCaseRight: DataFrame = right.toDF(right.columns.map(_.toUpperCase): _*)
 
     var visualResultType: VisualResultType = null
     var tempDf: DataFrame = upperCaseLeft
@@ -182,9 +189,9 @@ object Visualizer {
       visualResultType = VisualResultType.BOTH;
     }
 
-    val caseTransformedKeys = compositeKeyStrs.map(k => k.toUpperCase)
-    val compositeKeysCol = caseTransformedKeys.map(c => col(c)).toList
-    val nonKeyCols = tempDf.columns.filter(c => !caseTransformedKeys.contains(c)).toList
+    val caseTransformedKeys: Seq[String] = compositeKeyStrs.map(k => k.toUpperCase)
+    val compositeKeysCol: List[Column] = caseTransformedKeys.map(c => col(c)).toList
+    val nonKeyCols: List[String] = tempDf.columns.filter(c => !caseTransformedKeys.contains(c)).toList
 
     var joinedDf:DataFrame = null
     var data: Array[Row] = null;
@@ -226,7 +233,8 @@ object Visualizer {
     * @return
     */
   def mapHelper(value: String): Column = {
-    val x = SparkFactory.sparkSession
+
+    val x: SparkSession = SparkFactory.sparkSession
 
     require(x != null, throw new SparkSessionNullException("Spark Session is null"))
 
@@ -247,6 +255,7 @@ object Visualizer {
     * @return
     */
   def isValidKey(composite_key_strs: Seq[String]): Boolean = {
+
     var flag: Boolean = true;
 
     composite_key_strs.foreach(key => {
