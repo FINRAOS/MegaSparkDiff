@@ -22,7 +22,11 @@ public class VisualizerTest extends BaseJunitForSparkCompare {
     public void basicVisualizerTest()
     {
         Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test6", "Test7");
-        System.out.println(generateString(pair.getLeft(), pair.getRight(), "FRUIT", 100));
+        String html = generateString(pair.getLeft(), pair.getRight(), "FRUIT", 100);
+        if (html.isEmpty())
+        {
+            Assert.fail("html was empty");
+        }
     }
 
     @Test
@@ -30,7 +34,10 @@ public class VisualizerTest extends BaseJunitForSparkCompare {
     {
         Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test4", "Test1");
         String html = generateString(pair.getLeft(), pair.getRight(), "FRUIT", 100);
-        System.out.println(html);
+        if (html.isEmpty())
+        {
+            Assert.fail("html was empty");
+        }
     }
 
     @Test
@@ -38,7 +45,10 @@ public class VisualizerTest extends BaseJunitForSparkCompare {
     {
         Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test1", "Test4");
         String html = generateString(pair.getLeft(), pair.getRight(), "FRUIT", 100);
-        System.out.println(html);
+        if (html.isEmpty())
+        {
+            Assert.fail("html was empty");
+        }
     }
 
     @Test

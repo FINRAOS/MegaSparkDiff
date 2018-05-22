@@ -70,7 +70,7 @@ public class FileToFileTest extends BaseJunitForSparkCompare
             Assert.fail("Expected 5 differences coming from left table." +
                     "  Instead, found " + pair.getLeft().count() + ".");
 
-        pair.getLeft().show();
+
         if (pair.getRight().count() != 4)
             Assert.fail("Expected 4 differences coming from right table." +
                     "  Instead, found " + pair.getRight().count() + ".");
