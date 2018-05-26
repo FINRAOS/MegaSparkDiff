@@ -55,12 +55,11 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
 
         Pair<Dataset<Row>, Dataset<Row>> comparisonResult = SparkCompare.compareFiles(file1Path, file2Path);
 
-        try {
-            comparisonResult.getLeft().show();
-            comparisonResult.getRight().show();
-        } catch (Exception e) {
+        if (comparisonResult.getLeft().count() == 0 || comparisonResult.getRight().count() == 0)
+        {
             Assert.fail("Straightforward output of test results somehow failed");
         }
+
     }
 
     @Test
