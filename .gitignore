@@ -40,3 +40,4 @@ sparkOutputDirectory/
 /.project
 /.cache-main
 /.cache-tests
+/.settings/
