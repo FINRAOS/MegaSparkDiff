@@ -34,3 +34,7 @@ target/
 sparkOutputDirectory
 sparkOutputDirectory/
 /mega-spark-diff.iml
+/.classpath
+/.project
+/.cache-main
+/.cache-tests
