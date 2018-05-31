@@ -69,6 +69,6 @@ How to use via shell script in EMR
     
 Run tests on Windows
 ------------
-1. Download [Haddop winutils](https://github.com/steveloughran/winutils)
+1. Download [Hadoop winutils](https://github.com/steveloughran/winutils)
 1. Extract to some path, e.g. C:\Users\MegaSparkDiffFan\bin
 1. Run tests while defining `hadoop.home.dir`, e.g. `mvn test -Dhadoop.home.dir=C:\Users\MegaSparkDiffFan`
