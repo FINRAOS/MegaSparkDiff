@@ -45,6 +45,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.dependency.plugin.version>3.1.1</maven.dependency.plugin.version>
+        <maven.jar.plugin.version>3.1.0</maven.jar.plugin.version>
+        <scala.maven.plugin.version>3.3.2</scala.maven.plugin.version>
+        <spark.version>2.3.0</spark.version>
     </properties>
 
 
@@ -54,7 +58,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.5</version>
+            <version>3.7</version>
             <scope>compile</scope>
         </dependency>
 
@@ -62,7 +66,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.10</version>
+            <version>1.11</version>
             <scope>compile</scope>
         </dependency>
 
@@ -70,7 +74,7 @@
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>2.11.8</version>
+            <version>2.11.12</version>
             <scope>compile</scope>
         </dependency>
 
@@ -78,7 +82,7 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>
-            <version>2.2.1</version>
+            <version>${spark.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -86,14 +90,14 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.11</artifactId>
-            <version>2.2.1</version>
+            <version>${spark.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_2.11</artifactId>
-            <version>2.2.1</version>
+            <version>${spark.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -104,7 +108,7 @@
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.4.0</version>
+            <version>2.4.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -112,7 +116,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
 
@@ -122,17 +126,8 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>${maven.dependency.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -152,7 +147,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>${scala.maven.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>compile</id>
@@ -180,7 +175,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>${maven.jar.plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -221,17 +216,8 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.7.0</version>
-                        <configuration>
-                            <source>1.8</source>
-                            <target>1.8</target>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.0.2</version>
+                        <version>${maven.dependency.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>copy-dependencies</id>
@@ -250,12 +236,12 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>2.5.1</version>
+                        <version>2.5.3</version>
                         <dependencies>
                             <dependency>
                                 <groupId>org.apache.maven.scm</groupId>
                                 <artifactId>maven-scm-provider-gitexe</artifactId>
-                                <version>1.9.2</version>
+                                <version>1.10.0</version>
                             </dependency>
                         </dependencies>
                     </plugin>
@@ -263,7 +249,7 @@
                     <plugin>
                         <groupId>net.alchim31.maven</groupId>
                         <artifactId>scala-maven-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>${scala.maven.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>compile</id>
@@ -291,7 +277,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.0.2</version>
+                        <version>${maven.jar.plugin.version}</version>
                         <configuration>
                             <archive>
                                 <manifest>
@@ -395,7 +381,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>${scala.maven.plugin.version}</version>
                 <configuration>
                     <jvmArgs>
                         <jvmArg>-Xms64m</jvmArg>
