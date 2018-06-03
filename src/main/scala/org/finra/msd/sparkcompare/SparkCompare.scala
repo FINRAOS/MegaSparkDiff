@@ -89,7 +89,7 @@ object SparkCompare {
         if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC)
           {
             //DO A SCHEMA COMPARE even if one is HIVE and the other is JDBC
-            return compareSchemaDataFrames(left.dataFrame , left.tempViewName,right.dataFrame , right.tempViewName)
+            return compareSchemaDataFrames(left.dataFrame ,right.dataFrame )
           }
       }
 
@@ -136,8 +136,7 @@ object SparkCompare {
     * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
     *         the right parameter has values in RDD2 but not in RDD1
     */
-   def compareSchemaDataFrames(left: DataFrame , leftViewName: String
-                              , right: DataFrame , rightViewName: String) :Pair[DataFrame, DataFrame] = {
+   def compareSchemaDataFrames(left: DataFrame , right: DataFrame) :Pair[DataFrame, DataFrame] = {
     //make sure that column names match in both dataFrames
     if (!left.columns.sameElements(right.columns))
       {
