@@ -24,7 +24,7 @@ import org.finra.msd.containers.AppleTable
 import org.finra.msd.enums.SourceType
 import org.finra.msd.sparkfactory.SparkFactory
 import org.finra.msd.outputwriters.OutputWriter
-
+import org.finra.msd.implicits.DataFrameImplicits._
 
 /**
   * Contains comparison related operations
@@ -141,16 +141,16 @@ object SparkCompare {
     //make sure that column names match in both dataFrames
     if (!left.columns.sameElements(right.columns))
       {
-        println("column names were different")
         throw new Exception("Column Names Did Not Match")
       }
 
-    val leftCols = left.columns.mkString(",")
-    val rightCols = right.columns.mkString(",")
+     val groupedLeft = left.groupBy(left.getColumnsSeq() : _*)
+       .count()
+       .withColumnRenamed("count" , "recordRepeatCount")
 
-    //group by all columns in both data frames
-    val groupedLeft = left.sqlContext.sql("select " + leftCols + " , count(*) as recordRepeatCount from " +  leftViewName + " group by " + leftCols )
-    val groupedRight = left.sqlContext.sql("select " + rightCols + " , count(*) as recordRepeatCount from " +  rightViewName + " group by " + rightCols )
+     val groupedRight = right.groupBy(right.getColumnsSeq():_*)
+       .count()
+       .withColumnRenamed("count","recordRepeatCount")
 
     //do the except/subtract command
     val inLnotinR = groupedLeft.except(groupedRight).toDF()
