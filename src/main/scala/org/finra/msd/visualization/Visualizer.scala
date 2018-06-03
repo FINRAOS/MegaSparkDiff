@@ -229,10 +229,10 @@ object Visualizer {
 
   /**
     * Helper method to map non-composite key cell value to desired value
-    * @param value: column name
+    * @param columnName: column name
     * @return
     */
-  def mapHelper(value: String): Column = {
+  def mapHelper(columnName: String): Column = {
 
     val x: SparkSession = SparkFactory.sparkSession
 
@@ -241,12 +241,12 @@ object Visualizer {
     import x.implicits._
 
     //"<==>" is used as delimiter for mismatched left value and right value
-    when($"l.$value".isNull && $"r.$value".isNull, lit("[null]"))
-      .when($"l.$value".isNull, concat(lit("[null]<==>"), $"r.$value"))
-      .when($"r.$value".isNull, concat($"l.$value", lit("<==>[null]")))
-      .when($"l.$value" === $"r.$value", concat(lit(""), $"l.$value"))
-      .otherwise(concat($"l.$value",lit("<==>"),$"r.$value"))
-      .as(value)
+    when($"l.$columnName".isNull && $"r.$columnName".isNull, lit("[null]"))
+      .when($"l.$columnName".isNull, concat(lit("[null]<==>"), $"r.$columnName"))
+      .when($"r.$columnName".isNull, concat($"l.$columnName", lit("<==>[null]")))
+      .when($"l.$columnName" === $"r.$columnName", concat(lit(""), $"l.$columnName"))
+      .otherwise(concat($"l.$columnName",lit("<==>"),$"r.$columnName"))
+      .as(columnName)
   }
 
   /**
