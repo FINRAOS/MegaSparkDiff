@@ -1,7 +1,6 @@
 package org.finra.msd.sparkcompare;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.finra.msd.containers.AppleTable;
