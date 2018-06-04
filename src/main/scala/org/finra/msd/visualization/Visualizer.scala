@@ -1,19 +1,22 @@
 package org.finra.msd.visualization
 
-import org.apache.spark.sql.functions.{col, concat, lit, when}
 import org.apache.spark.sql._
-import org.finra.msd.sparkfactory.SparkFactory
-import org.finra.msd.enums.VisualResultType
+import org.apache.spark.sql.functions._
 import org.finra.msd.customExceptions._
+import org.finra.msd.enums.VisualResultType
+import org.finra.msd.sparkfactory.SparkFactory
 
 object Visualizer {
+
+
+  val ss = SparkFactory.sparkSession
 
   /**
     * Generate template string which can be used by displayHTML() in databricks
     *
     * @param left
     * @param right
-    * @param compositeKeyStrs: a sequence of strings used as keys to do full outer join. Case does not matter.
+    * @param compositeKeyStrs : a sequence of strings used as keys to do full outer join. Case does not matter.
     * @param maxRecords
     * @return a template string
     */
@@ -23,7 +26,7 @@ object Visualizer {
     var visualizerTemplate: String = "really?"
     var maxRecordsCopy: Integer = 1000;
 
-    try{
+    try {
       require(left != null, throw new DataFrameNullException("Left dataframe is null"));
       require(right != null, throw new DataFrameNullException("Right dataframe is null"));
       require(compositeKeyStrs != null && !compositeKeyStrs.isEmpty, throw new JoinKeysNullException(
@@ -31,22 +34,23 @@ object Visualizer {
       require(isValidKey(compositeKeyStrs), throw new InValidKeyException("One or more keys is empty or null"))
 
       //handler invalid maxRecords
-      if(maxRecords > 0) {
+      if (maxRecords > 0) {
         maxRecordsCopy = maxRecords;
       }
 
       //if both dataframes are empty, then no need to do full outer join
-      if(left.count() == 0 && right.count() == 0) {
+      if (left.count() == 0 && right.count() == 0) {
         visualizerTemplate = "No mismatches are found";
       } else {
         val headersRows: (Seq[String], Seq[Seq[String]], VisualResultType) =
-                generateHeadersRows(left, right, compositeKeyStrs, maxRecordsCopy);
+          generateHeadersRows(left, right, compositeKeyStrs, maxRecordsCopy);
 
         val headers: Seq[String] = headersRows._1;
         val rows: Seq[Seq[String]] = headersRows._2;
         val visualResultType: VisualResultType = headersRows._3;
 
-        visualizerTemplate = s"""
+        visualizerTemplate =
+          s"""
           <!DOCTYPE html>
             <head>
               <meta charset="utf-8">
@@ -101,39 +105,45 @@ object Visualizer {
                   ${headers.map(header => s"<th>${header}</th>").mkString}
                 </tr>
                 ${
-                if(visualResultType == VisualResultType.LEFT) {
-                  rows.map(row =>
-                    s"<tr>${row.map(cell =>
-                      "<td>" +
-                        s"<span class='spanBlue'>${cell}</span>" +
-                        "</td>"
-                    ).mkString}</tr>"
-                  ).mkString
-                } else if(visualResultType == VisualResultType.RIGHT) {
-                  rows.map(row =>
-                    s"<tr>${row.map(cell =>
-                      "<td>" +
-                        s"<span class='spanRed'>${cell}</span>" +
-                        "</td>"
-                    ).mkString}</tr>"
-                  ).mkString
-                } else{
-                  rows.map(row =>
-                    s"<tr>${row.map (cell => {
-                      if(cell.contains("<==>")){
-                        val leftRightVals: Array[String] = cell.split("<==>")
+          if (visualResultType == VisualResultType.LEFT) {
+            rows.map(row =>
+              s"<tr>${
+                row.map(cell =>
+                  "<td>" +
+                    s"<span class='spanBlue'>${cell}</span>" +
+                    "</td>"
+                ).mkString
+              }</tr>"
+            ).mkString
+          } else if (visualResultType == VisualResultType.RIGHT) {
+            rows.map(row =>
+              s"<tr>${
+                row.map(cell =>
+                  "<td>" +
+                    s"<span class='spanRed'>${cell}</span>" +
+                    "</td>"
+                ).mkString
+              }</tr>"
+            ).mkString
+          } else {
+            rows.map(row =>
+              s"<tr>${
+                row.map(cell => {
+                  if (cell.contains("<==>")) {
+                    val leftRightVals: Array[String] = cell.split("<==>")
 
-                        "<td>" +
-                          s"<span class='spanBlue'>${if(cell.startsWith("<==>")) "(empty)" else leftRightVals(0)}</span></br>" +
-                          s"<span class='spanRed'>${if(cell.endsWith("<==>")) "(empty)" else leftRightVals(1)}</span>" +
-                          "</td>"
-                      } else {
-                        s"<td>${cell}</td>"
-                      }
-                    }).mkString}</tr>"
-                  ).mkString
-                }
-              }
+                    "<td>" +
+                      s"<span class='spanBlue'>${if (cell.startsWith("<==>")) "(empty)" else leftRightVals(0)}</span></br>" +
+                      s"<span class='spanRed'>${if (cell.endsWith("<==>")) "(empty)" else leftRightVals(1)}</span>" +
+                      "</td>"
+                  } else {
+                    s"<td>${cell}</td>"
+                  }
+                }).mkString
+              }</tr>"
+            ).mkString
+          }
+        }
               </table>
             </body>
           </html>
@@ -147,7 +157,7 @@ object Visualizer {
       case ex: InValidKeyException => visualizerTemplate = "Error message: " + ex.getMessage
     }
 
-    if(visualizerTemplate.startsWith("Error message") || visualizerTemplate.startsWith("No mismatches")){
+    if (visualizerTemplate.startsWith("Error message") || visualizerTemplate.startsWith("No mismatches")) {
       "<h3>" + visualizerTemplate + "</h3>"
     } else {
       visualizerTemplate
@@ -156,17 +166,18 @@ object Visualizer {
 
   /**
     * Generate header, rows and a flag indicating the following scenarios:
-    *   1 - right is empty
-    *   2 - left is empty
-    *   3 - both are not empty
+    * 1 - right is empty
+    * 2 - left is empty
+    * 3 - both are not empty
+    *
     * @param left
     * @param right
     * @param compositeKeyStrs
     * @param maxRecords
     * @return a tuple containing header, rows and visualResultType
     */
-  def generateHeadersRows(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String] , maxRecords: Integer )
-                            : (Seq[String], Seq[Seq[String]], VisualResultType)= {
+  def generateHeadersRows(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String], maxRecords: Integer)
+  : (Seq[String], Seq[Seq[String]], VisualResultType) = {
 
     //convert column names to uppercase
     val upperCaseLeft: DataFrame = left.toDF(left.columns.map(_.toUpperCase): _*)
@@ -179,10 +190,10 @@ object Visualizer {
     //if right is empty, visualResultType = VisualResultType.LEFT
     //if neither is empty, visualResultType = VisualResultType.BOTH
     //if both are empty, no need to call visualize method???
-    if(upperCaseLeft.count() == 0) {
+    if (upperCaseLeft.count() == 0) {
       visualResultType = VisualResultType.RIGHT;
       tempDf = upperCaseRight;
-    } else if(upperCaseRight.count() == 0) {
+    } else if (upperCaseRight.count() == 0) {
       visualResultType = VisualResultType.LEFT;
       tempDf = upperCaseLeft;
     } else {
@@ -193,21 +204,21 @@ object Visualizer {
     val compositeKeysCol: List[Column] = caseTransformedKeys.map(c => col(c)).toList
     val nonKeyCols: List[String] = tempDf.columns.filter(c => !caseTransformedKeys.contains(c)).toList
 
-    var joinedDf:DataFrame = null
+    var joinedDf: DataFrame = null
     var data: Array[Row] = null;
 
-    if(visualResultType == VisualResultType.BOTH) {
-      try{
+    if (visualResultType == VisualResultType.BOTH) {
+      try {
         joinedDf = upperCaseLeft.as("l")
           .join(upperCaseRight.as("r"), caseTransformedKeys, "full_outer")
-          .select(compositeKeysCol:::nonKeyCols.map(mapHelper):_*)
+          .select(compositeKeysCol ::: nonKeyCols.map(mapHelper): _*)
       } catch {
         case ex: SparkSessionNullException => throw new SparkSessionNullException(ex.getMessage);
         case ex: Exception => throw new ColumnNullException(ex.getMessage)
       }
     }
 
-    if(joinedDf == null) {
+    if (joinedDf == null) {
       joinedDf = tempDf;
     }
 
@@ -215,7 +226,7 @@ object Visualizer {
     data = joinedDf.take(maxRecords)
 
     val headers: Seq[String] = joinedDf.schema.fieldNames.toSeq.map(header => header.toUpperCase)
-    val rows: Seq[Seq[String]] = data.map {row =>
+    val rows: Seq[Seq[String]] = data.map { row =>
       row.toSeq.map { cell =>
         cell match {
           case null => "[null]"
@@ -229,7 +240,8 @@ object Visualizer {
 
   /**
     * Helper method to map non-composite key cell value to desired value
-    * @param columnName: column name
+    *
+    * @param columnName : column name
     * @return
     */
   def mapHelper(columnName: String): Column = {
@@ -245,12 +257,13 @@ object Visualizer {
       .when($"l.$columnName".isNull, concat(lit("[null]<==>"), $"r.$columnName"))
       .when($"r.$columnName".isNull, concat($"l.$columnName", lit("<==>[null]")))
       .when($"l.$columnName" === $"r.$columnName", concat(lit(""), $"l.$columnName"))
-      .otherwise(concat($"l.$columnName",lit("<==>"),$"r.$columnName"))
+      .otherwise(concat($"l.$columnName", lit("<==>"), $"r.$columnName"))
       .as(columnName)
   }
 
   /**
     * Check whether passed sequence of keys are valid
+    *
     * @param composite_key_strs
     * @return
     */
@@ -259,7 +272,7 @@ object Visualizer {
     var flag: Boolean = true;
 
     composite_key_strs.foreach(key => {
-      if(key == null || key.isEmpty) {
+      if (key == null || key.isEmpty) {
         flag = false;
       }
     })

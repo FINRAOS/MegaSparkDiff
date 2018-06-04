@@ -39,10 +39,10 @@ class SparkCompareTests extends FeatureSpec  with SparkSessionTrait with Matcher
 
       val expectedSchema = new StructType()
         .add("KEY",StringType , true)
-        .add("l.VALUE" , StringType,true)
-        .add("l.RECORDREPEATCOUNT" , LongType , true)
-        .add("r.VALUE" , StringType , true)
-        .add("r.RECORDREPEATCOUNT" , LongType , true)
+        .add("l_VALUE" , StringType,true)
+        .add("l_RECORDREPEATCOUNT" , LongType , true)
+        .add("r_VALUE" , StringType , true)
+        .add("r_RECORDREPEATCOUNT" , LongType , true)
 
       val expected = Seq(
         Row(null,null,null,"zz",1L),

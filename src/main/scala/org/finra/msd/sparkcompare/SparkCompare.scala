@@ -20,7 +20,6 @@ import java.lang
 
 import org.apache.commons.lang3.tuple.{ImmutablePair, Pair}
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions.col
 import org.finra.msd.containers.AppleTable
 import org.finra.msd.enums.SourceType
 import org.finra.msd.implicits.DataFrameImplicits._
@@ -184,8 +183,8 @@ object SparkCompare {
     val nonKeyCols: List[String] = upperCaseLeft.columns.filter(c => !compositeKeysUpperCase.contains(c)).toList
 
     //prepend l and r to nonkey columns
-    val prependedColumnsLeft = compositeKeysUpperCase ++ nonKeyCols.map(c => "l." + c).toSeq
-    val prependedColumnsRight = compositeKeysUpperCase ++ nonKeyCols.map(c => "r." + c).toSeq
+    val prependedColumnsLeft = compositeKeysUpperCase ++ nonKeyCols.map(c => "l_" + c).toSeq
+    val prependedColumnsRight = compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c).toSeq
 
     //reselect the dataframes with prepended l. & r. to the columnss
     val prependedLeftDf: DataFrame = upperCaseLeft.toDF(prependedColumnsLeft : _*)
