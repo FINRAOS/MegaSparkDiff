@@ -1,17 +1,16 @@
 package org.finra.msd.sparkcompare
 
 import org.apache.commons.lang3.tuple
-import org.apache.spark.sql.types.{DataTypes, LongType, StringType, StructType}
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.types.{LongType, StringType, StructType}
+import org.apache.spark.sql.{DataFrame, Row}
 import org.finra.msd.basetestclasses.SparkSessionTrait
-import org.scalatest.{BeforeAndAfterAll, FeatureSpec, Matchers}
 import org.finra.msd.implicits.DataFrameImplicits._
+import org.scalatest.{FeatureSpec, Matchers}
 
 class SparkCompareTests extends FeatureSpec  with SparkSessionTrait with Matchers
 {
 
   import sparkSession.implicits._
-  import org.apache.spark.sql.functions._
 
   feature("FullOuterJoin") {
     scenario("positive scenario for full outer join") {
@@ -52,7 +51,6 @@ class SparkCompareTests extends FeatureSpec  with SparkSessionTrait with Matcher
         Row("4","C",1L,null,null),
         Row("5","D",2L,"D",1L)
       ).toDf(sparkSession = sparkSession , expectedSchema)
-
 
       joinedDf.collect() should contain allElementsOf expected.collect()
     }
