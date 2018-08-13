@@ -47,7 +47,7 @@ public class SparkFactoryTest extends BaseJunitForSparkCompare {
                 "SA",
                 "",
                 "(select * from Test1 )", "my_partition_test" , scala.Option.empty() , "Price"
-        ,"0" , "200000" ,"2");
+        ,"0" , "200000" ,"2", "10");
 
 
         if (rightAppleTable.getDataFrame().rdd().getNumPartitions() != 2)
