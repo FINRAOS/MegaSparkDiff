@@ -145,11 +145,16 @@ object SparkFactory {
     * @param sqlQuery Query to retrieve the desired data from database
     * @param tempViewName temporary table name for source data
     * @param delimiter source data separation character
+    * @param partitionColumn numeric column on which the table should be partitioned on
+    * @param lowerBound typically the minimum of the partition column
+    * @param upperBound typically the maximum of the partition column
+    * @param numPartitions number of partitions to break the table into, typically number of worker cores on cluster
+    * @param fetchSize number of rows to fetch per network request, default is at a low 10
     * @return custom table containing the data to be compared
     */
   def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
                             tempViewName: String , delimiter: Option[String] , partitionColumn: String
-                           , lowerBound :String , upperBound :String, numPartitions :String) : AppleTable =
+                           , lowerBound :String , upperBound :String, numPartitions :String, fetchSize: String = "10") : AppleTable =
   {
     val jdbcDF: DataFrame = sparkSession.sqlContext.read
       .format("jdbc")
@@ -162,6 +167,7 @@ object SparkFactory {
       .option("lowerBound", lowerBound)
       .option("upperBound", upperBound)
       .option("numPartitions", numPartitions)
+      .option("fetchsize", fetchSize)
       .load()
     jdbcDF.createOrReplaceTempView(tempViewName)
 

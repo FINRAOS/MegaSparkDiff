@@ -11,13 +11,13 @@
     Amazon EC2 instances and cloud environments
     with compatible Spark distributions.
 
-How to Use form Within a Java or SCALA Project
+How to Use from Within a Java or SCALA Project
 ----------------------------------------------
 ```sh
 <dependency>
     <groupId>org.finra.megasparkdiff</groupId>
     <artifactId>mega-spark-diff</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.7</version>
 </dependency>
 ```
 
