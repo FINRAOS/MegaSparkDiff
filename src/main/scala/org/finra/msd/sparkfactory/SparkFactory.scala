@@ -154,7 +154,7 @@ object SparkFactory {
     */
   def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
                             tempViewName: String , delimiter: Option[String] , partitionColumn: String
-                           , lowerBound :String , upperBound :String, numPartitions :String, fetchSize: String) : AppleTable =
+                           , lowerBound :String , upperBound :String, numPartitions :String, fetchSize: String = "10") : AppleTable =
   {
     val jdbcDF: DataFrame = sparkSession.sqlContext.read
       .format("jdbc")
