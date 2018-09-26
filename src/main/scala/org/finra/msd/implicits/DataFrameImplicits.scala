@@ -13,7 +13,7 @@ object DataFrameImplicits  {
     }
   }
 
-  implicit class SequenseImprovements(seq :Seq[Row])
+  implicit class SequenceImprovements(seq :Seq[Row])
   {
     def toDf(sparkSession: SparkSession , schema: StructType) :DataFrame = {
 
