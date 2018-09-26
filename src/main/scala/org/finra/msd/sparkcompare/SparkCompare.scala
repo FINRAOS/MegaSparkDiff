@@ -79,8 +79,8 @@ object SparkCompare {
     *
     * @param left  Custom table for source1
     * @param right Custom table for source2
-    * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
-    *         the right parameter has values in RDD2 but not in RDD1
+    * @return a pair of DataFrames, the left parameter has values in DF1 and not in DF2,
+    *         the right parameter has values in DF2 but not in DF1
     */
   def compareAppleTables(left: AppleTable, right: AppleTable): Pair[DataFrame, DataFrame] = {
     //if both are HIVE or JDBC then its a schema compare
