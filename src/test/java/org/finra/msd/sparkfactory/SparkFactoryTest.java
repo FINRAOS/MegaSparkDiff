@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.finra.msd.sparkcompare;
+package org.finra.msd.sparkfactory;
 
 import org.finra.msd.containers.AppleTable;
-import org.finra.msd.sparkcompare.baseclasses.BaseJunitForSparkCompare;
+import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.junit.*;
 

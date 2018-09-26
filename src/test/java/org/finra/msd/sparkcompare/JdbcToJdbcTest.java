@@ -20,7 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.finra.msd.containers.AppleTable;
-import org.finra.msd.sparkcompare.baseclasses.BaseJunitForSparkCompare;
+import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class JdbcToJdbcTest extends BaseJunitForSparkCompare
         boolean failed = false;
 
         try {
-            Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Persons1","Test1");
+            returnDiff("Persons1","Test1");
         } catch (Exception e) {
             failed = true;
             if (!e.getMessage().contains("Column Names Did Not Match"))
