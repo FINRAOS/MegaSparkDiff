@@ -7,7 +7,7 @@ import org.finra.msd.basetestclasses.SparkSessionTrait
 import org.finra.msd.implicits.DataFrameImplicits._
 import org.scalatest.{FeatureSpec, Matchers}
 
-class SparkCompareTests extends FeatureSpec  with SparkSessionTrait with Matchers
+class SparkCompareSuite extends FeatureSpec  with SparkSessionTrait with Matchers
 {
 
   import sparkSession.implicits._
