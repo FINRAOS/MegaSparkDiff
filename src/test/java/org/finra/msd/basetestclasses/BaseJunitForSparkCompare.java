@@ -1,4 +1,4 @@
-package org.finra.msd.sparkcompare.baseclasses;
+package org.finra.msd.basetestclasses;
 
 import org.finra.msd.memorydb.MemoryDbHsql;
 import org.finra.msd.sparkfactory.SparkFactory;

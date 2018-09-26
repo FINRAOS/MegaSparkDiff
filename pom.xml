@@ -6,11 +6,13 @@
 
     <groupId>org.finra.megasparkdiff</groupId>
     <artifactId>mega-spark-diff</artifactId>
-    <version>0.1.8</version>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
 
     <name>MegaSparkDiff</name>
-    <description>A diff analysis tool that compares data sets at scale of various types and can be executed in CLOUD or locally</description>
+    <description>A diff analysis tool that compares data sets at scale of various types and can be executed in CLOUD or
+        locally
+    </description>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -49,7 +51,7 @@
         <maven.dependency.plugin.version>3.1.1</maven.dependency.plugin.version>
         <maven.jar.plugin.version>3.1.0</maven.jar.plugin.version>
         <scala.maven.plugin.version>3.3.2</scala.maven.plugin.version>
-        <spark.version>2.3.0</spark.version>
+        <spark.version>2.3.1</spark.version>
     </properties>
 
 
@@ -120,6 +122,15 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest -->
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.11</artifactId>
+            <version>3.0.5</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 

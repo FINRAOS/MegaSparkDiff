@@ -22,9 +22,9 @@ import org.apache.commons.lang3.tuple.{ImmutablePair, Pair}
 import org.apache.spark.sql._
 import org.finra.msd.containers.AppleTable
 import org.finra.msd.enums.SourceType
-import org.finra.msd.sparkfactory.SparkFactory
+import org.finra.msd.implicits.DataFrameImplicits._
 import org.finra.msd.outputwriters.OutputWriter
-
+import org.finra.msd.sparkfactory.SparkFactory
 
 /**
   * Contains comparison related operations
@@ -44,54 +44,52 @@ object SparkCompare {
   def compareFiles(file1Location: String, file2Location: String): Pair[DataFrame, DataFrame] = {
     val left: DataFrame = SparkFactory.parallelizeTextFile(file1Location)
     val right: DataFrame = SparkFactory.parallelizeTextFile(file2Location)
-    return compareFlatDataFrames(left , right)
+    return compareFlatDataFrames(left, right)
   }
 
   /**
     * Compares two data sources and stores results locally
     *
-    * @param file1Location path to source1 data
-    * @param file2Location path to source2 data
-    * @param outputDirectory path where the comparison results have to be redirected
+    * @param file1Location    path to source1 data
+    * @param file2Location    path to source2 data
+    * @param outputDirectory  path where the comparison results have to be redirected
     * @param singleFileOutput a boolean variable to denote the number of output files to be one or more than one
     */
-  def compareFileSaveResults(file1Location: String, file2Location: String , outputDirectory: String ,
-                             singleFileOutput: Boolean , delimiter :String) : Unit= {
-    val resultPair: Pair[DataFrame, DataFrame] = compareFiles(file1Location,file2Location)
-    OutputWriter.saveResultsToDisk(resultPair.getLeft , resultPair.getRight , outputDirectory , singleFileOutput , delimiter)
+  def compareFileSaveResults(file1Location: String, file2Location: String, outputDirectory: String,
+                             singleFileOutput: Boolean, delimiter: String): Unit = {
+    val resultPair: Pair[DataFrame, DataFrame] = compareFiles(file1Location, file2Location)
+    OutputWriter.saveResultsToDisk(resultPair.getLeft, resultPair.getRight, outputDirectory, singleFileOutput, delimiter)
   }
 
   /**
     * Performs comparison between two custom source data types that were created from the actual source data details
     *
-    * @param left Custom table for source1
-    * @param right Custom table for source2
-    * @param outputDirectory path where the comparison results have to be redirected
+    * @param left             Custom table for source1
+    * @param right            Custom table for source2
+    * @param outputDirectory  path where the comparison results have to be redirected
     * @param singleFileOutput a boolean variable to denote the number of output files to be one or more than one
     */
-  def compareAppleTablesSaveResults(left: AppleTable , right: AppleTable , outputDirectory: String , singleFileOutput: Boolean , delimiter :String) :Unit = {
-    val result: Pair[DataFrame, DataFrame] = compareAppleTables(left,right)
-    OutputWriter.saveResultsToDisk(result.getLeft , result.getRight , outputDirectory , singleFileOutput , delimiter)
+  def compareAppleTablesSaveResults(left: AppleTable, right: AppleTable, outputDirectory: String, singleFileOutput: Boolean, delimiter: String): Unit = {
+    val result: Pair[DataFrame, DataFrame] = compareAppleTables(left, right)
+    OutputWriter.saveResultsToDisk(result.getLeft, result.getRight, outputDirectory, singleFileOutput, delimiter)
   }
 
   /**
     * Performs schema based comparison irrespective of source data types
     *
-    * @param left Custom table for source1
+    * @param left  Custom table for source1
     * @param right Custom table for source2
-    * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
-    *         the right parameter has values in RDD2 but not in RDD1
+    * @return a pair of DataFrames, the left parameter has values in DF1 and not in DF2,
+    *         the right parameter has values in DF2 but not in DF1
     */
-  def compareAppleTables(left: AppleTable, right: AppleTable) :Pair[DataFrame, DataFrame] = {
+  def compareAppleTables(left: AppleTable, right: AppleTable): Pair[DataFrame, DataFrame] = {
     //if both are HIVE or JDBC then its a schema compare
-    if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC)
-      {
-        if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC)
-          {
-            //DO A SCHEMA COMPARE even if one is HIVE and the other is JDBC
-            return compareSchemaDataFrames(left.dataFrame , left.tempViewName,right.dataFrame , right.tempViewName)
-          }
+    if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC) {
+      if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC) {
+        //DO A SCHEMA COMPARE even if one is HIVE and the other is JDBC
+        return compareSchemaDataFrames(left.dataFrame, right.dataFrame)
       }
+    }
 
     //Means one of them is not a schema data source and will flatten one of them
     var flatLeft: DataFrame = left.dataFrame
@@ -99,24 +97,24 @@ object SparkCompare {
 
     //if one of the inputs has no schema then will flatten it using the delimiter
     if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC)
-      flatLeft = SparkFactory.flattenDataFrame(left.dataFrame , left.delimiter)
+      flatLeft = SparkFactory.flattenDataFrame(left.dataFrame, left.delimiter)
 
     if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC)
-      flatright = SparkFactory.flattenDataFrame(right.dataFrame , right.delimiter)
+      flatright = SparkFactory.flattenDataFrame(right.dataFrame, right.delimiter)
 
     //COMPARE flatLeft to flatRight
-    return compareFlatDataFrames(flatLeft , flatright)
+    return compareFlatDataFrames(flatLeft, flatright)
   }
 
   /**
     * Compares two single-column DataFrames
     *
-    * @param left a dataframe generated form custom table for source1
+    * @param left  a dataframe generated form custom table for source1
     * @param right a dataframe generated form custom table for source2
     * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
     *         the right parameter has values in RDD2 but not in RDD1
     */
-  private def compareFlatDataFrames(left: DataFrame , right: DataFrame) :Pair[DataFrame, DataFrame] = {
+  private def compareFlatDataFrames(left: DataFrame, right: DataFrame): Pair[DataFrame, DataFrame] = {
     val leftGrouped: DataFrame = left.groupBy("values").count()
     val rightGrouped: DataFrame = right.groupBy("values").count()
 
@@ -129,28 +127,26 @@ object SparkCompare {
 
   /**
     *
-    * @param left dataframe containing source1 data
-    * @param leftViewName temporary table name of source1
-    * @param right dataframe containing source2 data
+    * @param left          dataframe containing source1 data
+    * @param leftViewName  temporary table name of source1
+    * @param right         dataframe containing source2 data
     * @param rightViewName temporary table name of source2
     * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
     *         the right parameter has values in RDD2 but not in RDD1
     */
-   def compareSchemaDataFrames(left: DataFrame , leftViewName: String
-                              , right: DataFrame , rightViewName: String) :Pair[DataFrame, DataFrame] = {
+  def compareSchemaDataFrames(left: DataFrame, right: DataFrame): Pair[DataFrame, DataFrame] = {
     //make sure that column names match in both dataFrames
-    if (!left.columns.sameElements(right.columns))
-      {
-        println("column names were different")
-        throw new Exception("Column Names Did Not Match")
-      }
+    if (!left.columns.sameElements(right.columns)) {
+      throw new Exception("Column Names Did Not Match")
+    }
 
-    val leftCols = left.columns.mkString(",")
-    val rightCols = right.columns.mkString(",")
+    val groupedLeft = left.groupBy(left.getColumnsSeq(): _*)
+      .count()
+      .withColumnRenamed("count", "recordRepeatCount")
 
-    //group by all columns in both data frames
-    val groupedLeft = left.sqlContext.sql("select " + leftCols + " , count(*) as recordRepeatCount from " +  leftViewName + " group by " + leftCols )
-    val groupedRight = left.sqlContext.sql("select " + rightCols + " , count(*) as recordRepeatCount from " +  rightViewName + " group by " + rightCols )
+    val groupedRight = right.groupBy(right.getColumnsSeq(): _*)
+      .count()
+      .withColumnRenamed("count", "recordRepeatCount")
 
     //do the except/subtract command
     val inLnotinR = groupedLeft.except(groupedRight).toDF()
@@ -162,11 +158,11 @@ object SparkCompare {
   /**
     * Performs schema based comparison irrespective of source data types
     *
-    * @param left Custom table for LeftSource
+    * @param left  Custom table for LeftSource
     * @param right Custom table for RightSource
     * @return a pair containing the count in left and right
     */
-  def compareAppleTablesCount(left: AppleTable, right: AppleTable) :Pair[lang.Long,lang.Long] = {
+  def compareAppleTablesCount(left: AppleTable, right: AppleTable): Pair[lang.Long, lang.Long] = {
 
     val leftCount = left.dataFrame.count()
     val rightCount = right.dataFrame.count()
@@ -176,4 +172,28 @@ object SparkCompare {
     return countsPair
   }
 
+
+  def fullOuterJoinDataFrames(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String]): DataFrame = {
+
+    //convert column names to uppercase
+    val upperCaseLeft: DataFrame = left.toDF(left.columns.map(_.toUpperCase): _*)
+    val upperCaseRight: DataFrame = right.toDF(right.columns.map(_.toUpperCase): _*)
+
+    val compositeKeysUpperCase: Seq[String] = compositeKeyStrs.map(k => k.toUpperCase)
+    val nonKeyCols: List[String] = upperCaseLeft.columns.filter(c => !compositeKeysUpperCase.contains(c)).toList
+
+    //prepend l and r to nonkey columns
+    val prependedColumnsLeft = compositeKeysUpperCase ++ nonKeyCols.map(c => "l_" + c).toSeq
+    val prependedColumnsRight = compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c).toSeq
+
+    //reselect the dataframes with prepended l. & r. to the columnss
+    val prependedLeftDf: DataFrame = upperCaseLeft.toDF(prependedColumnsLeft : _*)
+    val prependedRightDf: DataFrame = upperCaseRight.toDF(prependedColumnsRight : _*)
+
+
+    val joinedDf = prependedLeftDf.as("l")
+      .join(prependedRightDf.as("r"), compositeKeysUpperCase, "full_outer")
+
+    joinedDf
+  }
 }
