@@ -49,21 +49,37 @@ public class H2ToPgTest {
   public void testTransformH2ToPg() throws SQLException {
     SparkFactory.initializeSparkLocalMode("local[*]", "WARN", "1");
 
-    // Parallelize the source data
+    // Shown below are the two methods of reading a JDBC database.
+    // The first uses a pre-configured method that directly gives you an AppleTable.
+    // The second builds a customized Spark RDD and converts it into an AppleTable.
+    // The first is nice for quick setups, and basic applications.
+    // The second is nearly required for any performance enhancements, and is highly recommended.
+    // Parallelize the source data using pre-configured method.
     AppleTable leftTable = SparkFactory
-        .parallelizeJDBCSource("org.h2.Driver",
-            H2Database.getUrl(),
-            H2Database.getProperties().getProperty("user"),
-            H2Database.getProperties().getProperty("password"),
-            "(select * from appliance) a", "appliance_left");
+      .parallelizeJDBCSource("org.h2.Driver",
+        H2Database.getUrl(),
+        H2Database.getProperties().getProperty("user"),
+        H2Database.getProperties().getProperty("password"),
+        "(select * from appliance) a", "appliance_left");
 
-    // Parallelize the target data
-    AppleTable rightTable = SparkFactory
-        .parallelizeJDBCSource("org.postgresql.Driver",
-            PostgresDatabase.getUrl(),
-            PostgresDatabase.getProperties().getProperty("user"),
-            PostgresDatabase.getProperties().getProperty("password"),
-            "(select * from appliance) a", "appliance_right");
+    // Parallelize the target data using a customized Spark RDD.
+    // See the below link to find out what these options do.
+    // http://spark.apache.org/docs/latest/sql-programming-guide.html#jdbc-to-other-databases
+    Dataframe rightDataFrame = sparkSession.sqlContext.read()
+      .format("jdbc")
+      .option("driver" , "org.postgresql.Driver")
+      .option("url", PostgresDatabase.getUrl())
+      .option("dbtable", "(select * from appliance) a")
+      .option("user", PostgresDatabase.getProperties().getProperty("user"))
+      .option("password", PostgresDatabase.getProperties().getProperty("password"))
+      .option("partitionColumn", "partitionCol")
+      .option("lowerBound", "lowerBound")
+      .option("upperBound", "upperBound")
+      .option("numPartitions", "numReadPartitions")
+      .option("fetchSize", "fetchSize")
+      .load().createOrReplaceTempView("appliance_right");
+
+    AppleTable rightTable = AppleTable(SourceType.JDBC, rightDataFrame, ",", "appliance_right");
 
     // Parallelize the reference data
     AppleTable typeTable = SparkFactory
