@@ -72,11 +72,11 @@ public class H2ToPgTest {
       .option("dbtable", "(select * from appliance) a")
       .option("user", PostgresDatabase.getProperties().getProperty("user"))
       .option("password", PostgresDatabase.getProperties().getProperty("password"))
-      .option("partitionColumn", "partitionCol")
-      .option("lowerBound", "lowerBound")
-      .option("upperBound", "upperBound")
-      .option("numPartitions", "numReadPartitions")
-      .option("fetchSize", "fetchSize")
+      .option("partitionColumn", "PRICE")
+      .option("lowerBound", "0")
+      .option("upperBound", "500")
+      .option("numPartitions", "8")
+      .option("fetchSize", "50")
       .load().createOrReplaceTempView("appliance_right");
 
     AppleTable rightTable = AppleTable(SourceType.JDBC, rightDataFrame, ",", "appliance_right");
