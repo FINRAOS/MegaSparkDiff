@@ -64,6 +64,7 @@ public class H2ToPgTest {
 
     // Parallelize the target data using a customized Spark RDD.
     // See the below link to find out what these options do.
+    // It's recommended to use the below settings as a bare minimum.
     // http://spark.apache.org/docs/latest/sql-programming-guide.html#jdbc-to-other-databases
     Dataframe rightDataFrame = sparkSession.sqlContext.read()
       .format("jdbc")
