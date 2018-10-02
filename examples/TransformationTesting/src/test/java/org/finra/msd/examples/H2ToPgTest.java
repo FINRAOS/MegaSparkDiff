@@ -72,11 +72,11 @@ public class H2ToPgTest {
       .option("dbtable", "(select * from appliance) a")
       .option("user", PostgresDatabase.getProperties().getProperty("user"))
       .option("password", PostgresDatabase.getProperties().getProperty("password"))
-      .option("partitionColumn", "PRICE")
-      .option("lowerBound", "0")
-      .option("upperBound", "500")
-      .option("numPartitions", "8")
-      .option("fetchSize", "50")
+      .option("partitionColumn", "PRICE") // A numeric column
+      .option("lowerBound", "0") // Typically you want this to be the minimum value
+      .option("upperBound", "500") // Typically you want this to be the maximum value
+      .option("numPartitions", "8") // Number of partitions to break the db into
+      .option("fetchSize", "50") // Default is 10, increasing reduces network lag
       .load().createOrReplaceTempView("appliance_right");
 
     AppleTable rightTable = AppleTable(SourceType.JDBC, rightDataFrame, ",", "appliance_right");
