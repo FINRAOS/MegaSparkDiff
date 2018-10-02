@@ -68,7 +68,7 @@ public class H2ToPgTest {
     // http://spark.apache.org/docs/latest/sql-programming-guide.html#jdbc-to-other-databases
     Dataframe rightDataFrame = sparkSession.sqlContext.read()
       .format("jdbc")
-      .option("driver" , "org.postgresql.Driver")
+      .option("driver", "org.postgresql.Driver")
       .option("url", PostgresDatabase.getUrl())
       .option("dbtable", "(select * from appliance) a")
       .option("user", PostgresDatabase.getProperties().getProperty("user"))
@@ -76,8 +76,8 @@ public class H2ToPgTest {
       .option("partitionColumn", "PRICE") // A numeric column
       .option("lowerBound", "0") // Typically you want this to be the minimum value
       .option("upperBound", "500") // Typically you want this to be the maximum value
-      .option("numPartitions", "8") // Number of partitions to break the db into
-      .option("fetchSize", "50") // Default is 10, increasing reduces network lag
+      .option("numPartitions", "2") // Number of partitions to break the db into
+      .option("fetchSize", "10") // Default is 10, increasing reduces network lag
       .load().createOrReplaceTempView("appliance_right");
 
     AppleTable rightTable = AppleTable(SourceType.JDBC, rightDataFrame, ",", "appliance_right");
@@ -89,10 +89,7 @@ public class H2ToPgTest {
             PostgresDatabase.getProperties().getProperty("user"),
             PostgresDatabase.getProperties().getProperty("password"),
             "(select * from appliance_type) a", "appliance_type");
-
-
-
-
+    
     // Handle the source's "NAME" column transformation/split to the target's "name" and "brand"
     // columns.
     // First register two new UDFs, giving the UDFs a name, a lambda, and a data type to return.
