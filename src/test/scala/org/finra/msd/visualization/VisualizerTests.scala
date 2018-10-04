@@ -16,8 +16,8 @@ class VisualizerTests extends SparkTestSuiteSessionTrait with Matchers {
 
   test("Visualize as Text") {
     val left = Seq(
-      ("1", "1", "A", "A"),
-      ("2", "2", "B", "B"),
+      ("key11", "key12", "A", "A"),
+      ("key21", "key22", "B", "B"),
       ("4", "4", "C", "C"),
       ("5", "5", "D", "D"),
       ("5", "5", "D", "D"),
@@ -25,39 +25,18 @@ class VisualizerTests extends SparkTestSuiteSessionTrait with Matchers {
     ).toDF("key1", "key2", "value1", "value2")
 
     val right = Seq(
-      ("1", "1", null, null),
+      ("key11", "key12", null, null),
       ("3", "3", "Y", "Y"),
       ("5", "5", "D", "D"),
       ("6", "6", "E", "E"),
       (null, null, "zz", "zz")
     ).toDF("key1", "key2", "value1", "value2")
 
-    val comparisonReult: tuple.Pair[DataFrame, DataFrame] = SparkCompare.compareSchemaDataFrames(left, right)
+    val comparisonResult: tuple.Pair[DataFrame, DataFrame] = SparkCompare.compareSchemaDataFrames(left, right)
 
     val key: Seq[String] = Seq("key1", "key2")
-    val results: DataFrame = SparkCompare.fullOuterJoinDataFrames(comparisonReult.getLeft, comparisonReult.getRight, key)
+    val joinedResults: DataFrame = SparkCompare.fullOuterJoinDataFrames(comparisonResult.getLeft, comparisonResult.getRight, key)
+    Visualizer.renderHorizontalTable(joinedResults,100)
 
-    results.show()
-
-    val expectedSchema = new StructType()
-      .add("l_VALUE1", StringType, true)
-      .add("L_VALUE2", StringType, true)
-      .add("l_RECORDREPEATCOUNT", IntegerType, true)
-      .add("KEY1", StringType, true)
-      .add("KEY2", StringType, true)
-      .add("r_VALUE1", StringType, true)
-      .add("r_VALUE2", StringType, true)
-      .add("r_RECORDREPEATCOUNT", IntegerType, true)
-
-    val expected = Seq(
-      Row(null, null, null, null, null, "zz", "zz", 1),
-      Row("A", "A", 1, "1", "1", null, null, 1),
-      Row("B", "B", 1, "2", "2", null, null, null),
-      Row(null, null, null, "3", "3", "Y", "Y", 1),
-      Row("C", "C", 1, "4", "4", null, null, null),
-      Row("D", "D", 2, "5", "5", "D", "D", 1)
-    ).toDf(sparkSession, expectedSchema)
-
-    results.collect() should contain allElementsOf expected.collect()
   }
 }

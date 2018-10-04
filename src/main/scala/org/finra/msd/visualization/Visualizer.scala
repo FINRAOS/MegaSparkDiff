@@ -1,10 +1,13 @@
 package org.finra.msd.visualization
 
+import org.apache.avro.generic.GenericData.StringType
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.finra.msd.customExceptions._
 import org.finra.msd.enums.VisualResultType
 import org.finra.msd.sparkfactory.SparkFactory
+
+import scala.collection.immutable
 
 object Visualizer {
 
@@ -278,5 +281,59 @@ object Visualizer {
     })
 
     flag;
+  }
+
+
+  def renderHorizontalTable(df: DataFrame, limit: Int): String = {
+    val rows = df.take(limit).toSeq
+    val header: Seq[String] = df.schema.fieldNames.toSeq
+    val htmlTableWithNoHeader = rows.map(row => s"""<tr>${convertRowToHtml(row, header)}</tr>${System.lineSeparator()}""").mkString
+
+    val headerHtml = "<tr>" + header.map(h => "<th>" + h + "</th>").mkString + "</tr>" + System.lineSeparator()
+
+    println("<table>" + headerHtml + htmlTableWithNoHeader + "</table>")
+    ???
+  }
+
+  private def convertRowToHtml(row: Row, header: Seq[String]): String = {
+    val valuesMap: Map[String, Nothing] = row.getValuesMap(header)
+    header.map(h => getValueFromRowAsCell(valuesMap, h)).mkString
+  }
+
+  private def getValueFromRowAsCell(valuesMap: Map[String, Nothing], columnName: String): String = {
+    val value = {
+      val valueOption = valuesMap.get(columnName)
+      if (valueOption.get == null) "null"
+      else valueOption.get.toString
+    }
+
+    //here we will get the value of l_column or r_column depending on what we got as input
+    val valueOther = {
+      val otherColumnName = {
+        if (columnName.startsWith("l_")) {
+          Option.apply(columnName.replace("l_", "r_"))
+        } else if (columnName.startsWith("r_")) {
+          Option.apply(columnName.replace("r_", "l_"))
+        } else {
+          Option.empty
+        }
+      }
+
+      if (otherColumnName.isEmpty) Option.empty //this means its a key column
+      else //this means its a value column
+      {
+        val otherColumnValue = valuesMap.get(otherColumnName.get)
+        if (otherColumnValue.get == null) Option.apply("null")
+        else Option.apply(otherColumnValue.get.toString)
+      }
+    }
+
+    val htmlDiffClass = {
+      if (valueOther.isEmpty) "same"
+      else if (value.equals(valueOther.get)) "same"
+      else "different"
+    }
+
+    s"""<td class='${htmlDiffClass}'>${value}</td>"""
   }
 }
