@@ -284,7 +284,12 @@ object Visualizer {
     flag;
   }
 
-
+  /**
+    *
+    * @param df the resulting dataframe from FULL OUTER JOIN operation by SparkCompare.fullOuterJoinDataFrames
+    * @param limit the maximum number of records to be displayed in the table
+    * @return HTML table as a String to be further used as placement inside the horizontalTemplate
+    */
   def renderHorizontalTable(df: DataFrame, limit: Int): String = {
     val rows = df.take(limit).toSeq
     val header: Seq[String] = df.schema.fieldNames.toSeq
@@ -299,11 +304,26 @@ object Visualizer {
     html
   }
 
+  /**
+    *
+    * @param row a single row of the full outer join dataframe created by SparkCompare.fullOuterJoinDataFrames
+    * @param header a sequence of strings having the header column names. expectation is that it is ordered like so
+    *               l_column1 l_column2 key1 key2 r_column1 r_column2
+    * @return a string having HTML representation of a single htmlt able row
+    */
   private def convertRowToHtml(row: Row, header: Seq[String]): String = {
     val valuesMap: Map[String, Nothing] = row.getValuesMap(header)
     header.map(h => getValueFromRowAsCell(valuesMap, h)).mkString
   }
 
+  /**
+    *
+    * @param valuesMap a key value map extracted from the dataframe ROW object
+    * @param columnName the column name for which the caller wants to extract the value and render as html TD
+    * @return html TD encapsulating the column value. If the value between left and right are different then it will
+    *         have CSS class of "different" if the values are the same then the css class will have value of "same".
+    *         if the column is a key column it will have a css class of "same"
+    */
   private def getValueFromRowAsCell(valuesMap: Map[String, Nothing], columnName: String): String = {
     val value = {
       val valueOption = valuesMap.get(columnName)

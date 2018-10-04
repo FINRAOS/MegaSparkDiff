@@ -173,7 +173,16 @@ object SparkCompare {
     return countsPair
   }
 
-
+  /**
+    * This method does a full outer join between the resulting left and right dataframes from the method
+    * SparkCompare.compareSchemaDataFrames. It will return a single dataframe having the left columns prefixed with l_
+    * and the right columns prefixed with r_. the Key columns will not have prefixed. The resulting dataframe will have
+    * all l_ columns on the left, then the Key columns in the middle, then the r_ columns on the right.
+    * @param left Dataframe having inLeftNotInRight resulting from SparkCompare.compareSchemaDataFrames
+    * @param right Dataframe having inRightNotInLeft resulting from SparkCompare.compareSchemaDataFrames
+    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both dataframes
+    * @return a dataframe having the resulting full outer join operation.
+    */
   def fullOuterJoinDataFrames(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String]): DataFrame = {
 
     //convert column names to uppercase
