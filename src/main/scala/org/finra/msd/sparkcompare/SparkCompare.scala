@@ -25,6 +25,7 @@ import org.finra.msd.enums.SourceType
 import org.finra.msd.implicits.DataFrameImplicits._
 import org.finra.msd.outputwriters.OutputWriter
 import org.finra.msd.sparkfactory.SparkFactory
+import org.apache.spark.sql.functions.col
 
 /**
   * Contains comparison related operations
@@ -180,7 +181,7 @@ object SparkCompare {
     val upperCaseRight: DataFrame = right.toDF(right.columns.map(_.toUpperCase): _*)
 
     val compositeKeysUpperCase: Seq[String] = compositeKeyStrs.map(k => k.toUpperCase)
-    val nonKeyCols: List[String] = upperCaseLeft.columns.filter(c => !compositeKeysUpperCase.contains(c)).toList
+    val nonKeyCols: Seq[String] = upperCaseLeft.columns.filter(c => !compositeKeysUpperCase.contains(c)).toSeq
 
     //prepend l and r to nonkey columns
     val prependedColumnsLeft = compositeKeysUpperCase ++ nonKeyCols.map(c => "l_" + c).toSeq
@@ -191,9 +192,10 @@ object SparkCompare {
     val prependedRightDf: DataFrame = upperCaseRight.toDF(prependedColumnsRight : _*)
 
 
-    val joinedDf = prependedLeftDf.as("l")
+    val joinedDf: DataFrame = prependedLeftDf.as("l")
       .join(prependedRightDf.as("r"), compositeKeysUpperCase, "full_outer")
 
-    joinedDf
+    val allColsWithKeysInTheMiddle: Seq[String] = nonKeyCols.map(c => "l_" + c) ++ compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c)
+    joinedDf.select( allColsWithKeysInTheMiddle.map(name => col(name)) :_*)
   }
 }
