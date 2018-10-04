@@ -3,17 +3,16 @@ package org.finra.msd.sparkcompare
 import org.apache.commons.lang3.tuple
 import org.apache.spark.sql.types.{LongType, StringType, StructType}
 import org.apache.spark.sql.{DataFrame, Row}
-import org.finra.msd.basetestclasses.SparkSessionTrait
+import org.finra.msd.basetestclasses.SparkTestSuiteSessionTrait
 import org.finra.msd.implicits.DataFrameImplicits._
-import org.scalatest.{FeatureSpec, Matchers}
+import org.scalatest.Matchers
 
-class SparkCompareSuite extends FeatureSpec  with SparkSessionTrait with Matchers
+class SparkCompareTestSuite extends SparkTestSuiteSessionTrait with Matchers
 {
 
   import sparkSession.implicits._
 
-  feature("FullOuterJoin") {
-    scenario("positive scenario for full outer join") {
+  test("FullOuterJoin") {
       val left = Seq(
         ("1","A"),
         ("2","B"),
@@ -54,7 +53,4 @@ class SparkCompareSuite extends FeatureSpec  with SparkSessionTrait with Matcher
 
       joinedDf.collect() should contain allElementsOf expected.collect()
     }
-  }
-
-
 }
