@@ -3,6 +3,7 @@ package org.finra.msd.visualization
 import org.apache.avro.generic.GenericData.StringType
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
+import org.finra.msd.controllers.TemplateController
 import org.finra.msd.customExceptions._
 import org.finra.msd.enums.VisualResultType
 import org.finra.msd.sparkfactory.SparkFactory
@@ -291,8 +292,11 @@ object Visualizer {
 
     val headerHtml = "<tr>" + header.map(h => "<th>" + h + "</th>").mkString + "</tr>" + System.lineSeparator()
 
-    println("<table>" + headerHtml + htmlTableWithNoHeader + "</table>")
-    ???
+    val htmlTable = "<table>" + headerHtml + htmlTableWithNoHeader + "</table>"
+
+    val html = TemplateController.horizontalTableTemplate.replace("#tableContent" , htmlTable)
+
+    html
   }
 
   private def convertRowToHtml(row: Row, header: Seq[String]): String = {

@@ -13,7 +13,6 @@ class VisualizerTests extends SparkTestSuiteSessionTrait with Matchers {
 
   import sparkSession.implicits._
 
-
   test("Visualize as Text") {
     val left = Seq(
       ("key11", "key12", "A", "A"),
@@ -36,7 +35,10 @@ class VisualizerTests extends SparkTestSuiteSessionTrait with Matchers {
 
     val key: Seq[String] = Seq("key1", "key2")
     val joinedResults: DataFrame = SparkCompare.fullOuterJoinDataFrames(comparisonResult.getLeft, comparisonResult.getRight, key)
-    Visualizer.renderHorizontalTable(joinedResults,100)
+    val html = Visualizer.renderHorizontalTable(joinedResults,100)
 
+    assert(html.contains("class='different'"))
+    assert(html.contains("class='same'"))
+    assert(html.contains("</html>"))
   }
 }
