@@ -54,6 +54,8 @@ public class FileToPgTest {
   public void testTransformFileToPg() throws SQLException {
     SparkFactory.initializeSparkLocalMode("local[*]", "WARN", "1");
 
+    // See H2ToPgTest example to find other methods of reading from DBs
+
     // Parallelize the source text file
     AppleTable leftTable = SparkFactory
         .parallelizeTextSource(FileToPgTest.class.getResource(

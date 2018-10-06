@@ -17,7 +17,7 @@ How to Use from Within a Java or Scala Project
 <dependency>
     <groupId>org.finra.megasparkdiff</groupId>
     <artifactId>mega-spark-diff</artifactId>
-    <version>0.1.7</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 

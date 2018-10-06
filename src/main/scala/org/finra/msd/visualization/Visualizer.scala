@@ -1,10 +1,14 @@
 package org.finra.msd.visualization
 
+import org.apache.avro.generic.GenericData.StringType
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
+import org.finra.msd.controllers.TemplateController
 import org.finra.msd.customExceptions._
 import org.finra.msd.enums.VisualResultType
 import org.finra.msd.sparkfactory.SparkFactory
+
+import scala.collection.immutable
 
 object Visualizer {
 
@@ -278,5 +282,82 @@ object Visualizer {
     })
 
     flag;
+  }
+
+  /**
+    *
+    * @param df the resulting dataframe from FULL OUTER JOIN operation by SparkCompare.fullOuterJoinDataFrames
+    * @param limit the maximum number of records to be displayed in the table
+    * @return HTML table as a String to be further used as placement inside the horizontalTemplate
+    */
+  def renderHorizontalTable(df: DataFrame, limit: Int): String = {
+    val rows = df.take(limit).toSeq
+    val header: Seq[String] = df.schema.fieldNames.toSeq
+    val htmlTableWithNoHeader = rows.map(row => s"""<tr>${convertRowToHtml(row, header)}</tr>${System.lineSeparator()}""").mkString
+
+    val headerHtml = "<tr>" + header.map(h => "<th>" + h + "</th>").mkString + "</tr>" + System.lineSeparator()
+
+    val htmlTable = "<table>" + headerHtml + htmlTableWithNoHeader + "</table>"
+
+    val html = TemplateController.horizontalTableTemplate.replace("#tableContent" , htmlTable)
+
+    html
+  }
+
+  /**
+    *
+    * @param row a single row of the full outer join dataframe created by SparkCompare.fullOuterJoinDataFrames
+    * @param header a sequence of strings having the header column names. expectation is that it is ordered like so
+    *               l_column1 l_column2 key1 key2 r_column1 r_column2
+    * @return a string having HTML representation of a single htmlt able row
+    */
+  private def convertRowToHtml(row: Row, header: Seq[String]): String = {
+    val valuesMap: Map[String, Nothing] = row.getValuesMap(header)
+    header.map(h => getValueFromRowAsCell(valuesMap, h)).mkString
+  }
+
+  /**
+    *
+    * @param valuesMap a key value map extracted from the dataframe ROW object
+    * @param columnName the column name for which the caller wants to extract the value and render as html TD
+    * @return html TD encapsulating the column value. If the value between left and right are different then it will
+    *         have CSS class of "different" if the values are the same then the css class will have value of "same".
+    *         if the column is a key column it will have a css class of "same"
+    */
+  private def getValueFromRowAsCell(valuesMap: Map[String, Nothing], columnName: String): String = {
+    val value = {
+      val valueOption = valuesMap.get(columnName)
+      if (valueOption.get == null) "null"
+      else valueOption.get.toString
+    }
+
+    //here we will get the value of l_column or r_column depending on what we got as input
+    val valueOther = {
+      val otherColumnName = {
+        if (columnName.startsWith("l_")) {
+          Option.apply(columnName.replace("l_", "r_"))
+        } else if (columnName.startsWith("r_")) {
+          Option.apply(columnName.replace("r_", "l_"))
+        } else {
+          Option.empty
+        }
+      }
+
+      if (otherColumnName.isEmpty) Option.empty //this means its a key column
+      else //this means its a value column
+      {
+        val otherColumnValue = valuesMap.get(otherColumnName.get)
+        if (otherColumnValue.get == null) Option.apply("null")
+        else Option.apply(otherColumnValue.get.toString)
+      }
+    }
+
+    val htmlDiffClass = {
+      if (valueOther.isEmpty) "same"
+      else if (value.equals(valueOther.get)) "same"
+      else "different"
+    }
+
+    s"""<td class='${htmlDiffClass}'>${value}</td>"""
   }
 }
