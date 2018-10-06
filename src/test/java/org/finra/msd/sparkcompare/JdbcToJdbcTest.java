@@ -16,22 +16,19 @@
 
 package org.finra.msd.sparkcompare;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.finra.msd.containers.AppleTable;
 import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
+import org.finra.msd.containers.AppleTable;
+import org.finra.msd.containers.DiffResult;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class JdbcToJdbcTest extends BaseJunitForSparkCompare
-{
-    public JdbcToJdbcTest() {}
+public class JdbcToJdbcTest extends BaseJunitForSparkCompare {
+    public JdbcToJdbcTest() {
+    }
 
 
-    private Pair<Dataset<Row>, Dataset<Row>> returnDiff(String table1, String table2)
-    {
+    private DiffResult returnDiff(String table1, String table2) {
         AppleTable leftAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
                 "SA",
@@ -48,12 +45,11 @@ public class JdbcToJdbcTest extends BaseJunitForSparkCompare
     }
 
     @Test
-    public void testCompareDifferentSchemas()
-    {
+    public void testCompareDifferentSchemas() {
         boolean failed = false;
 
         try {
-            returnDiff("Persons1","Test1");
+            returnDiff("Persons1", "Test1");
         } catch (Exception e) {
             failed = true;
             if (!e.getMessage().contains("Column Names Did Not Match"))
@@ -65,78 +61,73 @@ public class JdbcToJdbcTest extends BaseJunitForSparkCompare
     }
 
     @Test
-    public void testCompareEqualTables()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test1","Test2");
+    public void testCompareEqualTables() {
+        DiffResult diffResult = returnDiff("Test1", "Test2");
 
         //the expectation is that both tables are equal
-        if (pair.getLeft().count() != 0)
+        if (diffResult.inLeftNotInRight().count() != 0)
             Assert.fail("Expected 0 differences coming from left table." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + diffResult.inLeftNotInRight().count() + ".");
 
-        if (pair.getRight().count() != 0)
+        if (diffResult.inRightNotInLeft().count() != 0)
             Assert.fail("Expected 0 differences coming from right table." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+                    "  Instead, found " + diffResult.inRightNotInLeft().count() + ".");
     }
 
     @Test
-    public void testCompareCompletelyDifferent()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test4","Test5");
+    public void testCompareCompletelyDifferent() {
+        DiffResult pair = returnDiff("Test4", "Test5");
 
         //the expectation is that both tables are completely different
-        if (pair.getLeft().count() != 5)
+        if (pair.inLeftNotInRight().count() != 5)
             Assert.fail("Expected 5 differences coming from left table." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + pair.inLeftNotInRight().count() + ".");
 
-        if (pair.getRight().count() != 5)
+        if (pair.inRightNotInLeft().count() != 5)
             Assert.fail("Expected 5 differences coming from right table." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+                    "  Instead, found " + pair.inRightNotInLeft().count() + ".");
     }
 
     @Test
-    public void testCompareAFewDifferences()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test1","Test3");
+    public void testCompareAFewDifferences() {
+        DiffResult pair = returnDiff("Test1", "Test3");
 
         //the expectation is that there are only a few differences
-        if (pair.getLeft().count() != 2)
+        if (pair.inLeftNotInRight().count() != 2)
             Assert.fail("Expected 2 differences coming from left table." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + pair.inLeftNotInRight().count() + ".");
 
-        if (pair.getRight().count() != 2)
+        if (pair.inRightNotInLeft().count() != 2)
             Assert.fail("Expected 2 differences coming from right table." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+                    "  Instead, found " + pair.inRightNotInLeft().count() + ".");
     }
 
     @Test
-    public void testCompareTable1IsSubset()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test4","Test1");
+    public void testCompareTable1IsSubset() {
+        DiffResult pair = returnDiff("Test4", "Test1");
 
         //the expectation is that table1 is a complete subset of table2
-        if (pair.getLeft().count() != 0)
+        if (pair.inLeftNotInRight().count() != 0)
             Assert.fail("Expected 0 differences coming from left table." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + pair.inLeftNotInRight().count() + ".");
 
-        if (pair.getRight().count() != 5)
+        if (pair.inRightNotInLeft().count() != 5)
             Assert.fail("Expected 5 differences coming from right table." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+                    "  Instead, found " + pair.inRightNotInLeft().count() + ".");
     }
 
     @Test
-    public void testCompareTable2IsSubset()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test1","Test5");
+    public void testCompareTable2IsSubset() {
+        DiffResult pair = returnDiff("Test1", "Test5");
 
         //the expectation is that table2 is a complete subset of table1
-        if (pair.getLeft().count() != 5)
+        if (pair.inLeftNotInRight().count() != 5)
             Assert.fail("Expected 5 differences coming from left table." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + pair.inLeftNotInRight().count() + ".");
 
-        if (pair.getRight().count() != 0)
+        if (pair.inRightNotInLeft().count() != 0)
             Assert.fail("Expected 0 differences coming from right table." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+                    "  Instead, found " + pair.inRightNotInLeft().count() + ".");
     }
 
 }

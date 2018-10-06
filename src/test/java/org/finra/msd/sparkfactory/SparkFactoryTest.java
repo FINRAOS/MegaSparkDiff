@@ -16,42 +16,38 @@
 
 package org.finra.msd.sparkfactory;
 
-import org.finra.msd.containers.AppleTable;
 import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
-import org.finra.msd.sparkfactory.SparkFactory;
-import org.junit.*;
+import org.finra.msd.containers.AppleTable;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class SparkFactoryTest extends BaseJunitForSparkCompare {
 
 
     @Test
-    public void parallelizeSqlQueryTest()
-    {
+    public void parallelizeSqlQueryTest() {
         AppleTable appleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
                 "SA",
                 "",
                 "(select * from Persons1)", "table1");
 
-        if (appleTable.getDataFrame().count() == 0)
-        {
+        if (appleTable.getDataFrame().count() == 0) {
             Assert.fail("dataset was empty");
         }
     }
 
     @Test
-    public void parrallelizeSqlQueryWithPartitioning()
-    {
+    public void parrallelizeSqlQueryWithPartitioning() {
         AppleTable rightAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
                 "SA",
                 "",
-                "(select * from Test1 )", "my_partition_test" , scala.Option.empty() , "Price"
-        ,"0" , "200000" ,"2");
+                "(select * from Test1 )", "my_partition_test", scala.Option.empty(), "Price"
+                , "0", "200000", "2");
 
 
-        if (rightAppleTable.getDataFrame().rdd().getNumPartitions() != 2)
-        {
+        if (rightAppleTable.getDataFrame().rdd().getNumPartitions() != 2) {
             Assert.fail("expected 2 partitions but received " + rightAppleTable.getDataFrame().rdd().getNumPartitions());
         }
 

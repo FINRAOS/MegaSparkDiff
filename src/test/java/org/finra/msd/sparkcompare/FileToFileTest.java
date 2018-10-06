@@ -17,88 +17,81 @@
 package org.finra.msd.sparkcompare;
 
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.finra.msd.containers.AppleTable;
 import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
+import org.finra.msd.containers.AppleTable;
+import org.finra.msd.containers.DiffResult;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
 
-public class FileToFileTest extends BaseJunitForSparkCompare
-{
-    public FileToFileTest() {}
+public class FileToFileTest extends BaseJunitForSparkCompare {
+    public FileToFileTest() {
+    }
 
 
-    private Pair<Dataset<Row>, Dataset<Row>> returnDiff(String fileName1, String fileName2)
-    {
+    private DiffResult returnDiff(String fileName1, String fileName2) {
         String file1Path = this.getClass().getClassLoader().
                 getResource(fileName1 + ".txt").getPath();
-        AppleTable leftAppleTable = SparkFactory.parallelizeTextSource(file1Path,"table1");
+        AppleTable leftAppleTable = SparkFactory.parallelizeTextSource(file1Path, "table1");
 
         String file2Path = this.getClass().getClassLoader().
                 getResource(fileName2 + ".txt").getPath();
-        AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file2Path,"table2");
+        AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file2Path, "table2");
 
         return SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable);
     }
 
     @Test
-    public void testCompareEqualFiles()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test1","Test2");
+    public void testCompareEqualFiles() {
+        DiffResult diffResult = returnDiff("Test1", "Test2");
 
         //the expectation is that both tables are equal
-        if (pair.getLeft().count() != 0)
+        if (diffResult.inLeftNotInRight().count() != 0)
             Assert.fail("Expected 0 differences coming from left file." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + diffResult.inLeftNotInRight().count() + ".");
 
-        if (pair.getRight().count() != 0)
+        if (diffResult.inRightNotInLeft().count() != 0)
             Assert.fail("Expected 0 differences coming from right file." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+                    "  Instead, found " + diffResult.inRightNotInLeft().count() + ".");
     }
 
     @Test
-    public void testCompareCompletelyDifferentFiles()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test4","Test5");
+    public void testCompareCompletelyDifferentFiles() {
+        DiffResult diffResult = returnDiff("Test4", "Test5");
 
         //the expectation is that both tables are completely different
-        if (pair.getLeft().count() != 5)
+        if (diffResult.inLeftNotInRight().count() != 5)
             Assert.fail("Expected 5 differences coming from left table." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + diffResult.inLeftNotInRight().count() + ".");
 
 
-        if (pair.getRight().count() != 4)
+        if (diffResult.inRightNotInLeft().count() != 4)
             Assert.fail("Expected 4 differences coming from right table." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+                    "  Instead, found " + diffResult.inRightNotInLeft().count() + ".");
     }
 
     @Test
-    public void testCompareAFewDifferences()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test1","Test3");
+    public void testCompareAFewDifferences() {
+        DiffResult diffResult = returnDiff("Test1", "Test3");
 
         //the expectation is that there are only a few differences
-        if (pair.getLeft().count() != 2)
+        if (diffResult.inLeftNotInRight().count() != 2)
             Assert.fail("Expected 2 differences coming from left table." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + diffResult.inLeftNotInRight().count() + ".");
 
-        if (pair.getRight().count() != 2)
+        if (diffResult.inRightNotInLeft().count() != 2)
             Assert.fail("Expected 2 differences coming from right table." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+                    "  Instead, found " + diffResult.inRightNotInLeft().count() + ".");
     }
 
     @Test
-    public void testCompareTable1IsSubset()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test4","Test1");
+    public void testCompareTable1IsSubset() {
+        DiffResult diffResult = returnDiff("Test4", "Test1");
 
         //the expectation is that table1 is a complete subset of table2
-        Long leftCount = pair.getLeft().count();
-        Long rightCount = pair.getRight().count();
+        Long leftCount = diffResult.inLeftNotInRight().count();
+        Long rightCount = diffResult.inRightNotInLeft().count();
         if (leftCount != 0)
             Assert.fail("Expected 0 differences coming from left table." +
                     "  Instead, found " + leftCount + ".");
@@ -109,18 +102,17 @@ public class FileToFileTest extends BaseJunitForSparkCompare
     }
 
     @Test
-    public void testCompareTable2IsSubset()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = returnDiff("Test1","Test5");
+    public void testCompareTable2IsSubset() {
+        DiffResult diffResult = returnDiff("Test1", "Test5");
 
         //the expectation is that table2 is a complete subset of table1
-        if (pair.getLeft().count() != 5)
+        if (diffResult.inLeftNotInRight().count() != 5)
             Assert.fail("Expected 5 differences coming from left table." +
-                    "  Instead, found " + pair.getLeft().count() + ".");
+                    "  Instead, found " + diffResult.inLeftNotInRight().count() + ".");
 
-        if (pair.getRight().count() != 0)
+        if (diffResult.inRightNotInLeft().count() != 0)
             Assert.fail("Expected 0 differences coming from right table." +
-                    "  Instead, found " + pair.getRight().count() + ".");
+                    "  Instead, found " + diffResult.inRightNotInLeft().count() + ".");
     }
 
 }

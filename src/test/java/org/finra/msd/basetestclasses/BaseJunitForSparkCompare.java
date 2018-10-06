@@ -11,10 +11,9 @@ public class BaseJunitForSparkCompare {
 
     @BeforeClass
     public static void setUpClass() {
-        SparkFactory.initializeSparkLocalMode("local[*]" , "WARN" ,"1");
+        SparkFactory.initializeSparkLocalMode("local[*]", "WARN", "1");
 
-        if (MemoryDbHsql.getInstance().getState() != 1 )
-        {
+        if (MemoryDbHsql.getInstance().getState() != 1) {
             MemoryDbHsql.getInstance().initializeMemoryDB();
             MemoryDbHsql.getInstance().stageTablesAndTestData();
         }

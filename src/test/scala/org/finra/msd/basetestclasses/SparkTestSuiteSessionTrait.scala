@@ -6,8 +6,8 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 trait SparkTestSuiteSessionTrait extends FunSuite with BeforeAndAfterAll {
 
-  SparkFactory.initializeSparkLocalMode("local[*]" , "WARN","1")
-  val sparkSession :SparkSession = SparkFactory.sparkSession
+  SparkFactory.initializeSparkLocalMode("local[*]", "WARN", "1")
+  val sparkSession: SparkSession = SparkFactory.sparkSession
 
   override def afterAll(): Unit = {
     sparkSession.stop()

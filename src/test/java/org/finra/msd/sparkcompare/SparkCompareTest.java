@@ -17,11 +17,10 @@
 package org.finra.msd.sparkcompare;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.finra.msd.containers.AppleTable;
 import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
+import org.finra.msd.containers.AppleTable;
+import org.finra.msd.containers.CountResult;
+import org.finra.msd.containers.DiffResult;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.finra.msd.util.FileUtil;
 import org.junit.Assert;
@@ -45,26 +44,24 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
      */
     @Test
     public void testCompareRdd() {
-       
+
         //code to get file1 location
         String file1Path = this.getClass().getClassLoader().
                 getResource("TC5NullsAndEmptyData1.txt").getPath();
-        
+
         String file2Path = this.getClass().getClassLoader().
                 getResource("TC5NullsAndEmptyData2.txt").getPath();
 
-        Pair<Dataset<Row>, Dataset<Row>> comparisonResult = SparkCompare.compareFiles(file1Path, file2Path);
+        DiffResult diffResult = SparkCompare.compareFiles(file1Path, file2Path);
 
-        if (comparisonResult.getLeft().count() == 0 || comparisonResult.getRight().count() == 0)
-        {
+        if (diffResult.inLeftNotInRight().count() == 0 || diffResult.inRightNotInLeft().count() == 0) {
             Assert.fail("Straightforward output of test results somehow failed");
         }
 
     }
 
     @Test
-    public void testCompareFileSaveResults()
-    {
+    public void testCompareFileSaveResults() {
         String file1Path = this.getClass().getClassLoader().
                 getResource("Test4.txt").getPath();
 
@@ -73,7 +70,7 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
 
         String testLoc = "file_test";
         cleanOutputDirectory("/" + testLoc);
-        SparkCompare.compareFileSaveResults(file1Path,file2Path,outputDirectory + "/" + testLoc, true , ",");
+        SparkCompare.compareFileSaveResults(file1Path, file2Path, outputDirectory + "/" + testLoc, true, ",");
 
         File outputFile = new File(outputDirectory + "/" + testLoc);
         if (!outputFile.exists())
@@ -81,29 +78,25 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
     }
 
     @Test
-    public void testCompareAppleTables()
-    {
+    public void testCompareAppleTables() {
         AppleTable appleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
                 "SA",
                 "",
                 "(select * from Persons1)", "table1");
 
-        Pair<Dataset<Row>, Dataset<Row>> pair = SparkCompare.compareAppleTables(appleTable, appleTable);
+        DiffResult diffResult = SparkCompare.compareAppleTables(appleTable, appleTable);
         //the expectation is that there is no diffrence
-        if (pair.getLeft().count() != 0)
-        {
+        if (diffResult.inLeftNotInRight().count() != 0) {
             Assert.fail("found different records in Left dataframe although passed in the same table as input");
         }
-        if (pair.getRight().count() != 0)
-        {
+        if (diffResult.inRightNotInLeft().count() != 0) {
             Assert.fail("found different records in right dataFrame although passed in the same table as input");
         }
     }
 
     @Test
-    public void testCompareJDBCAppleTablesWithDifference()
-    {
+    public void testCompareJDBCAppleTablesWithDifference() {
         AppleTable leftAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
                 "SA",
@@ -117,23 +110,20 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
                 "",
                 "(select * from Persons1 Where personid=1)", "table2");
 
-        Pair<Dataset<Row>, Dataset<Row>> pair = SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable);
+        DiffResult diffResult = SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable);
 
         //the expectation is one difference
-        if (pair.getLeft().count() != 1)
-        {
+        if (diffResult.inLeftNotInRight().count() != 1) {
             Assert.fail("expected 1 different record in left");
         }
-        if (pair.getRight().count() != 1)
-        {
+        if (diffResult.inRightNotInLeft().count() != 1) {
             Assert.fail("expected 1 different record in right");
         }
     }
 
 
     @Test
-    public void testCompareJDBCtpFileAppleTablesWithDifference()
-    {
+    public void testCompareJDBCtpFileAppleTablesWithDifference() {
         AppleTable leftAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
                 "SA",
@@ -143,24 +133,21 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
         String file1Path = this.getClass().getClassLoader().
                 getResource("TC1DiffsAndDups1.txt").getPath();
 
-        AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file1Path,"table2");
+        AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file1Path, "table2");
 
-        Pair<Dataset<Row>, Dataset<Row>> pair = SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable);
+        DiffResult diffResult = SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable);
 
         //the expectation is one difference
-        if (pair.getLeft().count() != 2)
-        {
+        if (diffResult.inLeftNotInRight().count() != 2) {
             Assert.fail("expected 2 different record in left");
         }
-        if (pair.getRight().count() != 5)
-        {
+        if (diffResult.inRightNotInLeft().count() != 5) {
             Assert.fail("expected 5 different record in right");
         }
     }
 
     @Test
-    public void testCompareJDBCtpFileAppleTablesWithDifferenceAndSaveToFile()
-    {
+    public void testCompareJDBCtpFileAppleTablesWithDifferenceAndSaveToFile() {
         AppleTable leftAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
                 "SA",
@@ -171,10 +158,10 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
                 getResource("TC1DiffsAndDups1.txt").getPath();
 
         String testLoc = "jdbc_test";
-        AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file1Path,"table2");
+        AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file1Path, "table2");
         cleanOutputDirectory("/" + testLoc);
         SparkCompare.compareAppleTablesSaveResults(leftAppleTable, rightAppleTable
-                , outputDirectory + "/" + testLoc, true , ",");
+                , outputDirectory + "/" + testLoc, true, ",");
 
         File outputFile = new File(outputDirectory + "/" + testLoc);
         if (!outputFile.exists())
@@ -182,8 +169,7 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
     }
 
     @Test
-    public void testCompareCoutnsFronJDBCAppleTablesWithDifference()
-    {
+    public void testCompareCoutnsFronJDBCAppleTablesWithDifference() {
         AppleTable leftAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
                 "SA",
@@ -197,17 +183,15 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
                 "",
                 "(select * from test1)", "table2");
 
-        Pair<Long, Long> pair = SparkCompare.compareAppleTablesCount(leftAppleTable, rightAppleTable);
+        CountResult countResult = SparkCompare.compareAppleTablesCount(leftAppleTable, rightAppleTable);
 
         //the expectation is that the counts are different
-        if (pair.getLeft() == pair.getRight())
-        {
+        if (countResult.getLetCount() == countResult.getRightCount()) {
             Assert.fail("expected counts to be different");
         }
     }
 
-    private void cleanOutputDirectory(String subdir)
-    {
+    private void cleanOutputDirectory(String subdir) {
         //will clean the output directory
         try {
             FileUtils.deleteDirectory(new File(outputDirectory + subdir));

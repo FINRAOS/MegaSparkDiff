@@ -1,13 +1,13 @@
 package org.finra.msd.visualization;
 
-import org.apache.commons.lang3.tuple.Pair;
+
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.finra.msd.containers.AppleTable;
-import org.finra.msd.sparkcompare.SparkCompare;
 import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
+import org.finra.msd.containers.AppleTable;
+import org.finra.msd.containers.DiffResult;
+import org.finra.msd.sparkcompare.SparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
-import org.finra.msd.visualization.Visualizer;
 import org.junit.Assert;
 import org.junit.Test;
 import scala.collection.JavaConverters;
@@ -19,81 +19,70 @@ import java.util.List;
 public class VisualizerTest extends BaseJunitForSparkCompare {
 
     @Test
-    public void basicVisualizerTest()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test6", "Test7");
-        String html = generateString(pair.getLeft(), pair.getRight(), "FRUIT", 100);
-        if (html.isEmpty())
-        {
+    public void basicVisualizerTest() {
+        DiffResult diffResult = getAppleTablediffResult("Test6", "Test7");
+        String html = generateString(diffResult.inLeftNotInRight(), diffResult.inRightNotInLeft(), "FRUIT", 100);
+        if (html.isEmpty()) {
             Assert.fail("html was empty");
         }
     }
 
     @Test
-    public void emptyLeftDfTest()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test4", "Test1");
-        String html = generateString(pair.getLeft(), pair.getRight(), "FRUIT", 100);
-        if (html.isEmpty())
-        {
+    public void emptyLeftDfTest() {
+        DiffResult diffResult = getAppleTablediffResult("Test4", "Test1");
+        String html = generateString(diffResult.inLeftNotInRight(), diffResult.inRightNotInLeft(), "FRUIT", 100);
+        if (html.isEmpty()) {
             Assert.fail("html was empty");
         }
     }
 
     @Test
-    public void emptyRightDfTest()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test1", "Test4");
-        String html = generateString(pair.getLeft(), pair.getRight(), "FRUIT", 100);
-        if (html.isEmpty())
-        {
+    public void emptyRightDfTest() {
+        DiffResult diffResult = getAppleTablediffResult("Test1", "Test4");
+        String html = generateString(diffResult.inLeftNotInRight(), diffResult.inRightNotInLeft(), "FRUIT", 100);
+        if (html.isEmpty()) {
             Assert.fail("html was empty");
         }
     }
 
     @Test
-    public void nullLeftDfTest()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test1", "Test4");
-        String html = generateString(null, pair.getRight(), "FRUIT", 100);
+    public void nullLeftDfTest() {
+        DiffResult diffResult = getAppleTablediffResult("Test1", "Test4");
+        String html = generateString(null, diffResult.inRightNotInLeft(), "FRUIT", 100);
         Assert.assertEquals("<h3>Error message: Left dataframe is null</h3>", html);
     }
 
     @Test
-    public void nullRightDfTest()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test1", "Test4");
-        String html = generateString(pair.getLeft(), null, "FRUIT", 100);
+    public void nullRightDfTest() {
+        DiffResult diffResult = getAppleTablediffResult("Test1", "Test4");
+        String html = generateString(diffResult.inLeftNotInRight(), null, "FRUIT", 100);
         Assert.assertEquals("<h3>Error message: Right dataframe is null</h3>", html);
     }
 
     @Test
-    public void emptyKeyTest()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test1", "Test4");
-        String html = generateString(pair.getLeft(), pair.getRight(), "", 100);
+    public void emptyKeyTest() {
+        DiffResult diffResult = getAppleTablediffResult("Test1", "Test4");
+        String html = generateString(diffResult.inLeftNotInRight(), diffResult.inRightNotInLeft(), "", 100);
         Assert.assertEquals("<h3>Error message: One or more keys is empty or null</h3>", html);
     }
 
     @Test
-    public void nullKeyTest()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test1", "Test4");
-        String html = generateString(pair.getLeft(), pair.getRight(), null, 100);
+    public void nullKeyTest() {
+        DiffResult diffResult = getAppleTablediffResult("Test1", "Test4");
+        String html = generateString(diffResult.inLeftNotInRight(), diffResult.inRightNotInLeft(), null, 100);
         Assert.assertEquals("<h3>Error message: One or more keys is empty or null</h3>", html);
     }
 
     @Test
-    public void keyCaseTest()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test1", "Test4");
+    public void keyCaseTest() {
+        DiffResult diffResult = getAppleTablediffResult("Test1", "Test4");
         boolean flag = true;
         String result1 = "";
         String result2 = "";
 
-        try{
-            result1 = generateString(pair.getLeft(), pair.getRight(), "Fruit", 100);
-            result2 = generateString(pair.getLeft(), pair.getRight(), "FrUit", 100);
+        try {
+            result1 = generateString(diffResult.inLeftNotInRight(), diffResult.inRightNotInLeft(), "Fruit", 100);
+            result2 = generateString(diffResult.inLeftNotInRight(), diffResult.inRightNotInLeft(), "FrUit", 100);
         } catch (Exception ex) {
             flag = false;
         }
@@ -103,21 +92,20 @@ public class VisualizerTest extends BaseJunitForSparkCompare {
     }
 
     @Test
-    public void invalidMaxRecordsTest()
-    {
-        Pair<Dataset<Row>,Dataset<Row>> pair = getAppleTablePair("Test1", "Test4");
+    public void invalidMaxRecordsTest() {
+        DiffResult diffResult = getAppleTablediffResult("Test1", "Test4");
         boolean flag = true;
 
-        try{
-            generateString(pair.getLeft(), pair.getRight(), "FRUIT", -100);
-        } catch(Exception ex) {
+        try {
+            generateString(diffResult.inLeftNotInRight(), diffResult.inRightNotInLeft(), "FRUIT", -100);
+        } catch (Exception ex) {
             flag = false;
         }
 
         Assert.assertEquals(true, flag);
     }
 
-    private String generateString(Dataset<Row> left, Dataset<Row> right, String key, int maxRecords){
+    private String generateString(Dataset<Row> left, Dataset<Row> right, String key, int maxRecords) {
         //Primary Key as Java List
         List<String> primaryKey = Arrays.asList(key);
         //Convert Java List to SCALA SEQ
@@ -128,7 +116,7 @@ public class VisualizerTest extends BaseJunitForSparkCompare {
         return html;
     }
 
-    private Pair<Dataset<Row>,Dataset<Row>> getAppleTablePair(String testName1, String testName2){
+    private DiffResult getAppleTablediffResult(String testName1, String testName2) {
         AppleTable leftAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver",
                 "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb",
                 "SA",

@@ -6,7 +6,7 @@
 
     <groupId>org.finra.megasparkdiff</groupId>
     <artifactId>mega-spark-diff</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
 
     <name>MegaSparkDiff</name>
