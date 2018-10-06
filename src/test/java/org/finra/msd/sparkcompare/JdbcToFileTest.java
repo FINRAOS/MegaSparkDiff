@@ -82,7 +82,6 @@ public class JdbcToFileTest extends BaseJunitForSparkCompare {
             Assert.fail("Expected 1 difference coming from right table." +
                     "  Instead, found " + pair.inRightNotInLeft().count() + ".");
 
-        SparkFactory.stopSparkContext();
     }
 
     @Test

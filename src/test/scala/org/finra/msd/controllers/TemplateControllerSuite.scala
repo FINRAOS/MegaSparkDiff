@@ -1,8 +1,9 @@
 package org.finra.msd.controllers
 
-import org.scalatest.FunSuite
+import org.finra.msd.basetestclasses.SparkFunSuite
 
-class TemplateControllerTestSuite extends FunSuite {
+
+class TemplateControllerSuite extends SparkFunSuite {
 
   test("html template loading") {
     val html = TemplateController.horizontalTableTemplate

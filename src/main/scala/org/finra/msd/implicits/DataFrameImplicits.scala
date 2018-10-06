@@ -12,13 +12,6 @@ object DataFrameImplicits {
     }
   }
 
-  implicit class SequenceImprovements(seq: Seq[Row]) {
-    def toDf(sparkSession: SparkSession, schema: StructType): DataFrame = {
 
-      val rowRdd = sparkSession.sparkContext.parallelize(seq)
-      val df = sparkSession.createDataFrame(rowRdd, schema)
-      return df
-    }
-  }
 
 }

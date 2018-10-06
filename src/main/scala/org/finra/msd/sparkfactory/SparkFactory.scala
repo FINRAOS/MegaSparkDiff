@@ -51,13 +51,16 @@ object SparkFactory {
     *                 "local[*]" this means spark will figure out how many cores you have and will use them all.
     */
   def initializeSparkLocalMode(numCores: String, logLevel: String, defaultPartitions: String): Unit = {
-    conf = new SparkConf().setAppName("megasparkdiff")
-      .setMaster(numCores)
-      .set("spark.driver.host", "localhost")
-      .set("spark.ui.enabled", "false") //disable spark UI
-      .set("spark.sql.shuffle.partitions", defaultPartitions)
-    sparkSession = SparkSession.builder.config(conf).getOrCreate()
-    sparkSession.sparkContext.setLogLevel(logLevel)
+    if (sparkSession == null)
+      {
+        conf = new SparkConf().setAppName("megasparkdiff")
+          .setMaster(numCores)
+          .set("spark.driver.host", "localhost")
+          .set("spark.ui.enabled", "false") //disable spark UI
+          .set("spark.sql.shuffle.partitions", defaultPartitions)
+        sparkSession = SparkSession.builder.config(conf).getOrCreate()
+        sparkSession.sparkContext.setLogLevel(logLevel)
+      }
   }
 
   def initializeDataBricks(dataBricksSparkSession: SparkSession): Unit = {

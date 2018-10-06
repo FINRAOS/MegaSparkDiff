@@ -5,9 +5,10 @@ import org.finra.msd.sparkfactory.SparkFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class BaseJunitForSparkCompare {
+public class BaseJunitForSparkCompare  {
 
     protected final String outputDirectory = System.getProperty("user.dir") + "/sparkOutputDirectory";
+
 
     @BeforeClass
     public static void setUpClass() {
@@ -21,7 +22,7 @@ public class BaseJunitForSparkCompare {
 
     @AfterClass
     public static void tearDownClass() {
-        SparkFactory.stopSparkContext();
+        //SparkFactory.stopSparkContext();
         //TODO: need to implement a better way to close in memory DB
         //MemoryDbHsql.getInstance().shutdownMemoryDb();
     }

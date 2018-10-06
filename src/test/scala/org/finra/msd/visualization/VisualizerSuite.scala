@@ -2,14 +2,14 @@ package org.finra.msd.visualization
 
 
 import org.apache.spark.sql.DataFrame
-import org.finra.msd.basetestclasses.SparkTestSuiteSessionTrait
+import org.finra.msd.basetestclasses.SparkFunSuite
 import org.finra.msd.containers.DiffResult
 import org.finra.msd.sparkcompare.SparkCompare
-import org.scalatest.Matchers
+import org.scalatest.BeforeAndAfterAll
 
-class VisualizerTests extends SparkTestSuiteSessionTrait with Matchers {
+class VisualizerSuite extends SparkFunSuite with BeforeAndAfterAll {
 
-  import sparkSession.implicits._
+  import testImplicits._
 
   test("Visualize as Text") {
     val left = Seq(
