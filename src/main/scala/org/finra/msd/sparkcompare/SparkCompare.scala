@@ -25,6 +25,7 @@ import org.finra.msd.enums.SourceType
 import org.finra.msd.implicits.DataFrameImplicits._
 import org.finra.msd.outputwriters.OutputWriter
 import org.finra.msd.sparkfactory.SparkFactory
+import org.apache.spark.sql.functions.col
 
 /**
   * Contains comparison related operations
@@ -172,7 +173,16 @@ object SparkCompare {
     return countsPair
   }
 
-
+  /**
+    * This method does a full outer join between the resulting left and right dataframes from the method
+    * SparkCompare.compareSchemaDataFrames. It will return a single dataframe having the left columns prefixed with l_
+    * and the right columns prefixed with r_. the Key columns will not have prefixed. The resulting dataframe will have
+    * all l_ columns on the left, then the Key columns in the middle, then the r_ columns on the right.
+    * @param left Dataframe having inLeftNotInRight resulting from SparkCompare.compareSchemaDataFrames
+    * @param right Dataframe having inRightNotInLeft resulting from SparkCompare.compareSchemaDataFrames
+    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both dataframes
+    * @return a dataframe having the resulting full outer join operation.
+    */
   def fullOuterJoinDataFrames(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String]): DataFrame = {
 
     //convert column names to uppercase
@@ -180,7 +190,7 @@ object SparkCompare {
     val upperCaseRight: DataFrame = right.toDF(right.columns.map(_.toUpperCase): _*)
 
     val compositeKeysUpperCase: Seq[String] = compositeKeyStrs.map(k => k.toUpperCase)
-    val nonKeyCols: List[String] = upperCaseLeft.columns.filter(c => !compositeKeysUpperCase.contains(c)).toList
+    val nonKeyCols: Seq[String] = upperCaseLeft.columns.filter(c => !compositeKeysUpperCase.contains(c)).toSeq
 
     //prepend l and r to nonkey columns
     val prependedColumnsLeft = compositeKeysUpperCase ++ nonKeyCols.map(c => "l_" + c).toSeq
@@ -191,9 +201,10 @@ object SparkCompare {
     val prependedRightDf: DataFrame = upperCaseRight.toDF(prependedColumnsRight : _*)
 
 
-    val joinedDf = prependedLeftDf.as("l")
+    val joinedDf: DataFrame = prependedLeftDf.as("l")
       .join(prependedRightDf.as("r"), compositeKeysUpperCase, "full_outer")
 
-    joinedDf
+    val allColsWithKeysInTheMiddle: Seq[String] = nonKeyCols.map(c => "l_" + c) ++ compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c)
+    joinedDf.select( allColsWithKeysInTheMiddle.map(name => col(name)) :_*)
   }
 }
