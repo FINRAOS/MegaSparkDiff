@@ -28,7 +28,7 @@ public class MemoryDbHsql {
 
 
     private static MemoryDbHsql instance = null;
-    Server hsqlDbServer;
+    Server hsqlDbServer = null;
 
 
     protected MemoryDbHsql() {
@@ -42,14 +42,18 @@ public class MemoryDbHsql {
         return instance;
     }
 
-    public void initializeMemoryDB()
+    public synchronized void  initializeMemoryDB()
     {
-        hsqlDbServer = new Server();
-        hsqlDbServer.setDatabaseName(0, "testDb");
-        hsqlDbServer.setDatabasePath(0, "mem:testDb");
-        hsqlDbServer.setPort(9001); // this is the default port
-        hsqlDbServer.setSilent(true);
-        hsqlDbServer.start();
+        if (hsqlDbServer == null)
+        {
+            hsqlDbServer = new Server();
+            hsqlDbServer.setDatabaseName(0, "testDb");
+            hsqlDbServer.setDatabasePath(0, "mem:testDb");
+            hsqlDbServer.setPort(9001); // this is the default port
+            hsqlDbServer.setSilent(true);
+            hsqlDbServer.start();
+            stageTablesAndTestData();
+        }
     }
 
     public int getState()
@@ -61,7 +65,7 @@ public class MemoryDbHsql {
         return hsqlDbServer.getState();
     }
 
-    public void stageTablesAndTestData()
+    private void stageTablesAndTestData()
     {
         String url="jdbc:hsqldb:hsql://127.0.0.1:9001/testDb";
         try {

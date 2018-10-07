@@ -153,6 +153,7 @@
                     <parallel>true</parallel>
                     <junitxml>.</junitxml>
                     <filereports>scala-msd-TestSuite.txt</filereports>
+                    <forkMode>never</forkMode>
                 </configuration>
                 <executions>
                     <execution>

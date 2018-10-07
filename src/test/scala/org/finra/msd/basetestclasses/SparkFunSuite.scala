@@ -53,13 +53,12 @@ class SparkFunSuite
     }
   }
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit = synchronized {
 
     SparkFactory.initializeSparkLocalMode("local[*]", "WARN", "1")
 
     if (MemoryDbHsql.getInstance.getState != 1) {
       MemoryDbHsql.getInstance.initializeMemoryDB()
-      MemoryDbHsql.getInstance.stageTablesAndTestData()
     }
     super.beforeAll()
   }
