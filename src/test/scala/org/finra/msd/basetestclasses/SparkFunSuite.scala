@@ -25,20 +25,14 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, Row, SQLContext, SQLImplicits}
 import org.finra.msd.memorydb.MemoryDbHsql
 import org.finra.msd.sparkfactory.SparkFactory
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers, Outcome}
 
-/**
- * Base abstract class for all unit tests in Spark for handling common functionality.
- */
-@RunWith(classOf[JUnitRunner])
 class SparkFunSuite
   extends FunSuite
-  with BeforeAndAfterAll
-  with Logging
-  with Matchers
-  with SharedSqlContext {
+    with BeforeAndAfterAll
+    with Logging
+    with Matchers
+    with SharedSqlContext {
 
 
   protected val outputDirectory: String = System.getProperty("user.dir") + "/sparkOutputDirectory"
@@ -60,7 +54,11 @@ class SparkFunSuite
   }
 
   override def beforeAll(): Unit = {
-    SparkFactory.initializeSparkLocalMode("local[*]", "WARN", "1")
+    if (SparkFunSuite.sparkStarted == false) {
+      SparkFactory.initializeSparkLocalMode("local[*]", "WARN", "1")
+      SparkFunSuite.sparkStarted = true
+    }
+
     if (MemoryDbHsql.getInstance.getState != 1) {
       MemoryDbHsql.getInstance.initializeMemoryDB()
       MemoryDbHsql.getInstance.stageTablesAndTestData()
@@ -82,12 +80,12 @@ class SparkFunSuite
   }
 
   /**
-   * Log the suite name and the test name before and after each test.
-   *
-   * Subclasses should never override this method. If they wish to run
-   * custom code before and after each test, they should mix in the
-   * {{org.scalatest.BeforeAndAfter}} trait instead.
-   */
+    * Log the suite name and the test name before and after each test.
+    *
+    * Subclasses should never override this method. If they wish to run
+    * custom code before and after each test, they should mix in the
+    * {{org.scalatest.BeforeAndAfter}} trait instead.
+    */
   final protected override def withFixture(test: NoArgTest): Outcome = {
     val testName = test.text
     val suiteName = this.getClass.getName
@@ -100,4 +98,8 @@ class SparkFunSuite
     }
   }
 
+}
+
+object SparkFunSuite {
+  var sparkStarted = false
 }
