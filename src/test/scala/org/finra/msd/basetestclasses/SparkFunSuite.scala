@@ -25,14 +25,15 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, Row, SQLContext, SQLImplicits}
 import org.finra.msd.memorydb.MemoryDbHsql
 import org.finra.msd.sparkfactory.SparkFactory
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers, Outcome}
+import org.scalatest._
 
 class SparkFunSuite
   extends FunSuite
     with BeforeAndAfterAll
     with Logging
     with Matchers
-    with SharedSqlContext {
+    with SharedSqlContext
+    with ParallelTestExecution {
 
 
   protected val outputDirectory: String = System.getProperty("user.dir") + "/sparkOutputDirectory"
