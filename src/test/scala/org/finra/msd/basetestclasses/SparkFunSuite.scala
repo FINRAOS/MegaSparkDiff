@@ -54,10 +54,8 @@ class SparkFunSuite
   }
 
   override def beforeAll(): Unit = {
-    if (SparkFunSuite.sparkStarted == false) {
-      SparkFactory.initializeSparkLocalMode("local[*]", "WARN", "1")
-      SparkFunSuite.sparkStarted = true
-    }
+
+    SparkFactory.initializeSparkLocalMode("local[*]", "WARN", "1")
 
     if (MemoryDbHsql.getInstance.getState != 1) {
       MemoryDbHsql.getInstance.initializeMemoryDB()
@@ -65,6 +63,7 @@ class SparkFunSuite
     }
     super.beforeAll()
   }
+
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -98,8 +97,4 @@ class SparkFunSuite
     }
   }
 
-}
-
-object SparkFunSuite {
-  var sparkStarted = false
 }
