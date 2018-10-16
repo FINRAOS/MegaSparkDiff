@@ -21,7 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.finra.msd.containers.AppleTable;
-import org.finra.msd.sparkcompare.baseclasses.BaseJunitForSparkCompare;
+import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.junit.Assert;
 import org.junit.Test;
@@ -70,7 +70,7 @@ public class FileToFileTest extends BaseJunitForSparkCompare
             Assert.fail("Expected 5 differences coming from left table." +
                     "  Instead, found " + pair.getLeft().count() + ".");
 
-        pair.getLeft().show();
+
         if (pair.getRight().count() != 4)
             Assert.fail("Expected 4 differences coming from right table." +
                     "  Instead, found " + pair.getRight().count() + ".");

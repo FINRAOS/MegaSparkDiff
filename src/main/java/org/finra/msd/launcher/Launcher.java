@@ -21,6 +21,7 @@ import org.finra.msd.containers.CmdLine;
 import org.finra.msd.containers.SourceVars;
 import org.finra.msd.sparkcompare.SparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
+import scala.Option;
 
 import java.io.IOException;
 
@@ -42,12 +43,13 @@ public class Launcher {
         AppleTable leftAppleTable = generateAppleTable(sv1, values.getData1(),"table1");
         AppleTable rightAppleTable = generateAppleTable(sv2, values.getData2(),"table2");
 
+
         /** Compare tables and save output to file **/
         SparkCompare.compareAppleTablesSaveResults(
                 leftAppleTable,
                 rightAppleTable,
                 values.getOutputDirectory(),
-                true);
+                true , values.getDelimiter());
         SparkFactory.stopSparkContext();
     }
 
@@ -69,7 +71,8 @@ public class Launcher {
                                     sv.getVar("user"),
                                     sv.getVar("password"),
                                     sv.getQuery(dataSetName),
-                                    tempViewName);
+                                    tempViewName,
+                                    Option.apply(sv.getVar("delimiter")));
             case "hive": return SparkFactory.parallelizeHiveSource(
                                     sv.getQuery(dataSetName),
                                     tempViewName);

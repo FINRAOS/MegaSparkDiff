@@ -73,10 +73,10 @@ public class SourceVars
                        query = line.substring(line.indexOf(":")+1).trim();
                 queries.put(dataName,query);
             }
-            else if (line.contains("=") && line.indexOf("=") == line.lastIndexOf("="))
+            else if (line.contains("="))
             {
-                String key = line.substring(0,line.indexOf("=")).trim(),
-                       val = line.substring(line.indexOf("=")+1).trim();
+                String key = line.substring(0, line.indexOf("=")).trim();
+                String val = line.substring(line.indexOf("=") + 1).trim();
                 if (key.equals("connection"))
                     connection = val;
                 else

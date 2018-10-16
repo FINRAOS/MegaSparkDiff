@@ -7,23 +7,24 @@
 
     (HDFS, JDBC, S3, Hbase, Text Files, Hive). 
     
-    MegaSparkDiff can run on Amazon EMR (Elastic Map Reduce),
-    Amazon EC2 instances and cloud environments
-    with compatible Spark distributions.
+    MegaSparkDiff can run on 
+    (a) Amazon EMR (Elastic Map Reduce),
+    (b) Amazon EC2 instances and cloud environments with compatible Spark distributions.
+    (c) DataBricks Interactive Notebooks with Visualizations via displayhtml function.
 
-How to Use form Within a Java or SCALA Project
+How to Use from Within a Java or Scala Project
 ----------------------------------------------
 ```sh
 <dependency>
     <groupId>org.finra.megasparkdiff</groupId>
     <artifactId>mega-spark-diff</artifactId>
-    <version>0.1.3</version>
+    <version>0.2.1</version>
 </dependency>
 ```
 
 SparkFactory
 -----------
-    It parallelizes source/target data.
+    parallelizes source/target data.
 
     The data sources can be in following forms:
         Text File
@@ -66,3 +67,9 @@ How to use via shell script in EMR
     Additionally, the user will have the option to add JDBC Driver jar
     files by including them in the classpath.  This is to enable them to
     extract from whichever database they choose.
+    
+Run tests on Windows
+------------
+1. Download [Hadoop winutils](https://github.com/steveloughran/winutils)
+1. Extract to some path, e.g. C:\Users\MegaSparkDiffFan\bin
+1. Run tests while defining `hadoop.home.dir`, e.g. `mvn test -Dhadoop.home.dir=C:\Users\MegaSparkDiffFan`

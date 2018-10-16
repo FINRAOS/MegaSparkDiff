@@ -21,7 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.finra.msd.containers.AppleTable;
-import org.finra.msd.sparkcompare.baseclasses.BaseJunitForSparkCompare;
+import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.finra.msd.util.FileUtil;
 import org.junit.Assert;
@@ -55,12 +55,11 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
 
         Pair<Dataset<Row>, Dataset<Row>> comparisonResult = SparkCompare.compareFiles(file1Path, file2Path);
 
-        try {
-            comparisonResult.getLeft().show();
-            comparisonResult.getRight().show();
-        } catch (Exception e) {
+        if (comparisonResult.getLeft().count() == 0 || comparisonResult.getRight().count() == 0)
+        {
             Assert.fail("Straightforward output of test results somehow failed");
         }
+
     }
 
     @Test
@@ -74,7 +73,7 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
 
         String testLoc = "file_test";
         cleanOutputDirectory("/" + testLoc);
-        SparkCompare.compareFileSaveResults(file1Path,file2Path,outputDirectory + "/" + testLoc, true);
+        SparkCompare.compareFileSaveResults(file1Path,file2Path,outputDirectory + "/" + testLoc, true , ",");
 
         File outputFile = new File(outputDirectory + "/" + testLoc);
         if (!outputFile.exists())
@@ -175,7 +174,7 @@ public class SparkCompareTest extends BaseJunitForSparkCompare {
         AppleTable rightAppleTable = SparkFactory.parallelizeTextSource(file1Path,"table2");
         cleanOutputDirectory("/" + testLoc);
         SparkCompare.compareAppleTablesSaveResults(leftAppleTable, rightAppleTable
-                , outputDirectory + "/" + testLoc, true);
+                , outputDirectory + "/" + testLoc, true , ",");
 
         File outputFile = new File(outputDirectory + "/" + testLoc);
         if (!outputFile.exists())
