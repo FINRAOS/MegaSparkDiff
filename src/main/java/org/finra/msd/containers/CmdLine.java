@@ -119,6 +119,7 @@ public class CmdLine
      */
     private String upperBound;
 
+    private String delimiter = ",";
 
     /**
      * Gets the location of source data
@@ -235,6 +236,10 @@ public class CmdLine
     public String getUpperBound() { return upperBound; }
 
 
+    public String getDelimiter() {
+        return delimiter;
+    }
+
     /**
      * Parse the command line to retrieve at least the necessary parameters
      * @param args Input/Output/Query parameters
@@ -281,6 +286,7 @@ public class CmdLine
                     case "-cluster-id": clusterId = after; break;
                     case "-cn":
                     case "-cluster-name": clusterName = after; break;
+                    case "-delimiter": delimiter = after; break;
 
                     default: break;
                 }

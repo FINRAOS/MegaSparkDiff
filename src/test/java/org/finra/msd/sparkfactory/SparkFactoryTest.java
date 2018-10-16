@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.finra.msd.sparkcompare;
+package org.finra.msd.sparkfactory;
 
 import org.finra.msd.containers.AppleTable;
-import org.finra.msd.sparkcompare.baseclasses.BaseJunitForSparkCompare;
+import org.finra.msd.basetestclasses.BaseJunitForSparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
 import org.junit.*;
 
@@ -32,7 +32,7 @@ public class SparkFactoryTest extends BaseJunitForSparkCompare {
                 "SA",
                 "",
                 "(select * from Persons1)", "table1");
-        appleTable.getDataFrame().show();
+
         if (appleTable.getDataFrame().count() == 0)
         {
             Assert.fail("dataset was empty");

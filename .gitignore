@@ -34,3 +34,10 @@ target/
 sparkOutputDirectory
 sparkOutputDirectory/
 /mega-spark-diff.iml
+
+# Eclipse project files
+/.classpath
+/.project
+/.cache-main
+/.cache-tests
+/.settings/
