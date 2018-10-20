@@ -7,5 +7,4 @@ import scala.beans.BeanProperty
 case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty inRightNotInLeft :DataFrame) {
 
 
-  //todo: implement a compare count method
 }
