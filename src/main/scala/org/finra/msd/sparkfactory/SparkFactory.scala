@@ -36,8 +36,8 @@ object SparkFactory {
     * It creates a spark app with the name "megasparkdiff" and enables hive support by default.
     */
   def initializeSparkContext(): Unit = { //todo: need to refactor it to support spark-submit command
-      conf = new SparkConf().setAppName("megasparkdiff")
-      sparkSession = SparkSession.builder.config(conf).enableHiveSupport().getOrCreate()
+    conf = new SparkConf().setAppName("megasparkdiff")
+    sparkSession = SparkSession.builder.config(conf).enableHiveSupport().getOrCreate()
   }
 
 
@@ -50,19 +50,23 @@ object SparkFactory {
     *                 you can specify "local[1]" this means spark will use 1 core only. Alternatively you can specify
     *                 "local[*]" this means spark will figure out how many cores you have and will use them all.
     */
-  def initializeSparkLocalMode(numCores: String , logLevel :String , defaultPartitions :String): Unit = {
-    conf = new SparkConf().setAppName("megasparkdiff")
-      .setMaster(numCores)
-      .set("spark.driver.host", "localhost")
-      .set("spark.ui.enabled","false") //disable spark UI
-      .set("spark.sql.shuffle.partitions",defaultPartitions)
-    sparkSession = SparkSession.builder.config(conf).getOrCreate()
-    sparkSession.sparkContext.setLogLevel(logLevel)
+  def initializeSparkLocalMode(numCores: String, logLevel: String, defaultPartitions: String): Unit = synchronized {
+    if (sparkSession == null)
+      {
+        conf = new SparkConf().setAppName("megasparkdiff")
+          .setMaster(numCores)
+          .set("spark.driver.host", "localhost")
+          .set("spark.ui.enabled", "false") //disable spark UI
+          .set("spark.sql.shuffle.partitions", defaultPartitions)
+        sparkSession = SparkSession.builder.config(conf).getOrCreate()
+        sparkSession.sparkContext.setLogLevel(logLevel)
+      }
   }
 
-  def initializeDataBricks(dataBricksSparkSession: SparkSession) : Unit ={
+  def initializeDataBricks(dataBricksSparkSession: SparkSession): Unit = {
     sparkSession = dataBricksSparkSession;
   }
+
   /**
     * Terminates the current Spark session
     */
@@ -94,13 +98,14 @@ object SparkFactory {
     * machine or HDFS for HDFS url like so
     * "hdfs://nn1home:8020/input/war-and-peace.txt" for S3 the url like so
     * "s3n://myBucket/myFile1.log"
+    *
     * @param textFileLocation path of a flat file containing the data to be compared
-    * @param tempViewName temporary table name for source data
+    * @param tempViewName     temporary table name for source data
     * @return custom table containing the data to be compared
     */
   def parallelizeTextSource(textFileLocation: String, tempViewName: String): AppleTable = {
     val df = parallelizeTextFile(textFileLocation)
-    val a: AppleTable = new AppleTable(SourceType.FILE , df , null , tempViewName )
+    val a: AppleTable = new AppleTable(SourceType.FILE, df, null, tempViewName)
     return a
   }
 
@@ -109,20 +114,19 @@ object SparkFactory {
     * accessed through JDBC connection.
     *
     * @param driverClassName JDBC driver name
-    * @param jdbcUrl JDBC URL
-    * @param username Username for database connection
-    * @param password Password for database connection
-    * @param sqlQuery Query to retrieve the desired data from database
-    * @param tempViewName temporary table name for source data
-    * @param delimiter source data separation character
+    * @param jdbcUrl         JDBC URL
+    * @param username        Username for database connection
+    * @param password        Password for database connection
+    * @param sqlQuery        Query to retrieve the desired data from database
+    * @param tempViewName    temporary table name for source data
+    * @param delimiter       source data separation character
     * @return custom table containing the data to be compared
     */
   def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
-                          tempViewName: String , delimiter: Option[String] ) : AppleTable =
-  {
+                            tempViewName: String, delimiter: Option[String]): AppleTable = {
     val jdbcDF: DataFrame = sparkSession.sqlContext.read
       .format("jdbc")
-      .option("driver" , driverClassName)
+      .option("driver", driverClassName)
       .option("url", jdbcUrl)
       .option("dbtable", sqlQuery)
       .option("user", username)
@@ -130,7 +134,7 @@ object SparkFactory {
       .load()
     jdbcDF.createOrReplaceTempView(tempViewName)
 
-    val appleTable: AppleTable = new AppleTable(SourceType.JDBC,  jdbcDF,delimiter.getOrElse(null) , tempViewName)
+    val appleTable: AppleTable = new AppleTable(SourceType.JDBC, jdbcDF, delimiter.getOrElse(null), tempViewName)
     return appleTable
   }
 
@@ -139,21 +143,20 @@ object SparkFactory {
     * accessed through JDBC connection.
     *
     * @param driverClassName JDBC driver name
-    * @param jdbcUrl JDBC URL
-    * @param username Username for database connection
-    * @param password Password for database connection
-    * @param sqlQuery Query to retrieve the desired data from database
-    * @param tempViewName temporary table name for source data
-    * @param delimiter source data separation character
+    * @param jdbcUrl         JDBC URL
+    * @param username        Username for database connection
+    * @param password        Password for database connection
+    * @param sqlQuery        Query to retrieve the desired data from database
+    * @param tempViewName    temporary table name for source data
+    * @param delimiter       source data separation character
     * @return custom table containing the data to be compared
     */
   def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
-                            tempViewName: String , delimiter: Option[String] , partitionColumn: String
-                           , lowerBound :String , upperBound :String, numPartitions :String) : AppleTable =
-  {
+                            tempViewName: String, delimiter: Option[String], partitionColumn: String
+                            , lowerBound: String, upperBound: String, numPartitions: String): AppleTable = {
     val jdbcDF: DataFrame = sparkSession.sqlContext.read
       .format("jdbc")
-      .option("driver" , driverClassName)
+      .option("driver", driverClassName)
       .option("url", jdbcUrl)
       .option("dbtable", sqlQuery)
       .option("user", username)
@@ -165,34 +168,35 @@ object SparkFactory {
       .load()
     jdbcDF.createOrReplaceTempView(tempViewName)
 
-    val appleTable: AppleTable = new AppleTable(SourceType.JDBC,  jdbcDF,delimiter.getOrElse(null) , tempViewName)
+    val appleTable: AppleTable = new AppleTable(SourceType.JDBC, jdbcDF, delimiter.getOrElse(null), tempViewName)
     return appleTable
   }
 
   /**
-    *This method will create an AppleTable from a query that retrieves data from a database
+    * This method will create an AppleTable from a query that retrieves data from a database
     * accessed through JDBC connection; passes in "," as a default delimiter
     *
     * @param driverClassName JDBC driver name
-    * @param jdbcUrl JDBC URL
-    * @param username Username for database connection
-    * @param password Password for database connection
-    * @param sqlQuery Query to retrieve the desired data from database
-    * @param tempViewName temporary table name for source data
+    * @param jdbcUrl         JDBC URL
+    * @param username        Username for database connection
+    * @param password        Password for database connection
+    * @param sqlQuery        Query to retrieve the desired data from database
+    * @param tempViewName    temporary table name for source data
     * @return
     */
   def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
-                          tempViewName: String ) : AppleTable = {
-    parallelizeJDBCSource(driverClassName,jdbcUrl,username,password,sqlQuery,tempViewName,Option.apply(","))
+                            tempViewName: String): AppleTable = {
+    parallelizeJDBCSource(driverClassName, jdbcUrl, username, password, sqlQuery, tempViewName, Option.apply(","))
   }
 
   /**
     * Flattens a DataFrame to only have a single column that contains the entire original row
-    * @param df a dataframe which contains one or more columns
+    *
+    * @param df        a dataframe which contains one or more columns
     * @param delimiter a character which separates the source data
     * @return flattened dataframe
     */
-  def flattenDataFrame(df: DataFrame , delimiter: String) :DataFrame = {
+  def flattenDataFrame(df: DataFrame, delimiter: String): DataFrame = {
     //There is a bug open for this in the Spark Bug tracker
     val x = SparkFactory.sparkSession
     import x.implicits._
@@ -205,14 +209,15 @@ object SparkFactory {
     * This method will create an AppleTable from a query that retrieves data from a hive
     * table.  It is assumed that hive connectivity is already enabled in the environment from
     * which this project is run.
-    * @param sqlText a query to retrieve the data
+    *
+    * @param sqlText      a query to retrieve the data
     * @param tempViewName custom table name for source
     * @return custom table containing the data
     */
-  def parallelizeHiveSource(sqlText: String , tempViewName: String) : AppleTable = {
+  def parallelizeHiveSource(sqlText: String, tempViewName: String): AppleTable = {
     val df: DataFrame = sparkSession.sql(sqlText)
     df.createOrReplaceTempView(tempViewName)
-    val  a:AppleTable = new AppleTable(SourceType.HIVE , df , "," ,tempViewName )
+    val a: AppleTable = new AppleTable(SourceType.HIVE, df, ",", tempViewName)
     return a
   }
 

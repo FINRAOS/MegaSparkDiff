@@ -25,13 +25,14 @@ import scala.beans.BeanProperty
 
 /**
   * Custom container class that stores all data gotten from any source
+  *
   * @param sourceType
   * @param dataFrame
   * @param delimiter
   * @param tempViewName
   */
 case class AppleTable(@BeanProperty sourceType: SourceType, @BeanProperty dataFrame: DataFrame, @BeanProperty delimiter: String
-                     , @BeanProperty tempViewName: String) {
+                      , @BeanProperty tempViewName: String) {
 
 }
 
