@@ -6,7 +6,7 @@
 
   <groupId>org.finra.megasparkdiff</groupId>
   <artifactId>examples.transformation-testing</artifactId>
-  <version>0.1.5</version>
+  <version>0.2.1</version>
 
   <build>
     <plugins>
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>org.finra.megasparkdiff</groupId>
       <artifactId>mega-spark-diff</artifactId>
-      <version>0.1.5</version>
+      <version>0.2.1</version>
     </dependency>
 
     <dependency>
