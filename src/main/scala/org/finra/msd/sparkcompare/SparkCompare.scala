@@ -72,6 +72,24 @@ object SparkCompare {
     OutputWriter.saveResultsToDisk(result.inLeftNotInRight, result.inRightNotInLeft, outputDirectory, singleFileOutput, delimiter)
   }
 
+  def compareAppleTablesSaveResultsWithManipulation(left: AppleTable, right: AppleTable,
+                                                    outputDirectory: String, singleFileOutput: Boolean, delimiter: String,
+                                                    excludeCols: Option[Array[String]],
+                                                    orderByCols: Option[Array[String]], ascOrder: Boolean): Boolean = {
+    var result: DiffResult = compareAppleTables(left, right)
+    if(excludeCols.getOrElse(0) != 0) {
+      result = result.removeCols(excludeCols.get)
+    }
+
+    if(orderByCols.getOrElse(0) != 0) {
+      result = result.getOrderedResult(orderByCols.get, isAsc = ascOrder)
+    }
+
+    OutputWriter.saveResultsToDisk(result.inLeftNotInRight, result.inRightNotInLeft, outputDirectory, singleFileOutput, delimiter)
+    result.noDiff()
+
+  }
+
   /**
     * Performs schema based comparison irrespective of source data types
     *
