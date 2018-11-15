@@ -27,6 +27,9 @@ import org.finra.msd.memorydb.MemoryDbHsql
 import org.finra.msd.sparkfactory.SparkFactory
 import org.scalatest._
 
+import scala.reflect.io.Path
+import scala.util.Try
+
 class SparkFunSuite
   extends FunSuite
     with BeforeAndAfterAll
@@ -95,6 +98,11 @@ class SparkFunSuite
     } finally {
       logInfo(s"\n\n===== FINISHED $shortSuiteName: '$testName' =====\n")
     }
+  }
+
+  def deleteSavedFiles(folder : String): Unit = {
+    val path: Path = Path(outputDirectory + "/" + folder + "/")
+    Try(path.deleteRecursively())
   }
 
 }

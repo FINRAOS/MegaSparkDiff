@@ -42,6 +42,19 @@ class JdbcToJdbcTest() extends SparkFunSuite {
     SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable)
   }
 
+  private def returnDiffWithSavingResult(table1: String, table2: String, testName: String) : Boolean = {
+    val leftAppleTable = SparkFactory.parallelizeJDBCSource(hsqlDriverName, hsqlUrl, "SA", "",
+      "(select * from " + table1 + ")", "table1")
+    val rightAppleTable = SparkFactory.parallelizeJDBCSource(hsqlDriverName, hsqlUrl, "SA", "",
+      "(select * from " + table2 + ")", "table2")
+    val outputPath = outputDirectory + "/"+ testName + "/"
+
+    // The save result will exclude the "Ripeness" column and result order by "PRICE" descending
+    SparkCompare.compareAppleTablesSaveResultsWithManipulation(
+      leftAppleTable, rightAppleTable, outputPath, singleFileOutput = true, ",",
+      Option.apply(Array("Ripeness")), Option.apply(Array("PRICE")), ascOrder = false)
+  }
+
   test("testCompareDifferentSchemas") {
     var failed = false
     try returnDiff("Persons1", "Test1")
@@ -89,4 +102,11 @@ class JdbcToJdbcTest() extends SparkFunSuite {
     if (pair.inRightNotInLeft.count != 0)
       fail("Expected 0 differences coming from right table." + "  Instead, found " + pair.inRightNotInLeft.count + ".")
   }
+
+  test("testCompareAndSaveFile") {
+    deleteSavedFiles("testCompareAndSaveFile")
+    val noDiff = returnDiffWithSavingResult("Test1", "Test3", "testCompareAndSaveFile")
+    Assert.assertFalse("Expected differences. Instead found no difference!", noDiff)
+  }
+
 }
