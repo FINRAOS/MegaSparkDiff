@@ -126,9 +126,7 @@ object SparkCompare {
   /**
     *
     * @param left          dataframe containing source1 data
-    * @param leftViewName  temporary table name of source1
     * @param right         dataframe containing source2 data
-    * @param rightViewName temporary table name of source2
     * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
     *         the right parameter has values in RDD2 but not in RDD1
     */
