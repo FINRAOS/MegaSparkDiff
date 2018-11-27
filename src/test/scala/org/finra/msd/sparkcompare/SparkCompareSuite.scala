@@ -34,7 +34,7 @@ class SparkCompareSuite extends SparkFunSuite {
     val comparisonReult = SparkCompare.compareSchemaDataFrames(left, right)
 
     val key: Seq[String] = Seq("key")
-    val joinedDf = SparkCompare.fullOuterJoinDataFrames(comparisonReult.inLeftNotInRight, comparisonReult.inRightNotInLeft, key)
+    val joinedDf = comparisonReult.fullOuterJoinDataFrames(key)
 
     val expectedSchema = new StructType()
       .add("KEY", StringType, true)
@@ -76,8 +76,7 @@ class SparkCompareSuite extends SparkFunSuite {
     val diffResult = SparkCompare.compareSchemaDataFrames(left, right)
 
     val key: Seq[String] = Seq("key1", "key2")
-    val results: DataFrame = SparkCompare.fullOuterJoinDataFrames(diffResult.inLeftNotInRight,
-      diffResult.inRightNotInLeft, key)
+    val results: DataFrame = diffResult.fullOuterJoinDataFrames(key)
 
     val expectedSchema = new StructType()
       .add("l_VALUE1", StringType, true)
