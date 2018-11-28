@@ -17,7 +17,6 @@
 package org.finra.msd.sparkcompare
 
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions.col
 import org.finra.msd.containers.{AppleTable, CountResult, DiffResult}
 import org.finra.msd.enums.SourceType
 import org.finra.msd.implicits.DataFrameImplicits._
