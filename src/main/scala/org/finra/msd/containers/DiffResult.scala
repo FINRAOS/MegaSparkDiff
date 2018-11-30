@@ -43,11 +43,12 @@ case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty 
   /**
     * This method compares all "l_" with their corresponding "r_" columns from the joined table returned in
     * fullOuterJoinDataFrames() and returns a mapping between column and the amount/percentage of discrepant
-    * entries in that column. 
+    * entries between those columns. 
     *
     * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both DataFrames
-    * @return a Map between column names and the amount/percentage of discrepant entries for that row.  The key values
-    *         are a Seq containing two Doubles: amount and percentage (ranging from 0 to 1).
+    * @return a Map between column names and the amount/percentage of discrepant entries for those "l_/r_" rows in the
+    *         full outer joined table.  The values of the map are Seqs containing two Doubles: amount and percentage
+    *         (ranging from 0 to 1 inclusive).
     */
   def discrepancyStats(compositeKeyStrs: Seq[String]): Map[String,Seq[Double]] = {
 
