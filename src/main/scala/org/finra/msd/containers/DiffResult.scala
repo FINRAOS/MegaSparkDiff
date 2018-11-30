@@ -1,7 +1,7 @@
 package org.finra.msd.containers
 
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions._
 
 import scala.beans.BeanProperty
 
@@ -33,11 +33,43 @@ case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty 
     val prependedLeftDf: DataFrame = upperCaseLeft.toDF(prependedColumnsLeft: _*)
     val prependedRightDf: DataFrame = upperCaseRight.toDF(prependedColumnsRight: _*)
 
-
     val joinedDf: DataFrame = prependedLeftDf.as("l")
       .join(prependedRightDf.as("r"), compositeKeysUpperCase, "full_outer")
 
     val allColsWithKeysInTheMiddle: Seq[String] = nonKeyCols.map(c => "l_" + c) ++ compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c)
     joinedDf.select(allColsWithKeysInTheMiddle.map(name => col(name)): _*)
+  }
+
+  /**
+    * This method XXX
+    *
+    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both dataframes
+    * @return a DataFrame XXX
+    */
+  def discrepancyStats(compositeKeyStrs: Seq[String]): Map[String,Seq[Double]] = {
+
+    val joinedDf: DataFrame = fullOuterJoinDataFrames(compositeKeyStrs)
+
+    val compositeKeysUpperCase: Seq[String] = compositeKeyStrs.map(k => k.toUpperCase)
+    val nonKeyCols: Seq[String] = inLeftNotInRight.columns.filter(c => !compositeKeysUpperCase.contains(c.toUpperCase)).toSeq.map(k => k.toUpperCase)
+    val zColumns: Seq[String] = nonKeyCols.map( c => "z_" + c)
+    
+    var withEqFlags = joinedDf
+    for ( c <- nonKeyCols )
+      withEqFlags = withEqFlags.withColumn("z_" + c, when(withEqFlags("l_" + c) === withEqFlags("r_" + c), "1").otherwise("0"))
+
+    var counts:Map[String,Seq[Double]] = Map()
+    for ( c <- zColumns ) {
+      val s: Double = withEqFlags.agg(sum(c)).first().getDouble(0)
+      val a: Double = withEqFlags.agg(avg(c)).first().getDouble(0)
+      counts += ( c.substring(2) -> Seq(s,a) )
+    }
+    
+    val problems:Seq[String] = nonKeyCols.sortWith(counts(_).head < counts(_).head)
+    var sortedCounts:Map[String,Seq[Double]] = Map()
+    for ( c <- problems ) {
+      sortedCounts += ( c -> counts(c) )
+    }
+    return sortedCounts
   }
 }
