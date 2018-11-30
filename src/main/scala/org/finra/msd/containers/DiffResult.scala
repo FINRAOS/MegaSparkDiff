@@ -13,7 +13,7 @@ case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty 
     * and the right columns prefixed with r_. the Key columns will not have prefixed. The resulting DataFrame will have
     * all l_ columns on the left, then the Key columns in the middle, then the r_ columns on the right.
     *
-    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both dataframes
+    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both DataFrames
     * @return a DataFrame having the resulting full outer join operation.
     */
   def fullOuterJoinDataFrames(compositeKeyStrs: Seq[String]): DataFrame = {
@@ -29,7 +29,7 @@ case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty 
     val prependedColumnsLeft = compositeKeysUpperCase ++ nonKeyCols.map(c => "l_" + c).toSeq
     val prependedColumnsRight = compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c).toSeq
 
-    //reselect the dataframes with prepended l. & r. to the columnss
+    //reselect the DataFrames with prepended l. & r. to the columnss
     val prependedLeftDf: DataFrame = upperCaseLeft.toDF(prependedColumnsLeft: _*)
     val prependedRightDf: DataFrame = upperCaseRight.toDF(prependedColumnsRight: _*)
 
@@ -41,10 +41,13 @@ case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty 
   }
 
   /**
-    * This method XXX
+    * This method compares all "l_" with their corresponding "r_" columns from the joined table returned in
+    * fullOuterJoinDataFrames() and returns a mapping between column and the amount/percentage of discrepant
+    * entries in that column. 
     *
-    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both dataframes
-    * @return a DataFrame XXX
+    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both DataFrames
+    * @return a Map between column names and the amount/percentage of discrepant entries for that row.  The key values
+    *         are a Seq containing two Doubles: amount and percentage (ranging from 0 to 1).
     */
   def discrepancyStats(compositeKeyStrs: Seq[String]): Map[String,Seq[Double]] = {
 
