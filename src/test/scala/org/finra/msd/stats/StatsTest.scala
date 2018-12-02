@@ -37,10 +37,10 @@ class StatsTest extends SparkFunSuite with BeforeAndAfterAll {
     val stats = comparisonResult.discrepancyStats(key)
     
     joinedResults.show()
-    println(stats)
+    stats.show()
   }
 
-  test("One problematic column") {
+  test("A few discrepancies across two non-key columns") {
     
     val key: Seq[String] = Seq("a_column")
 
@@ -56,8 +56,7 @@ class StatsTest extends SparkFunSuite with BeforeAndAfterAll {
 
     val right = Seq(
       ("a1","b1","c1","d1"),
-      ("a2","b2","c2","d2"),
-      ("a2","b2","c2","d2"),
+      ("a2","b2","c2","x2"),
       ("a3","b3","c3","d3"),
       ("a4","x4","c4","d4"),
       ("a5","b5","c5","d5"),
@@ -70,6 +69,38 @@ class StatsTest extends SparkFunSuite with BeforeAndAfterAll {
     val stats = comparisonResult.discrepancyStats(key)
 
     joinedResults.show()
-    println(stats)
+    stats.show()
+  }
+
+  test("Discrepancies in the key columns") {
+
+    val key: Seq[String] = Seq("a_column")
+
+    val left = Seq(
+      ("a1","b1","c1","d1"),
+      ("a2","b2","c2","d2"),
+      ("a3","b3","c3","d3"),
+      ("a4","b4","c4","d4"),
+      ("a5","b5","c5","d5"),
+      ("a6","b6","c6","d6"),
+      ("a7","b7","c7","d7")
+    ).toDF("a_column","b_column","c_column","d_column")
+
+    val right = Seq(
+      ("a1","b1","c1","d1"),
+      ("a2","b2","c2","d2"),
+      ("a3","b3","c3","d3"),
+      ("a8","b4","c4","d4"),
+      ("a5","b5","c5","d5"),
+      ("a6","b6","c6","d6"),
+      ("a9","b7","c7","d7")
+    ).toDF("a_column","b_column","c_column","d_column")
+
+    val comparisonResult: DiffResult = SparkCompare.compareSchemaDataFrames(left, right)
+    val joinedResults: DataFrame = comparisonResult.fullOuterJoinDataFrames(key)
+    val stats = comparisonResult.discrepancyStats(key)
+
+    joinedResults.show()
+    stats.show()
   }
 }
