@@ -221,5 +221,8 @@ object SparkFactory {
     return a
   }
 
+  object sparkImplicits extends SQLImplicits {
+    protected override def _sqlContext: SQLContext = SparkFactory.sparkSession.sqlContext
+  }
 }
 
