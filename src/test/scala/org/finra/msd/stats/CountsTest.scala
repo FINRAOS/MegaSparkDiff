@@ -6,7 +6,7 @@ import org.finra.msd.containers.DiffResult
 import org.finra.msd.sparkcompare.SparkCompare
 import org.scalatest.BeforeAndAfterAll
 
-class StatsTest extends SparkFunSuite with BeforeAndAfterAll {
+class CountsTest extends SparkFunSuite with BeforeAndAfterAll {
 
   import testImplicits._
 
