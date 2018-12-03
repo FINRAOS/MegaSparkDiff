@@ -1,12 +1,14 @@
 package org.finra.msd.containers
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Row, SQLContext, SQLImplicits}
 import org.apache.spark.sql.functions._
 
 import scala.beans.BeanProperty
 
 case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty inRightNotInLeft :DataFrame) {
 
+  import org.finra.msd.sparkfactory.SparkFactory.sparkImplicits._
+  
   /**
     * This method does a full outer join between the resulting left and right DataFrames from the method
     * SparkCompare.compareSchemaDataFrames. It will return a single DataFrame having the left columns prefixed with l_
@@ -25,11 +27,11 @@ case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty 
     val compositeKeysUpperCase: Seq[String] = compositeKeyStrs.map(k => k.toUpperCase)
     val nonKeyCols: Seq[String] = upperCaseLeft.columns.filter(c => !compositeKeysUpperCase.contains(c)).toSeq
 
-    //prepend l and r to nonkey columns
+    //prepend l_ and r_ to nonkey columns
     val prependedColumnsLeft = compositeKeysUpperCase ++ nonKeyCols.map(c => "l_" + c).toSeq
     val prependedColumnsRight = compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c).toSeq
 
-    //reselect the DataFrames with prepended l. & r. to the columnss
+    //reselect the DataFrames with prepended l_ & r_ to the columnss
     val prependedLeftDf: DataFrame = upperCaseLeft.toDF(prependedColumnsLeft: _*)
     val prependedRightDf: DataFrame = upperCaseRight.toDF(prependedColumnsRight: _*)
 
@@ -42,15 +44,14 @@ case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty 
 
   /**
     * This method compares all "l_" with their corresponding "r_" columns from the joined table returned in
-    * fullOuterJoinDataFrames() and returns a mapping between column and the amount/percentage of discrepant
-    * entries between those columns. 
+    * fullOuterJoinDataFrames() and returns a DataFrame that maps column names with the amount of discrepant entries
+    * between those l_ and r_ columns. 
     *
     * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both DataFrames
-    * @return a Map between column names and the amount/percentage of discrepant entries for those "l_/r_" rows in the
-    *         full outer joined table.  The values of the map are Seqs containing two Doubles: amount and percentage
-    *         (ranging from 0 to 1 inclusive).
+    * @return a DataFrame that maps between column names and the amount of discrepant entries for those "l_/r_" rows in
+    *         the full outer joined table.
     */
-  def discrepancyStats(compositeKeyStrs: Seq[String]): Map[String,Seq[Double]] = {
+  def discrepancyStats(compositeKeyStrs: Seq[String]): DataFrame = {
 
     val joinedDf: DataFrame = fullOuterJoinDataFrames(compositeKeyStrs)
 
@@ -58,22 +59,24 @@ case class DiffResult (@BeanProperty inLeftNotInRight :DataFrame, @BeanProperty 
     val nonKeyCols: Seq[String] = inLeftNotInRight.columns.filter(c => !compositeKeysUpperCase.contains(c.toUpperCase)).toSeq.map(k => k.toUpperCase)
     val zColumns: Seq[String] = nonKeyCols.map( c => "z_" + c)
     
+    //create new table with z_ columns that contain 0 if there the corresponding l_ and r_ columns were equal, 1 otherwise 
     var withEqFlags = joinedDf
     for ( c <- nonKeyCols )
-      withEqFlags = withEqFlags.withColumn("z_" + c, when(withEqFlags("l_" + c) === withEqFlags("r_" + c), "1").otherwise("0"))
+      withEqFlags = withEqFlags.withColumn("z_" + c, when(withEqFlags("l_" + c) === withEqFlags("r_" + c), "0").otherwise("1"))
 
-    var counts:Map[String,Seq[Double]] = Map()
-    for ( c <- zColumns ) {
-      val s: Double = withEqFlags.agg(sum(c)).first().getDouble(0)
-      val a: Double = withEqFlags.agg(avg(c)).first().getDouble(0)
-      counts += ( c.substring(2) -> Seq(s,a) )
-    }
+    //for each column, sum the corresponding z_ column to count how many discrepancies there were
+    var counts:Map[String,Int] = Map()
+    for ( c <- zColumns )
+      counts += ( c.substring(2) -> withEqFlags.agg(sum(c)).first().getDouble(0).toInt )
     
-    val problems:Seq[String] = nonKeyCols.sortWith(counts(_).head < counts(_).head)
-    var sortedCounts:Map[String,Seq[Double]] = Map()
-    for ( c <- problems ) {
-      sortedCounts += ( c -> counts(c) )
-    }
-    return sortedCounts
+    //sort the columns in decending order of how many discrepancies they had
+    val problems:Seq[String] = nonKeyCols.sortWith(counts(_) > counts(_))
+    
+    //return a DataFrame containing the column discrepancy count information from above 
+    var sortedCounts:Seq[(String,Int)] = Seq()
+    for ( c <- problems )
+      if ( !c.equals("RECORDREPEATCOUNT") ) // If table has keys, it shouldn't have duplicates, so this column is ignored
+        sortedCounts = sortedCounts :+ (c,counts(c))
+    sortedCounts.toDF("COLUMN_NAME","DISCREPANCIES")
   }
 }
