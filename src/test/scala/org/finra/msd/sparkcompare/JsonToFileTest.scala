@@ -7,8 +7,10 @@ import org.finra.msd.sparkfactory.SparkFactory
 class JsonToFileTest extends SparkFunSuiteDynamoDb
   with JsonFormatToFileTests {
   override def returnDiff(jsonFile: String, textFile: String): DiffResult = {
-    val leftAppleTable = SparkFactory.parallelizeJSONSource(System.getProperty("user.dir") + "/target/test-classes/" + jsonFile, "json_left")
-    val rightAppleTable = SparkFactory.parallelizeTextSource(System.getProperty("user.dir") + "/target/test-classes/" + textFile, "text_right")
+    val filePathJson = this.getClass.getClassLoader.getResource(jsonFile).getPath
+    val leftAppleTable = SparkFactory.parallelizeJSONSource(filePathJson, "json_left")
+    val filePathText = this.getClass.getClassLoader.getResource(textFile).getPath
+    val rightAppleTable = SparkFactory.parallelizeTextSource(filePathText, "text_right")
 
     SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable)
   }

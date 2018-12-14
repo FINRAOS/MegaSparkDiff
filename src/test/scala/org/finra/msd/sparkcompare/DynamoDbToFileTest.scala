@@ -14,7 +14,8 @@ class DynamoDbToFileTest extends SparkFunSuiteDynamoDb
     dynamoDbMap.put("dynamodb.endpoint", dynamoDbEndpoint)
 
     val leftAppleTable = SparkFactory.parallelizeDynamoDBSource(table, table + "_left", dynamoDbMap)
-    val rightAppleTable = SparkFactory.parallelizeTextSource(System.getProperty("user.dir") + "/target/test-classes/" + textFile, "text_right")
+    val filePath = this.getClass.getClassLoader.getResource(textFile).getPath
+    val rightAppleTable = SparkFactory.parallelizeTextSource(filePath, "text_right")
 
     SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable)
   }

@@ -15,7 +15,8 @@ class DynamoDbToJsonTest extends SparkFunSuiteDynamoDb
     dynamoDbMap.put("dynamodb.endpoint", dynamoDbEndpoint)
 
     val leftAppleTable = SparkFactory.parallelizeDynamoDBSource(table, table + "_left", dynamoDbMap)
-    val rightAppleTable = SparkFactory.parallelizeJSONSource(System.getProperty("user.dir") + "/target/test-classes/" + jsonFile, "json_right")
+    val filePath = this.getClass.getClassLoader.getResource(jsonFile).getPath
+    val rightAppleTable = SparkFactory.parallelizeJSONSource(filePath, "json_right")
 
     SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable)
   }

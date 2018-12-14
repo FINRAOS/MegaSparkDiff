@@ -7,7 +7,8 @@ import org.finra.msd.sparkfactory.SparkFactory
 class JsonToJdbcTest extends SparkFunSuiteDynamoDb
   with JsonFormatToJdbcTests {
   override def returnDiff(jsonFile: String, table: String): DiffResult = {
-    val leftAppleTable = SparkFactory.parallelizeJSONSource(System.getProperty("user.dir") + "/target/test-classes/" + jsonFile, "json_left")
+    val filePath = this.getClass.getClassLoader.getResource(jsonFile).getPath
+    val leftAppleTable = SparkFactory.parallelizeJSONSource(filePath, "json_left")
     val rightAppleTable = SparkFactory.parallelizeJDBCSource(hsqlDriverName, hsqlUrl, "SA", "",
       "(select * from " + table + ")", table + "_right")
 
