@@ -22,7 +22,9 @@ package org.finra.msd.enums;
 public enum SourceType {
     JDBC("JDBC"),
     HIVE("HIVE"),
-    FILE("FILE");
+    FILE("FILE"),
+    DYNAMODB("DYNAMODB"),
+    JSON("JSON");
 
     /**
      * Represents the source type

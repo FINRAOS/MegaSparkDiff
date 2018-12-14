@@ -82,26 +82,74 @@ object SparkCompare {
     */
   def compareAppleTables(left: AppleTable, right: AppleTable): DiffResult = {
     //if both are HIVE or JDBC then its a schema compare
-    if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC) {
-      if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC) {
-        //DO A SCHEMA COMPARE even if one is HIVE and the other is JDBC
-        return compareSchemaDataFrames(left.dataFrame, right.dataFrame)
+    if (left.sourceType != SourceType.FILE && right.sourceType != SourceType.FILE) {
+      var expandLeft = left.dataFrame
+      var expandRight = right.dataFrame
+
+      val leftCol = expandLeft.columns
+      val rightCol = expandRight.columns
+
+      if ((left.sourceType == SourceType.DYNAMODB || left.sourceType == SourceType.JSON)
+        && (right.sourceType == SourceType.DYNAMODB || right.sourceType == SourceType.JSON)) {
+        // Both tables are JSON format
+        val (expandLeftNew, expandRightNew) = SparkFactory.syncJSONFormatSchemaDataFrame(expandLeft, expandRight)
+
+        expandLeft = expandLeftNew
+        expandRight = expandRightNew
       }
+      else {
+        //make sure that column names match in both dataFrames
+        if (!expandLeft.columns.sameElements(expandRight.columns)) {
+          throw new Exception("Column Names Did Not Match")
+        }
+
+        if (left.sourceType == SourceType.DYNAMODB || left.sourceType == SourceType.JSON) {
+          // Left table is JSON format and right table is not
+          expandLeft = SparkFactory.complexJSONFormatTableToSimpleJSONFormatTable(expandLeft)
+          expandRight = SparkFactory.simpleTableToSimpleJSONFormatTable(expandRight)
+
+          val (expandLeftNew, expandRightNew) = SparkFactory.syncJSONFormatSchemaDataFrame(expandLeft, expandRight)
+
+          expandLeft = expandLeftNew
+          expandRight = expandRightNew
+        }
+        else if (right.sourceType == SourceType.DYNAMODB || right.sourceType == SourceType.JSON) {
+          // Right table is JSON format and left table is not
+          expandRight = SparkFactory.complexJSONFormatTableToSimpleJSONFormatTable(expandRight)
+          expandLeft = SparkFactory.simpleTableToSimpleJSONFormatTable(expandLeft)
+
+          val (expandLeftNew, expandRightNew) = SparkFactory.syncJSONFormatSchemaDataFrame(expandLeft, expandRight)
+
+          expandLeft = expandLeftNew
+          expandRight = expandRightNew
+        }
+      }
+
+      //DO A SCHEMA COMPARE even if one is HIVE and the other is JDBC, or JSON format transformations have been applied
+      return compareSchemaDataFrames(expandLeft, expandRight)
     }
 
     //Means one of them is not a schema data source and will flatten one of them
     var flatLeft: DataFrame = left.dataFrame
-    var flatright: DataFrame = right.dataFrame
+    var flatRight: DataFrame = right.dataFrame
 
     //if one of the inputs has no schema then will flatten it using the delimiter
     if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC)
       flatLeft = SparkFactory.flattenDataFrame(left.dataFrame, left.delimiter)
 
+    if (left.sourceType == SourceType.DYNAMODB || left.sourceType == SourceType.JSON)
+      flatLeft = SparkFactory.removeComplexNullFromFlatDataFrame(
+        SparkFactory.flattenDataFrame(SparkFactory.complexJSONFormatTableToSimpleJSONFormatTable(flatLeft), left.delimiter))
+
     if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC)
-      flatright = SparkFactory.flattenDataFrame(right.dataFrame, right.delimiter)
+      flatRight = SparkFactory.flattenDataFrame(right.dataFrame, right.delimiter)
+
+    if (right.sourceType == SourceType.DYNAMODB || right.sourceType == SourceType.JSON)
+      flatRight = SparkFactory.removeComplexNullFromFlatDataFrame(
+        SparkFactory.flattenDataFrame(SparkFactory.complexJSONFormatTableToSimpleJSONFormatTable(flatRight), right.delimiter))
 
     //COMPARE flatLeft to flatRight
-    return compareFlatDataFrames(flatLeft, flatright)
+    return compareFlatDataFrames(flatLeft, flatRight)
   }
 
   /**
@@ -133,11 +181,6 @@ object SparkCompare {
     *         the right parameter has values in RDD2 but not in RDD1
     */
   def compareSchemaDataFrames(left: DataFrame, right: DataFrame): DiffResult = {
-    //make sure that column names match in both dataFrames
-    if (!left.columns.sameElements(right.columns)) {
-      throw new Exception("Column Names Did Not Match")
-    }
-
     val groupedLeft = left.groupBy(left.getColumnsSeq(): _*)
       .count()
       .withColumnRenamed("count", "recordRepeatCount")

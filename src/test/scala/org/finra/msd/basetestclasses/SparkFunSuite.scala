@@ -32,8 +32,7 @@ class SparkFunSuite
     with BeforeAndAfterAll
     with Logging
     with Matchers
-    with SharedSqlContext
-    with ParallelTestExecution {
+    with SharedSqlContext {
 
 
   protected val outputDirectory: String = System.getProperty("user.dir") + "/sparkOutputDirectory"
@@ -66,6 +65,8 @@ class SparkFunSuite
 
 
   override def afterAll(): Unit = {
+    MemoryDbHsql.getInstance().shutdownMemoryDb()
+
     super.afterAll()
   }
 

@@ -104,6 +104,19 @@
             <scope>compile</scope>
         </dependency>
 
+        <!--Dynamo DB-->
+        <dependency>
+            <groupId>com.amazon.emr</groupId>
+            <artifactId>emr-dynamodb-hadoop</artifactId>
+            <version>4.6.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.7.1</version>
+        </dependency>
+
         <!-- ******************************** TEST DEPENDENCIES ************************************** -->
 
         <!-- H2 in memory DB for testing purposes -->
@@ -131,6 +144,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Local DynamoDB for testing purposes -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>DynamoDBLocal</artifactId>
+            <version>1.11.119</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
@@ -150,7 +171,7 @@
                 <version>2.0.0</version>
                 <configuration>
                     <reportsDirectory>${project.build.directory}/scala-surefire-reports</reportsDirectory>
-                    <parallel>true</parallel>
+                    <parallel>false</parallel>
                     <junitxml>.</junitxml>
                     <filereports>scala-msd-TestSuite.txt</filereports>
                     <forkMode>never</forkMode>
@@ -174,6 +195,18 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>${maven.dependency.plugin.version}</version>
                 <executions>
+                    <execution>
+                        <id>copy-test-dependencies</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>test</includeScope>
+                            <includeTypes>so,dll,dylib</includeTypes>
+                            <outputDirectory>${basedir}/target/testDependencies</outputDirectory>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>copy-dependencies</id>
                         <phase>package</phase>
