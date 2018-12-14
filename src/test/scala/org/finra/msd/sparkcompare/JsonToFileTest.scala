@@ -15,19 +15,19 @@ class JsonToFileTest extends SparkFunSuiteDynamoDb
     SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable)
   }
 
-  testSameDataTypesJsonFormatToFile("DynamoDbTest1.json", "DynamoDBTest1.txt")
+  testSameDataTypesJsonFormatToFile("DynamoDbTest1.json", "DynamoDbTest1.txt")
 
-  testMixedDataTypesSimpleJsonFormatToFile("DynamoDbTest2.json", "DynamoDBTest1.txt")
+  testMixedDataTypesSimpleJsonFormatToFile("DynamoDbTest2.json", "DynamoDbTest1.txt")
 
-  testSameDataTypesDiffJsonFormatToFile("DynamoDbTest1.json", "DynamoDBTest2.txt")
+  testSameDataTypesDiffJsonFormatToFile("DynamoDbTest1.json", "DynamoDbTest2.txt")
 
-  testMixedDataTypesSimpleDiffJsonFormatToFile("DynamoDbTest2.json", "DynamoDBTest2.txt")
+  testMixedDataTypesSimpleDiffJsonFormatToFile("DynamoDbTest2.json", "DynamoDbTest2.txt")
 
-  testMixedDataTypesWithListDiffJsonFormatToFile("DynamoDbTest3.json", "DynamoDBTest1.txt")
+  testMixedDataTypesWithListDiffJsonFormatToFile("DynamoDbTest3.json", "DynamoDbTest1.txt")
 
-  testMixedDataTypesWithSetDiffJsonFormatToFile("DynamoDbTest4.json", "DynamoDBTest1.txt")
+  testMixedDataTypesWithSetDiffJsonFormatToFile("DynamoDbTest4.json", "DynamoDbTest1.txt")
 
-  testMixedDataTypesWithMapDiffJsonFormatToFile("DynamoDbTest5.json", "DynamoDBTest1.txt")
+  testMixedDataTypesWithMapDiffJsonFormatToFile("DynamoDbTest5.json", "DynamoDbTest1.txt")
 
-  testSameDataTypesExtraNullColumnJsonFormatToFile("DynamoDbTest6.json", "DynamoDBTest1.txt")
+  testSameDataTypesExtraNullColumnJsonFormatToFile("DynamoDbTest6.json", "DynamoDbTest1.txt")
 }
