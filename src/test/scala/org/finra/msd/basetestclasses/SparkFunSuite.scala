@@ -73,8 +73,8 @@ class SparkFunSuite
   }
 
   // helper function
-  protected final def getTestResourceFile(file: String): File = {
-    new File(getClass.getClassLoader.getResource(file).getFile)
+  protected final def getTestResourceFile(file: String): java.io.File = {
+    new java.io.File(getClass.getClassLoader.getResource(file).getFile)
   }
 
   protected final def getTestResourcePath(file: String): String = {
