@@ -107,6 +107,30 @@ class JdbcToJdbcTest() extends SparkFunSuite {
     deleteSavedFiles("testCompareAndSaveFile")
     val noDiff = returnDiffWithSavingResult("Test1", "Test3", "testCompareAndSaveFile")
     Assert.assertFalse("Expected differences. Instead found no difference!", noDiff)
+    
+    val leftDiff = readSavedFile("testCompareAndSaveFile/inLeftNotInRight").split("\n")
+    val rightDiff = readSavedFile("testCompareAndSaveFile/inRightNotInLeft").split("\n")
+    if (leftDiff.length != 3) // Includes header line
+      fail("Expected 3 rows (1 header and 2 data) coming from left table." + "  Instead, found " + leftDiff.length + ".")
+    if (rightDiff.length != 3) // Includes header line
+      fail("Expected 3 rows (1 header and 2 data) coming from right table." + "  Instead, found " + rightDiff.length + ".")
+      
+    val leftCols = leftDiff(0).split(",")
+    val rightCols = rightDiff(0).split(",")
+    if (leftCols.length != 4)
+      fail("Expected 4 columns (3 data columns and 1 repeated row count) returned in left table differences." + "  Instead, found " + leftCols.length + ".")
+    if (rightCols.length != 4)
+      fail("Expected 4 columns (3 data columns and 1 repeated row count) returned in right table differences." + "  Instead, found " + rightCols.length + ".")
+      
+    if (leftDiff(0).contains("RIPENESS"))
+      fail("Expected ripeness not to be included in left table differences.")
+    if (rightDiff(0).contains("Ripeness"))
+      fail("Expected ripeness not to be included in right table differences.")
+      
+    if (leftDiff(1).split(",")(1).toInt < leftDiff(2).split(",")(1).toInt)
+      fail("Expected results to be sorted descending by price in left table differences.")
+    if (rightDiff(1).split(",")(1).toInt < rightDiff(2).split(",")(1).toInt)
+      fail("Expected results to be sorted descending by price in right table differences.")
   }
 
 }
