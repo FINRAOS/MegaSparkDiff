@@ -105,4 +105,12 @@ class SparkFunSuite
     Try(path.deleteRecursively())
   }
 
+def readSavedFile(folder : String): String = {
+    val file = new java.io.File(outputDirectory + "/" + folder + "/")
+      .listFiles
+      .filter(_.isFile)
+      .filter(_.getName.endsWith(".csv"))(0)
+
+    scala.reflect.io.File(file).slurp()
+  }
 }
