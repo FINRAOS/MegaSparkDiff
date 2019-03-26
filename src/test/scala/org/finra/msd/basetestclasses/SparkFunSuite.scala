@@ -27,7 +27,7 @@ import org.finra.msd.memorydb.MemoryDbHsql
 import org.finra.msd.sparkfactory.SparkFactory
 import org.scalatest._
 
-import scala.reflect.io.Path
+import scala.reflect.io.{File, Path}
 import scala.util.Try
 
 class SparkFunSuite
