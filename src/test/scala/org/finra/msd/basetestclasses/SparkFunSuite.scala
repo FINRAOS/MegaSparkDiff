@@ -27,6 +27,9 @@ import org.finra.msd.memorydb.MemoryDbHsql
 import org.finra.msd.sparkfactory.SparkFactory
 import org.scalatest._
 
+import scala.reflect.io.{File, Path}
+import scala.util.Try
+
 class SparkFunSuite
   extends FunSuite
     with BeforeAndAfterAll
@@ -70,8 +73,8 @@ class SparkFunSuite
   }
 
   // helper function
-  protected final def getTestResourceFile(file: String): File = {
-    new File(getClass.getClassLoader.getResource(file).getFile)
+  protected final def getTestResourceFile(file: String): java.io.File = {
+    new java.io.File(getClass.getClassLoader.getResource(file).getFile)
   }
 
   protected final def getTestResourcePath(file: String): String = {
@@ -97,4 +100,17 @@ class SparkFunSuite
     }
   }
 
+  def deleteSavedFiles(folder : String): Unit = {
+    val path: Path = Path(outputDirectory + "/" + folder + "/")
+    Try(path.deleteRecursively())
+  }
+
+def readSavedFile(folder : String): String = {
+    val file = new java.io.File(outputDirectory + "/" + folder + "/")
+      .listFiles
+      .filter(_.isFile)
+      .filter(_.getName.endsWith(".csv"))(0)
+
+    scala.reflect.io.File(file).slurp()
+  }
 }
