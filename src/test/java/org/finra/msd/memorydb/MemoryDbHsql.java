@@ -28,7 +28,7 @@ public class MemoryDbHsql {
 
 
     private static MemoryDbHsql instance = null;
-    Server hsqlDbServer = null;
+    private Server hsqlDbServer = null;
 
 
     protected MemoryDbHsql() {
@@ -78,6 +78,8 @@ public class MemoryDbHsql {
             conn = DriverManager.getConnection(url, "SA", "");
             Statement stmt = conn.createStatement();
 
+            stmt.execute("DROP TABLE IF EXISTS Persons1;");
+
             stmt.execute("CREATE TABLE Persons1 (\n" +
                     "           PersonID int,\n" +
                     "           LastName varchar(255),\n" +
@@ -85,15 +87,20 @@ public class MemoryDbHsql {
                     "           Address varchar(255),\n" +
                     "           City varchar(255));");
             String[] fruitTables = {"Test1","Test2","Test3","Test4","Test5"};
-            for (String fruitTable : fruitTables)
+            for (String fruitTable : fruitTables) {
+                stmt.execute("DROP TABLE IF EXISTS " + fruitTable + ";");
+
                 stmt.execute("CREATE TABLE " + fruitTable + " (\n" +
-                        "           Fruit VARCHAR(255),\n" +
-                        "           Price INT,\n" +
-                        "           Ripeness INT,\n" +
-                        "           Color VARCHAR(255));");
+                    "           Fruit VARCHAR(255),\n" +
+                    "           Price INT,\n" +
+                    "           Ripeness INT,\n" +
+                    "           Color VARCHAR(255));");
+            }
 
             String[] fruitEnhancedTables = {"Test6","Test7"};
             for(String table : fruitEnhancedTables) {
+                stmt.execute("DROP TABLE IF EXISTS " + table + ";");
+
                 stmt.execute("CREATE TABLE " + table +  "(\n" +
                         "           Fruit VARCHAR(255),\n" +
                         "           Price DOUBLE,\n" +
@@ -104,6 +111,18 @@ public class MemoryDbHsql {
                         "           Status BOOLEAN, \n" +
                         "           BValues BLOB, \n" +
                         "           CValues CLOB);");
+            }
+
+            String[] dynamoDbTables = {"DynamoDbTest1", "DynamoDbTest2"};
+            for(String table : dynamoDbTables) {
+                stmt.execute("DROP TABLE IF EXISTS " + table + ";");
+
+                stmt.execute("CREATE TABLE " + table + "(\n" +
+                    "           key1 varchar(255),\n" +
+                    "           key2 int,\n" +
+                    "           attribute1 varchar(255),\n" +
+                    "           attribute2 varchar(255),\n" +
+                    "           attribute3 INT);");
             }
 
             String[] personRecords = {
@@ -166,6 +185,13 @@ public class MemoryDbHsql {
                     "insert into Test7 values('Plum', 8261.05, 6, 'Purple', '2017-05-20', '2017-05-20 10:22:10', FALSE, X'01FF', 'clob')",
                     "insert into Test7 values('Tomato', 0.9, 0, 'Red', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
                     "insert into Test7 values('Watermelon', null, 11, null, '2017-05-21', '2017-05-21 8:10:18', FALSE, X'01FF', 'clob')",
+
+                    "insert into DynamoDbTest1 values('TEST1', 1, 'test number 1', '1', 1)",
+                    "insert into DynamoDbTest1 values('TEST2', 1, 'test number 2', '2', 2)",
+                    "insert into DynamoDbTest1 values('TEST3', 3, 'test number 3', 'true', 3)",
+
+                    "insert into DynamoDbTest2 values('TEST1', 1, 'test number 1', '1', 1)",
+                    "insert into DynamoDbTest2 values('TEST2', 1, 'test number 2', '2 ', 2)"
             };
 
             for (String record : personRecords)
@@ -176,7 +202,7 @@ public class MemoryDbHsql {
         }
     }
 
-    public void shutdownMemoryDb()
+    public synchronized void shutdownMemoryDb()
     {
         hsqlDbServer.shutdown();
         while (hsqlDbServer.getState() != 16)
@@ -187,6 +213,7 @@ public class MemoryDbHsql {
                 e.printStackTrace();
             }
         }
+        hsqlDbServer = null;
     }
 
 }

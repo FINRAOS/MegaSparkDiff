@@ -16,12 +16,19 @@
 
 package org.finra.msd.sparkfactory
 
+import com.google.gson.Gson
+import org.apache.hadoop.dynamodb.DynamoDBItemWritable
+import org.apache.hadoop.dynamodb.read.DynamoDBInputFormat
+import org.apache.hadoop.io.Text
+import org.apache.hadoop.mapred.JobConf
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
-import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
+import org.apache.spark.sql.types._
 import org.finra.msd.containers.AppleTable
 import org.finra.msd.enums.SourceType
+
+import scala.collection.mutable
 
 object SparkFactory {
 
@@ -109,6 +116,32 @@ object SparkFactory {
     return a
   }
 
+  /** This method will create an AppleTable for data in a JSON file.
+    *
+    * @param jsonFileLocation path of a json file containing the data to be compared
+    * @param tempViewName     temporary table name for source data
+    * @param delimiter        source data separation character
+    * @return custom table containing the data to be compared
+    */
+  def parallelizeJSONSource(jsonFileLocation: String, tempViewName: String, delimiter: Option[String]): AppleTable = {
+    val df = sparkSession.sqlContext.read
+      .option("multiLine", "true")
+      .json(jsonFileLocation)
+    df.createOrReplaceTempView(tempViewName)
+
+    AppleTable(SourceType.JSON, df, delimiter.orNull, tempViewName)
+  }
+
+  /** This method will create an AppleTable for data in a JSON file.
+    *
+    * @param jsonFileLocation path of a json file containing the data to be compared
+    * @param tempViewName     temporary table name for source data
+    * @return custom table containing the data to be compared
+    */
+  def parallelizeJSONSource(jsonFileLocation: String, tempViewName: String): AppleTable = {
+    parallelizeJSONSource(jsonFileLocation, tempViewName, Option.apply(","))
+  }
+
   /**
     * This method will create an AppleTable from a query that retrieves data from a database
     * accessed through JDBC connection.
@@ -190,6 +223,72 @@ object SparkFactory {
   }
 
   /**
+    * This method will create an AppleTable from a query that retrieves data from a hive
+    * table.  It is assumed that hive connectivity is already enabled in the environment from
+    * which this project is run.
+    *
+    * @param sqlText      a query to retrieve the data
+    * @param tempViewName custom table name for source
+    * @return custom table containing the data
+    */
+  def parallelizeHiveSource(sqlText: String, tempViewName: String): AppleTable = {
+    val df: DataFrame = sparkSession.sql(sqlText)
+    df.createOrReplaceTempView(tempViewName)
+    val a: AppleTable = new AppleTable(SourceType.HIVE, df, ",", tempViewName)
+    return a
+  }
+
+  /**
+    * This method will create an AppleTable for data in DynamoDB table.
+    *
+    * @param tableName    name of DynamoDB table
+    * @param tempViewName temporary table name for source data
+    * @param jobConfMap   job configuration parameters for DynamoDB EMR connector
+    * @param delimiter    source data separation character
+    * @return custom table containing the data to be compared
+    */
+  def parallelizeDynamoDBSource(tableName: String, tempViewName: String, jobConfMap: mutable.HashMap[String, String],
+                                delimiter: Option[String]): AppleTable = {
+    val jobConf = new JobConf(sparkSession.sparkContext.hadoopConfiguration)
+    jobConf.set("dynamodb.input.tableName", tableName)
+
+    for (x <- jobConfMap) {
+      jobConf.set(x._1, x._2)
+    }
+
+    if (jobConf.get("dynamodb.customAWSCredentialsProvider") == null) {
+      jobConf.set("dynamodb.customAWSCredentialsProvider", "com.amazonaws.auth.DefaultAWSCredentialsProviderChain")
+    }
+
+    val hadoopRDD: RDD[(Text, DynamoDBItemWritable)] =
+      sparkSession.sparkContext.hadoopRDD(
+        jobConf, classOf[DynamoDBInputFormat], classOf[Text], classOf[DynamoDBItemWritable])
+    val values = hadoopRDD.values.map(x => x.getItem)
+      .map(x => {
+        new Gson().toJson(x)
+          .replace("{\"nULLValue\":true}", "null")
+      })
+
+    val df = sparkSession.sqlContext.read.json(sparkSession.createDataset(values)(Encoders.STRING))
+
+    df.createOrReplaceTempView(tempViewName)
+
+    AppleTable(SourceType.DYNAMODB, df, delimiter.orNull, tempViewName)
+  }
+
+  /**
+    * This method will create an AppleTable for data in DynamoDB table.
+    *
+    * @param tableName    name of DynamoDB table
+    * @param tempViewName temporary table name for source data
+    * @param jobConfMap   job configuration parameters for DynamoDB EMR connector
+    * @return custom table containing the data to be compared
+    */
+  def parallelizeDynamoDBSource(tableName: String, tempViewName: String, jobConfMap: mutable.HashMap[String, String]): AppleTable = {
+    parallelizeDynamoDBSource(tableName, tempViewName, jobConfMap, Option.apply(","))
+  }
+
+  /**
     * Flattens a DataFrame to only have a single column that contains the entire original row
     *
     * @param df        a dataframe which contains one or more columns
@@ -206,19 +305,179 @@ object SparkFactory {
   }
 
   /**
-    * This method will create an AppleTable from a query that retrieves data from a hive
-    * table.  It is assumed that hive connectivity is already enabled in the environment from
-    * which this project is run.
+    * Removes null values stored in mixed data type nested structure dataframes that have been flattened
     *
-    * @param sqlText      a query to retrieve the data
-    * @param tempViewName custom table name for source
-    * @return custom table containing the data
+    * @param df a dataframe flattened from mixed data type nested structure
+    * @return flattened dataframe without mixed data type null values
     */
-  def parallelizeHiveSource(sqlText: String, tempViewName: String): AppleTable = {
-    val df: DataFrame = sparkSession.sql(sqlText)
-    df.createOrReplaceTempView(tempViewName)
-    val a: AppleTable = new AppleTable(SourceType.HIVE, df, ",", tempViewName)
-    return a
+  def removeComplexNullFromFlatDataFrame(df: DataFrame): DataFrame = {
+    val x = SparkFactory.sparkSession
+    import x.implicits._
+
+    df.map(row =>
+      (for (x <- row.mkString.split("]"))
+        yield x.replace("null,", "").replace(",null", "")
+      ).mkString("]") + "]"
+    ).toDF("values")
+  }
+
+  /**
+    * Combine the schemas of two JSON format schemas and remove duplicate columns.
+    * @param structTypeLeft   left table schema
+    * @param structTypeRight  right table schema
+    * @return combined schema without duplicate columns
+    */
+  def combineJSONFormatSchema(structTypeLeft: StructType, structTypeRight: StructType): StructType = {
+    StructType(combineJSONFormatSchemaInner(StructType(structTypeLeft ++ structTypeRight)))
+  }
+
+  /**
+    * Recursive helper function for combineJSONFormatSchema.
+    * @param structType combined schema with duplicate columns
+    * @return combined schema without duplicate columns
+    */
+  def combineJSONFormatSchemaInner(structType: StructType): StructType = {
+    StructType(
+      structType
+        .groupBy(x => x.name)
+        .flatMap(x => {
+          val types = x._2.distinct
+          if (types.length > 1) {
+            StructType(
+              Seq(StructField(x._1,
+                if (x._2.head.dataType.typeName.equals("array") | x._2.last.dataType.typeName.equals("array"))
+                  ArrayType(
+                  combineJSONFormatSchemaInner(
+                  StructType(
+                    (for (x <- x._2)
+                      yield
+                        if (x.dataType.typeName.equals("array"))
+                          for (field <- x.dataType.asInstanceOf[ArrayType].elementType.asInstanceOf[StructType])
+                            yield field
+                        else if (x.dataType.typeName.equals("struct"))
+                          for (field <- x.dataType.asInstanceOf[StructType])
+                            yield field
+                        else
+                          null
+                    ).filter(x => x != null).flatten
+                  )
+                ))
+                else
+                  combineJSONFormatSchemaInner(
+                    StructType(
+                      (for (x <- x._2)
+                        yield
+                          if (x.dataType.typeName.equals("struct"))
+                            for (field <- x.dataType.asInstanceOf[StructType])
+                              yield field
+                          else
+                            Seq(StructField(x.name, StringType, nullable = true))
+                        ).flatten
+                    )
+                  )
+                , nullable = true
+              ))
+            )
+          }
+          else types
+        }).toSeq
+    )
+  }
+
+  /**
+    * Synchronize the schemas of two JSON format DataFrames.
+    * @param leftDf   left JSON format DataFrame
+    * @param rightDf  right JSON format DataFrame
+    * @return left and right JSON format DataFrames with same schema
+    */
+  def syncJSONFormatSchemaDataFrame(leftDf: DataFrame, rightDf: DataFrame): (DataFrame, DataFrame) = {
+    val schema = combineJSONFormatSchema(leftDf.schema, rightDf.schema)
+
+    (
+      sparkSession.read.schema(schema).json(leftDf.toJSON),
+      sparkSession.read.schema(schema).json(rightDf.toJSON)
+    )
+  }
+
+  /**
+    * Combine all non-nested lower level values of a JSON format DataFrame into a common structure named "value".
+    * @param df JSON format DataFrame
+    * @return simplified JSON format DataFrame
+    */
+  def complexJSONFormatTableToSimpleJSONFormatTable(df: DataFrame): DataFrame = {
+    var expandDf = df
+
+    val schemaArray = df.schema.toArray
+
+    for (colName <- df.columns
+    ) {
+      expandDf = expandDf.withColumn(colName,
+        if (schemaArray(df.schema.fieldIndex(colName)).dataType.typeName.equals("struct"))
+          complexJSONFormatTableToSimpleJSONFormatTableStruct(colName, functions.col(colName),
+            schemaArray(df.schema.fieldIndex(colName)).dataType.asInstanceOf[StructType])
+        else
+          functions.col(colName)
+      )
+    }
+
+    expandDf
+  }
+
+  /**
+    * Helper function for complexJSONFormatTableToSimpleJSONFormatTable.
+    * @param colName  name of column being processed
+    * @param col      column being processed
+    * @param schema   schema being processed
+    * @return simplified column
+    */
+  def complexJSONFormatTableToSimpleJSONFormatTableStruct(colName: String, col: Column, schema: StructType): Column = {
+    functions.struct(
+      (
+        (for (x <- schema.filter(x => x.dataType.typeName.startsWith("array")))
+        yield
+          col(x.name).alias(x.name)
+        ) :+
+        (if (schema.exists(x => !x.dataType.typeName.startsWith("array")))
+          (if (col == null) functions.lit(null)
+          else
+            getCombinedValue(schema.filter(x => !x.dataType.typeName.startsWith("array") & !x.name.equals("nULLValue")), col)
+          ).alias("value")
+        else null
+          )
+        ).filter(x => x != null):_*
+    )
+  }
+
+  /**
+    * Helper function for complexJSONFormatTableToSimpleJSONFormatTableStruct.
+    * @param schema schema being processed
+    * @param col    column being processed
+    * @return simplified column
+    */
+  def getCombinedValue(schema: Seq[StructField], col: Column): Column = {
+    if (schema.nonEmpty)
+      functions.when(col(schema.head.name).isNotNull, col(schema.head.name).cast("string"))
+        .otherwise(
+          if (schema.length > 1) getCombinedValue(schema.toArray.slice(1, schema.length), col)
+          else functions.lit(null)
+        )
+    else
+      functions.lit(null)
+  }
+
+  /**
+    * Transform single level DataFrame to a JSON format DataFrame
+    * @param df single level DataFrame
+    * @return simplified JSON format DataFrame
+    */
+  def simpleTableToSimpleJSONFormatTable(df: DataFrame): DataFrame = {
+    var expandDf = df
+
+    for (colName <- df.columns) {
+      expandDf = expandDf.withColumn(colName, functions.struct(functions.col(colName).cast("string").alias("value")))
+    }
+
+    expandDf
   }
 
   object sparkImplicits extends SQLImplicits {
