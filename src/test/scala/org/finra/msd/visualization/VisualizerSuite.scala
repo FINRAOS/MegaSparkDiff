@@ -1,17 +1,15 @@
 package org.finra.msd.visualization
 
 
-import org.apache.commons.lang3.tuple
-import org.apache.spark.sql.types.{IntegerType, StringType, StructType}
-import org.apache.spark.sql.{DataFrame, Row}
-import org.finra.msd.basetestclasses.SparkTestSuiteSessionTrait
-import org.finra.msd.implicits.DataFrameImplicits._
+import org.apache.spark.sql.DataFrame
+import org.finra.msd.basetestclasses.SparkFunSuite
+import org.finra.msd.containers.DiffResult
 import org.finra.msd.sparkcompare.SparkCompare
-import org.scalatest.Matchers
+import org.scalatest.BeforeAndAfterAll
 
-class VisualizerTests extends SparkTestSuiteSessionTrait with Matchers {
+class VisualizerSuite extends SparkFunSuite with BeforeAndAfterAll {
 
-  import sparkSession.implicits._
+  import testImplicits._
 
   test("Visualize as Text") {
     val left = Seq(
@@ -31,11 +29,11 @@ class VisualizerTests extends SparkTestSuiteSessionTrait with Matchers {
       (null, null, "zz", "zz")
     ).toDF("key1", "key2", "value1", "value2")
 
-    val comparisonResult: tuple.Pair[DataFrame, DataFrame] = SparkCompare.compareSchemaDataFrames(left, right)
+    val comparisonResult: DiffResult = SparkCompare.compareSchemaDataFrames(left, right)
 
     val key: Seq[String] = Seq("key1", "key2")
-    val joinedResults: DataFrame = SparkCompare.fullOuterJoinDataFrames(comparisonResult.getLeft, comparisonResult.getRight, key)
-    val html = Visualizer.renderHorizontalTable(joinedResults,100)
+    val joinedResults: DataFrame = comparisonResult.fullOuterJoinDataFrames(key)
+    val html = Visualizer.renderHorizontalTable(joinedResults, 100)
 
     assert(html.contains("class='different'"))
     assert(html.contains("class='same'"))
