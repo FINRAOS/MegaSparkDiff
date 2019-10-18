@@ -44,4 +44,36 @@ class SparkFactorySuite extends SparkFunSuite {
     val rightAppleTable = SparkFactory.parallelizeJDBCSource("org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb", "SA", "", "(select * from Test1 )", "my_partition_test", scala.Option.empty, "Price", "0", "200000", "2")
     if (rightAppleTable.getDataFrame.rdd.getNumPartitions != 2) fail("expected 2 partitions but received " + rightAppleTable.getDataFrame.rdd.getNumPartitions)
   }
+
+
+  test("parallelizeDelimitedFile can load file delimited by default delimiter")
+  {
+    val filePath = this.getClass.getClassLoader.getResource( "Test1.txt").getPath
+    val dataFrame = SparkFactory.parallelizeDelimitedFile(filePath)
+    assert (dataFrame.columns.size == 4)
+  }
+
+  test("parallelizeDelimitedFile can load file delimited by u0001")
+  {
+    val filePath = this.getClass.getClassLoader.getResource( "SparkFactorySuite/Delimited.by0x01.csv").getPath
+    val dataFrame = SparkFactory.parallelizeDelimitedFile(filePath, "\u0001")
+    assert (dataFrame.columns.size == 5)
+  }
+
+  test("parallelizeDelimitedFileWithDdl can apply specified schema")
+  {
+    val schema =
+      """
+        |    `SBMSN_ID` INT,
+        |    `SBMSN_IDNTR` VARCHAR(25),
+        |    `SBMSN_ST` VARCHAR(25),
+        |    `SBMSN_DT` TIMESTAMP,
+        |    `SCRTY_TYPE` VARCHAR(100)
+        |""".stripMargin
+
+    val filePath = this.getClass.getClassLoader.getResource( "SparkFactorySuite/Delimited.by0x01.csv").getPath
+    val df = SparkFactory.parallelizeDelimitedFileWithDdl(filePath, schema, "\u0001")
+    assert (df.columns.sameElements(Array("SBMSN_ID", "SBMSN_IDNTR", "SBMSN_ST", "SBMSN_DT", "SCRTY_TYPE")))
+  }
+
 }
