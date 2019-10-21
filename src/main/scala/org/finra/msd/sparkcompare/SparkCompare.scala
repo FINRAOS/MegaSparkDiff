@@ -151,14 +151,14 @@ object SparkCompare {
     var flatRight: DataFrame = right.dataFrame
 
     //if one of the inputs has no schema then will flatten it using the delimiter
-    if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC)
+    if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC || left.sourceType == SourceType.CSV)
       flatLeft = SparkFactory.flattenDataFrame(left.dataFrame, left.delimiter)
 
     if (left.sourceType == SourceType.DYNAMODB || left.sourceType == SourceType.JSON)
       flatLeft = SparkFactory.removeComplexNullFromFlatDataFrame(
         SparkFactory.flattenDataFrame(SparkFactory.complexJSONFormatTableToSimpleJSONFormatTable(flatLeft), left.delimiter))
 
-    if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC)
+    if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC || right.sourceType == SourceType.CSV)
       flatRight = SparkFactory.flattenDataFrame(right.dataFrame, right.delimiter)
 
     if (right.sourceType == SourceType.DYNAMODB || right.sourceType == SourceType.JSON)

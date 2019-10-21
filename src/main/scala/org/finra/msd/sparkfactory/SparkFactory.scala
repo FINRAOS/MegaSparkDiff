@@ -102,41 +102,6 @@ object SparkFactory {
   }
 
   /**
-    * Create DataFrame from a delimited text file.
-    * The file can be on local machine or HDFS or other file system supported by the Spark implementation.
-    * "hdfs://nn1home:8020/input/war-and-peace.txt" for S3 the url like so
-    * "s3n://myBucket/myFile1.log"
-    *
-    * @param fileLocation path of file
-    * @param delimiter delimiter used in the delimited file
-    * @return DataFrame created from the file
-    */
-  def parallelizeDelimitedFile(fileLocation: String, delimiter: String = ","): DataFrame = {
-    sparkSession.read
-      .option("delimiter", delimiter)
-      .csv(fileLocation)
-  }
-
-  /**
-    * Create DataFrame from a delimited text file, applying the specified schema.
-    * The file can be on local machine or HDFS or other file system supported by the Spark implementation.
-    * "hdfs://nn1home:8020/input/war-and-peace.txt" for S3 the url like so
-    * "s3n://myBucket/myFile1.log"
-    *
-    * @param fileLocation path of file
-    * @param delimiter delimiter used in the delimited file
-    * @param ddl schema specified in DDL style, e.g. "name VARCHAR(50), age INT"
-    * @return DataFrame created from the file
-    */
-  def parallelizeDelimitedFileWithDdl(fileLocation: String, ddl: String, delimiter: String = ","): DataFrame = {
-    sparkSession.read
-      .option("delimiter", delimiter)
-      .schema(ddl)
-      .csv(fileLocation)
-  }
-
-
-  /**
     * This method will create DataFrame with a single column called "field1" from a text file, the file can be on local
     * machine or HDFS for HDFS url like so
     * "hdfs://nn1home:8020/input/war-and-peace.txt" for S3 the url like so
@@ -177,6 +142,75 @@ object SparkFactory {
   def parallelizeJSONSource(jsonFileLocation: String, tempViewName: String): AppleTable = {
     parallelizeJSONSource(jsonFileLocation, tempViewName, Option.apply(","))
   }
+
+  /**
+    * Create DataFrame from a delimited text file.
+    * The file can be on local machine or HDFS or other file system supported by the Spark implementation.
+    * "hdfs://nn1home:8020/input/war-and-peace.txt" for S3 the url like so
+    * "s3n://myBucket/myFile1.log"
+    *
+    * @param fileLocation path of file
+    * @param delimiter delimiter used in the delimited file
+    * @return DataFrame created from the file
+    */
+  def parallelizeDelimitedFile(fileLocation: String, delimiter: String = ","): DataFrame = {
+    sparkSession.read
+      .option("delimiter", delimiter)
+      .csv(fileLocation)
+  }
+
+  /**
+    * Create AppleTable from a delimited text file.
+    * The file can be on local machine or HDFS or other file system supported by the Spark implementation.
+    * "hdfs://nn1home:8020/input/war-and-peace.txt" for S3 the url like so
+    * "s3n://myBucket/myFile1.log"
+    *
+    * @param fileLocation path of file
+    * @param delimiter delimiter used in the delimited file
+    * @param tempViewName    temporary table name for source data
+    * @return AppleTable created from the file
+    */
+  def parallelizeDelimitedSource(fileLocation: String, tempViewName: String, delimiter: String = ","): AppleTable = {
+    val df = parallelizeDelimitedFile(fileLocation, delimiter)
+    df.createOrReplaceTempView(tempViewName)
+    new AppleTable(SourceType.CSV, df, delimiter, tempViewName)
+  }
+
+  /**
+    * Create DataFrame from a delimited text file, applying the specified schema.
+    * The file can be on local machine or HDFS or other file system supported by the Spark implementation.
+    * "hdfs://nn1home:8020/input/war-and-peace.txt" for S3 the url like so
+    * "s3n://myBucket/myFile1.log"
+    *
+    * @param fileLocation path of file
+    * @param delimiter delimiter used in the delimited file
+    * @param ddl schema specified in DDL style, e.g. "name VARCHAR(50), age INT"
+    * @return DataFrame created from the file
+    */
+  def parallelizeDelimitedFileWithDdl(fileLocation: String, ddl: String, delimiter: String = ","): DataFrame = {
+    sparkSession.read
+      .option("delimiter", delimiter)
+      .schema(ddl)
+      .csv(fileLocation)
+  }
+
+  /**
+    * Create AppleTable from a delimited text file.
+    * The file can be on local machine or HDFS or other file system supported by the Spark implementation.
+    * "hdfs://nn1home:8020/input/war-and-peace.txt" for S3 the url like so
+    * "s3n://myBucket/myFile1.log"
+    *
+    * @param fileLocation path of file
+    * @param delimiter delimiter used in the delimited file
+    * @param tempViewName    temporary table name for source data
+    * @return AppleTable created from the file
+    */
+  def parallelizeDelimitedSourceWithDdl(fileLocation: String, ddl: String, tempViewName: String, delimiter: String = ","): AppleTable = {
+    val df = parallelizeDelimitedFileWithDdl(fileLocation, ddl, delimiter)
+    df.createOrReplaceTempView(tempViewName)
+    new AppleTable(SourceType.CSV, df, delimiter, tempViewName)
+  }
+
 
   /**
     * This method will create an AppleTable from a query that retrieves data from a database
