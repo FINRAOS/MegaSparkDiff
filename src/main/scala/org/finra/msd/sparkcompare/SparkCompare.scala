@@ -17,7 +17,6 @@
 package org.finra.msd.sparkcompare
 
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions.col
 import org.finra.msd.containers.{AppleTable, CountResult, DiffResult}
 import org.finra.msd.enums.SourceType
 import org.finra.msd.implicits.DataFrameImplicits._
@@ -72,6 +71,24 @@ object SparkCompare {
     OutputWriter.saveResultsToDisk(result.inLeftNotInRight, result.inRightNotInLeft, outputDirectory, singleFileOutput, delimiter)
   }
 
+  def compareAppleTablesSaveResultsWithManipulation(left: AppleTable, right: AppleTable,
+                                                    outputDirectory: String, singleFileOutput: Boolean, delimiter: String,
+                                                    excludeCols: Option[Array[String]],
+                                                    orderByCols: Option[Array[String]], ascOrder: Boolean): Boolean = {
+    var result: DiffResult = compareAppleTables(left, right)
+    if(excludeCols.getOrElse(0) != 0) {
+      result = result.removeCols(excludeCols.get)
+    }
+
+    if(orderByCols.getOrElse(0) != 0) {
+      result = result.getOrderedResult(orderByCols.get, isAsc = ascOrder)
+    }
+
+    OutputWriter.saveResultsToDisk(result.inLeftNotInRight, result.inRightNotInLeft, outputDirectory, singleFileOutput, delimiter)
+    result.noDiff()
+
+  }
+
   /**
     * Performs schema based comparison irrespective of source data types
     *
@@ -82,26 +99,74 @@ object SparkCompare {
     */
   def compareAppleTables(left: AppleTable, right: AppleTable): DiffResult = {
     //if both are HIVE or JDBC then its a schema compare
-    if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC) {
-      if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC) {
-        //DO A SCHEMA COMPARE even if one is HIVE and the other is JDBC
-        return compareSchemaDataFrames(left.dataFrame, right.dataFrame)
+    if (left.sourceType != SourceType.FILE && right.sourceType != SourceType.FILE) {
+      var expandLeft = left.dataFrame
+      var expandRight = right.dataFrame
+
+      val leftCol = expandLeft.columns
+      val rightCol = expandRight.columns
+
+      if ((left.sourceType == SourceType.DYNAMODB || left.sourceType == SourceType.JSON)
+        && (right.sourceType == SourceType.DYNAMODB || right.sourceType == SourceType.JSON)) {
+        // Both tables are JSON format
+        val (expandLeftNew, expandRightNew) = SparkFactory.syncJSONFormatSchemaDataFrame(expandLeft, expandRight)
+
+        expandLeft = expandLeftNew
+        expandRight = expandRightNew
       }
+      else {
+        //make sure that column names match in both dataFrames
+        if (!expandLeft.columns.sameElements(expandRight.columns)) {
+          throw new Exception("Column Names Did Not Match")
+        }
+
+        if (left.sourceType == SourceType.DYNAMODB || left.sourceType == SourceType.JSON) {
+          // Left table is JSON format and right table is not
+          expandLeft = SparkFactory.complexJSONFormatTableToSimpleJSONFormatTable(expandLeft)
+          expandRight = SparkFactory.simpleTableToSimpleJSONFormatTable(expandRight)
+
+          val (expandLeftNew, expandRightNew) = SparkFactory.syncJSONFormatSchemaDataFrame(expandLeft, expandRight)
+
+          expandLeft = expandLeftNew
+          expandRight = expandRightNew
+        }
+        else if (right.sourceType == SourceType.DYNAMODB || right.sourceType == SourceType.JSON) {
+          // Right table is JSON format and left table is not
+          expandRight = SparkFactory.complexJSONFormatTableToSimpleJSONFormatTable(expandRight)
+          expandLeft = SparkFactory.simpleTableToSimpleJSONFormatTable(expandLeft)
+
+          val (expandLeftNew, expandRightNew) = SparkFactory.syncJSONFormatSchemaDataFrame(expandLeft, expandRight)
+
+          expandLeft = expandLeftNew
+          expandRight = expandRightNew
+        }
+      }
+
+      //DO A SCHEMA COMPARE even if one is HIVE and the other is JDBC, or JSON format transformations have been applied
+      return compareSchemaDataFrames(expandLeft, expandRight)
     }
 
     //Means one of them is not a schema data source and will flatten one of them
     var flatLeft: DataFrame = left.dataFrame
-    var flatright: DataFrame = right.dataFrame
+    var flatRight: DataFrame = right.dataFrame
 
     //if one of the inputs has no schema then will flatten it using the delimiter
     if (left.sourceType == SourceType.HIVE || left.sourceType == SourceType.JDBC)
       flatLeft = SparkFactory.flattenDataFrame(left.dataFrame, left.delimiter)
 
+    if (left.sourceType == SourceType.DYNAMODB || left.sourceType == SourceType.JSON)
+      flatLeft = SparkFactory.removeComplexNullFromFlatDataFrame(
+        SparkFactory.flattenDataFrame(SparkFactory.complexJSONFormatTableToSimpleJSONFormatTable(flatLeft), left.delimiter))
+
     if (right.sourceType == SourceType.HIVE || right.sourceType == SourceType.JDBC)
-      flatright = SparkFactory.flattenDataFrame(right.dataFrame, right.delimiter)
+      flatRight = SparkFactory.flattenDataFrame(right.dataFrame, right.delimiter)
+
+    if (right.sourceType == SourceType.DYNAMODB || right.sourceType == SourceType.JSON)
+      flatRight = SparkFactory.removeComplexNullFromFlatDataFrame(
+        SparkFactory.flattenDataFrame(SparkFactory.complexJSONFormatTableToSimpleJSONFormatTable(flatRight), right.delimiter))
 
     //COMPARE flatLeft to flatRight
-    return compareFlatDataFrames(flatLeft, flatright)
+    return compareFlatDataFrames(flatLeft, flatRight)
   }
 
   /**
@@ -126,18 +191,11 @@ object SparkCompare {
   /**
     *
     * @param left          dataframe containing source1 data
-    * @param leftViewName  temporary table name of source1
     * @param right         dataframe containing source2 data
-    * @param rightViewName temporary table name of source2
     * @return a pair of RDDs, the left parameter has values in RDD1 and not in RDD2,
     *         the right parameter has values in RDD2 but not in RDD1
     */
   def compareSchemaDataFrames(left: DataFrame, right: DataFrame): DiffResult = {
-    //make sure that column names match in both dataFrames
-    if (!left.columns.sameElements(right.columns)) {
-      throw new Exception("Column Names Did Not Match")
-    }
-
     val groupedLeft = left.groupBy(left.getColumnsSeq(): _*)
       .count()
       .withColumnRenamed("count", "recordRepeatCount")
@@ -150,7 +208,7 @@ object SparkCompare {
     val inLnotinR = groupedLeft.except(groupedRight).toDF()
     val inRnotinL = groupedRight.except(groupedLeft).toDF()
 
-    return new DiffResult(inLnotinR, inRnotinL)
+    return DiffResult(inLnotinR, inRnotinL)
   }
 
   /**
@@ -168,41 +226,5 @@ object SparkCompare {
     val countsPair = new CountResult(leftCount, rightCount)
 
     return countsPair
-  }
-
-  /**
-    * This method does a full outer join between the resulting left and right dataframes from the method
-    * SparkCompare.compareSchemaDataFrames. It will return a single dataframe having the left columns prefixed with l_
-    * and the right columns prefixed with r_. the Key columns will not have prefixed. The resulting dataframe will have
-    * all l_ columns on the left, then the Key columns in the middle, then the r_ columns on the right.
-    *
-    * @param left             Dataframe having inLeftNotInRight resulting from SparkCompare.compareSchemaDataFrames
-    * @param right            Dataframe having inRightNotInLeft resulting from SparkCompare.compareSchemaDataFrames
-    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both dataframes
-    * @return a dataframe having the resulting full outer join operation.
-    */
-  def fullOuterJoinDataFrames(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String]): DataFrame = {
-
-    //convert column names to uppercase
-    val upperCaseLeft: DataFrame = left.toDF(left.columns.map(_.toUpperCase): _*)
-    val upperCaseRight: DataFrame = right.toDF(right.columns.map(_.toUpperCase): _*)
-
-    val compositeKeysUpperCase: Seq[String] = compositeKeyStrs.map(k => k.toUpperCase)
-    val nonKeyCols: Seq[String] = upperCaseLeft.columns.filter(c => !compositeKeysUpperCase.contains(c)).toSeq
-
-    //prepend l and r to nonkey columns
-    val prependedColumnsLeft = compositeKeysUpperCase ++ nonKeyCols.map(c => "l_" + c).toSeq
-    val prependedColumnsRight = compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c).toSeq
-
-    //reselect the dataframes with prepended l. & r. to the columnss
-    val prependedLeftDf: DataFrame = upperCaseLeft.toDF(prependedColumnsLeft: _*)
-    val prependedRightDf: DataFrame = upperCaseRight.toDF(prependedColumnsRight: _*)
-
-
-    val joinedDf: DataFrame = prependedLeftDf.as("l")
-      .join(prependedRightDf.as("r"), compositeKeysUpperCase, "full_outer")
-
-    val allColsWithKeysInTheMiddle: Seq[String] = nonKeyCols.map(c => "l_" + c) ++ compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c)
-    joinedDf.select(allColsWithKeysInTheMiddle.map(name => col(name)): _*)
   }
 }

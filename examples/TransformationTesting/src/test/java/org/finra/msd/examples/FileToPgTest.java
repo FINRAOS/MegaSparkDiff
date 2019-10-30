@@ -1,11 +1,5 @@
 package org.finra.msd.examples;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.api.java.function.MapFunction;
@@ -21,12 +15,14 @@ import org.finra.msd.containers.AppleTable;
 import org.finra.msd.examples.db.PostgresDatabase;
 import org.finra.msd.sparkcompare.SparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FileToPgTest {
 

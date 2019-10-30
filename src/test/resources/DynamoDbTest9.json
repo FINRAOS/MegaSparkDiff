@@ -1,0 +1,75 @@
+[
+  {
+    "key1": {
+      "s": "TEST1"
+    },
+    "key2": {
+      "n": "1"
+    },
+    "attribute1": {
+      "s": "test number 1"
+    },
+    "attribute2": {
+      "n": "1"
+    },
+    "attribute3": {
+      "n": "1"
+    }
+  },
+  {
+    "key1": {
+      "s": "TEST2"
+    },
+    "key2": {
+      "n": "1"
+    },
+    "attribute1": {
+      "s": "test number 2"
+    },
+    "attribute2": {
+      "m": {
+        "test": {
+          "n": "2"
+        },
+        "test_list": {
+          "l": [
+            {
+              "nS": [
+                "2"
+              ]
+            },
+            {
+              "sS": [
+                "string 2", "string 2 new"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "attribute3": {
+      "n": "2"
+    }
+  },
+  {
+    "key1": {
+      "s": "TEST3"
+    },
+    "key2": {
+      "n": "3"
+    },
+    "attribute1": {
+      "s": "test number 3"
+    },
+    "attribute2": {
+      "m": {
+        "test": {
+          "n": "3"
+        }
+      }
+    },
+    "attribute3": {
+      "n": "3"
+    }
+  }
+]
