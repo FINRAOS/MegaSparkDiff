@@ -479,5 +479,9 @@ object SparkFactory {
 
     expandDf
   }
+
+  object sparkImplicits extends SQLImplicits {
+    protected override def _sqlContext: SQLContext = SparkFactory.sparkSession.sqlContext
+  }
 }
 
