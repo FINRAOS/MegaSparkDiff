@@ -66,26 +66,32 @@ case class DiffResult(@BeanProperty inLeftNotInRight: DataFrame, @BeanProperty i
     */
   def fullOuterJoinDataFrames(compositeKeyStrs: Seq[String]): DataFrame = {
 
-    //convert column names to uppercase
-    val upperCaseLeft: DataFrame = inLeftNotInRight.toDF(inLeftNotInRight.columns.map(_.toUpperCase): _*)
-    val upperCaseRight: DataFrame = inRightNotInLeft.toDF(inRightNotInLeft.columns.map(_.toUpperCase): _*)
+    val compositeKeysUpperCaseSeq = compositeKeyStrs.map(k => k.toUpperCase)
+    val compositeKeysUpperCase = compositeKeyStrs.map(k => k.toUpperCase).toSeq
+    var tempLeft: DataFrame = inLeftNotInRight.select(inLeftNotInRight.columns.map(c => col(c).as(c.toUpperCase)): _*)
+    var tempRight: DataFrame = inRightNotInLeft.select(inRightNotInLeft.columns.map(c => col(c).as(c.toUpperCase)): _*)
 
-    val compositeKeysUpperCase: Seq[String] = compositeKeyStrs.map(k => k.toUpperCase)
-    val nonKeyCols: Seq[String] = upperCaseLeft.columns.filter(c => !compositeKeysUpperCase.contains(c)).toSeq
+    for (col <- inLeftNotInRight.columns)
+    {
+      if (!compositeKeysUpperCaseSeq.contains(col.toUpperCase))
+      {
+        tempLeft = tempLeft.withColumnRenamed(col ,"l_" + col.toUpperCase)
+      }
+    }
 
-    //prepend l_ and r_ to nonkey columns
-    val prependedColumnsLeft = compositeKeysUpperCase ++ nonKeyCols.map(c => "l_" + c).toSeq
-    val prependedColumnsRight = compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c).toSeq
-
-    //reselect the DataFrames with prepended l_ & r_ to the columnss
-    val prependedLeftDf: DataFrame = upperCaseLeft.toDF(prependedColumnsLeft: _*)
-    val prependedRightDf: DataFrame = upperCaseRight.toDF(prependedColumnsRight: _*)
-
-    val joinedDf: DataFrame = prependedLeftDf.as("l")
-      .join(prependedRightDf.as("r"), compositeKeysUpperCase, "full_outer")
-
-    val allColsWithKeysInTheMiddle: Seq[String] = nonKeyCols.map(c => "l_" + c) ++ compositeKeysUpperCase ++ nonKeyCols.map(c => "r_" + c)
-    joinedDf.select(allColsWithKeysInTheMiddle.map(name => col(name)): _*)
+    for (col <- inRightNotInLeft.columns)
+    {
+      if (!compositeKeysUpperCaseSeq.contains(col.toUpperCase))
+      {
+        tempRight = tempRight.withColumnRenamed(col ,"r_" + col.toUpperCase)
+      }
+    }
+    val leftCols: Seq[String] = tempLeft.columns.filter(c => !compositeKeysUpperCase.contains(c.toUpperCase)).toSeq
+    val rightCols: Seq[String] = tempRight.columns.filter(c => !compositeKeysUpperCase.contains(c.toUpperCase)).toSeq
+    val joinedDf: DataFrame = tempLeft.as("l_")
+      .join(tempRight.as("r_"), compositeKeysUpperCaseSeq, "full_outer")
+    val allColsWithKeysInTheMiddle = leftCols.toSeq ++ compositeKeysUpperCase ++ rightCols.toSeq
+    joinedDf.select( allColsWithKeysInTheMiddle.map(c => col(c)) :_*)
   }
 
   /**
