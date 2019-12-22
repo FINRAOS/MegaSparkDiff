@@ -1,31 +1,29 @@
 package org.finra.msd.examples;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.sql.SQLException;
 import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.types.DataTypes;
 import org.finra.msd.containers.AppleTable;
-import org.finra.msd.examples.db.PostgresDatabase;
+import org.finra.msd.containers.DiffResult;
+import org.finra.msd.enums.SourceType;
 import org.finra.msd.examples.db.H2Database;
+import org.finra.msd.examples.db.PostgresDatabase;
 import org.finra.msd.sparkcompare.SparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.SQLException;
 
 public class H2ToPgTest {
 
   @BeforeClass
-  public static void start() throws IOException {
+  public static void start() throws IOException, ClassNotFoundException {
     PostgresDatabase.startPostgres();
+    H2Database.setH2Driver();
   }
 
   @AfterClass
@@ -66,7 +64,7 @@ public class H2ToPgTest {
     // See the below link to find out what these options do.
     // It's recommended to use the below settings as a bare minimum.
     // http://spark.apache.org/docs/latest/sql-programming-guide.html#jdbc-to-other-databases
-    Dataframe rightDataFrame = sparkSession.sqlContext.read()
+    Dataset<Row> rightDataFrame = SparkFactory.sparkSession().sqlContext().read()
       .format("jdbc")
       .option("driver", "org.postgresql.Driver")
       .option("url", PostgresDatabase.getUrl())
@@ -78,9 +76,11 @@ public class H2ToPgTest {
       .option("upperBound", "500") // Typically you want this to be the maximum value
       .option("numPartitions", "2") // Number of partitions to break the db into
       .option("fetchSize", "10") // Default is 10, increasing reduces network lag
-      .load().createOrReplaceTempView("appliance_right");
+      .load();
 
-    AppleTable rightTable = AppleTable(SourceType.JDBC, rightDataFrame, ",", "appliance_right");
+    rightDataFrame.createOrReplaceTempView("appliance_right");
+
+    AppleTable rightTable = new AppleTable(SourceType.JDBC, rightDataFrame, ",", "appliance_right");
 
     // Parallelize the reference data
     AppleTable typeTable = SparkFactory
@@ -181,10 +181,10 @@ public class H2ToPgTest {
 
 
     // Comparison of transformed left dataframe and right dataframe
-    Pair<Dataset<Row>, Dataset<Row>> result = SparkCompare
+    DiffResult result = SparkCompare
         .compareAppleTables(leftTableTransform, rightTable);
 
-    Assert.assertEquals(0, result.getLeft().count());
-    Assert.assertEquals(0, result.getRight().count());
+    Assert.assertEquals(0, result.inLeftNotInRight().count());
+    Assert.assertEquals(0, result.inRightNotInLeft().count());
   }
 }

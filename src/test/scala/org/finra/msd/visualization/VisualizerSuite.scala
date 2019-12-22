@@ -32,8 +32,7 @@ class VisualizerSuite extends SparkFunSuite with BeforeAndAfterAll {
     val comparisonResult: DiffResult = SparkCompare.compareSchemaDataFrames(left, right)
 
     val key: Seq[String] = Seq("key1", "key2")
-    val joinedResults: DataFrame = SparkCompare.fullOuterJoinDataFrames(comparisonResult.inLeftNotInRight,
-      comparisonResult.inRightNotInLeft, key)
+    val joinedResults: DataFrame = comparisonResult.fullOuterJoinDataFrames(key)
     val html = Visualizer.renderHorizontalTable(joinedResults, 100)
 
     assert(html.contains("class='different'"))

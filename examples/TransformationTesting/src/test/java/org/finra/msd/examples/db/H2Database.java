@@ -17,6 +17,10 @@ public class H2Database {
     properties.setProperty("password", "password");
   }
 
+  public static void setH2Driver() throws ClassNotFoundException {
+    Class.forName("org.h2.Driver");
+  }
+
   public static String getUrl() {
     return url;
   }

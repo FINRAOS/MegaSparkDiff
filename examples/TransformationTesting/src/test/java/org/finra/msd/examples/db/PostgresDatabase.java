@@ -3,12 +3,6 @@ package org.finra.msd.examples.db;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
 import ru.yandex.qatools.embed.postgresql.Command;
 import ru.yandex.qatools.embed.postgresql.PostgresExecutable;
 import ru.yandex.qatools.embed.postgresql.PostgresProcess;
@@ -19,6 +13,13 @@ import ru.yandex.qatools.embed.postgresql.config.AbstractPostgresConfig.Storage;
 import ru.yandex.qatools.embed.postgresql.config.AbstractPostgresConfig.Timeout;
 import ru.yandex.qatools.embed.postgresql.config.PostgresConfig;
 import ru.yandex.qatools.embed.postgresql.config.RuntimeConfigBuilder;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
 
 public class PostgresDatabase {
   private static PostgresProcess process;
@@ -33,7 +34,9 @@ public class PostgresDatabase {
     return properties;
   }
 
-  public static void startPostgres() throws IOException {
+  public static void startPostgres() throws IOException, ClassNotFoundException {
+    Class.forName("org.postgresql.Driver");
+
     IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
         .defaults(Command.Postgres)
         .build();
@@ -41,7 +44,7 @@ public class PostgresDatabase {
     PostgresStarter<PostgresExecutable, PostgresProcess> runtime = PostgresStarter.getInstance(runtimeConfig);
 
     PostgresConfig config = new PostgresConfig(
-        () -> "9.6.3-1",
+        () -> "10.11-1",
         new Net(),
         new Storage("src/test/resources/sample"),
         new Timeout(),
