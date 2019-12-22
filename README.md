@@ -1,4 +1,4 @@
-[![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/develop/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/develop)
+[![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/master/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/master)
 
 <h1>MegaSparkDiff</h1>
     
@@ -17,7 +17,7 @@ How to Use from Within a Java or Scala Project
 <dependency>
     <groupId>org.finra.megasparkdiff</groupId>
     <artifactId>mega-spark-diff</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
 </dependency>
 ```
 
