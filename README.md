@@ -1,4 +1,4 @@
-[![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/develop/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/develop)
+[![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/MLVizDiff/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/MLVizDiff)
 
 <h1>MegaSparkDiff</h1>
     
