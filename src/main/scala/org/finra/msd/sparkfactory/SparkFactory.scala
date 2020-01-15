@@ -37,10 +37,6 @@ object SparkFactory {
 
   var conf: SparkConf = null
 
-  var schemaStruct: StructType = null;
-
-  var dataFrameReader: DataFrameReader = null;
-
   /**
     * The initialize method creates the main spark session which MegaSparkDiff uses.
     * This needs to be called before any operation can be made using MegaSparkDiff.
@@ -322,17 +318,6 @@ object SparkFactory {
         .format("csv")
         .load(filePath)
     }
-
-    val rowCollection: Array[Row] = df.rdd.collect()
-    println("ROW LENGTH: " + rowCollection{0}.length)
-
-      for (row <- rowCollection)
-      {
-        println(row.toString())
-          println(row.get(0))
-      }
-
-    df.printSchema()
 
     df.createOrReplaceTempView(tempViewName)
 
