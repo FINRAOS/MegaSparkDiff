@@ -168,14 +168,14 @@ class SparkCompareSuite extends SparkFunSuite {
     assert(outputFile.exists() == true)
   }
 
-  test("test Compare Coutns Fron JDBC Apple Tables With Difference") {
+  test("test Compare Counts From JDBC Apple Tables With Difference") {
     val leftAppleTable = SparkFactory.parallelizeJDBCSource(hsqlDriverName, hsqlUrl, "SA", "",
       "(select * from Persons1)", "table1")
     val rightAppleTable = SparkFactory.parallelizeJDBCSource(hsqlDriverName, hsqlUrl, "SA", "",
       "(select * from test1)", "table2")
     val countResult = SparkCompare.compareAppleTablesCount(leftAppleTable, rightAppleTable)
 
-    assert(countResult.getLetCount != countResult.getRightCount)
+    assert(countResult.getLeftCount != countResult.getRightCount)
   }
 
   private def cleanOutputDirectory(subdir: String) = {
@@ -187,5 +187,31 @@ class SparkCompareSuite extends SparkFunSuite {
         log.error(e.toString)
     }
     FileUtil.createDirectory(outputDirectory + subdir)
+  }
+
+  test("test CSV Load"){
+    val expectedSchema = new StructType()
+      .add("fruit", StringType, true)
+      .add("num_1", StringType, true)
+      .add("num_2", StringType, true)
+      .add("color", StringType, true)
+
+    val file1Path: String = this.getClass.getClassLoader.getResource("TestCSV.txt").getPath
+//  val leftAppleTable = SparkFactory.parallelizeCSVSource(file1Path, None, Option("|"), "left_table")
+    val leftAppleTable = SparkFactory.parallelizeCSVSource(file1Path, Option(expectedSchema), Option("|"), "left_table")
+
+    println(leftAppleTable.getDataFrame)
+
+    val file2Path: String = this.getClass.getClassLoader.getResource("TestCSV_2.txt").getPath
+//  val rightAppleTable = SparkFactory.parallelizeCSVSource(file2Path, None, Option(","), "right_table")
+    val rightAppleTable = SparkFactory.parallelizeCSVSource(file2Path, Option(expectedSchema), Option(","), "right_table")
+
+    println(rightAppleTable.getDataFrame)
+
+    //comparison complains about column name diffs between the tables (from the schemaStruct/inferSchema)
+    val diffResult = SparkCompare.compareAppleTables(leftAppleTable, rightAppleTable)
+
+    assert(diffResult.inLeftNotInRight.count == 0)
+    assert(diffResult.inRightNotInLeft.count == 0)
   }
 }

@@ -37,6 +37,10 @@ object SparkFactory {
 
   var conf: SparkConf = null
 
+  var schemaStruct: StructType = null;
+
+  var dataFrameReader: DataFrameReader = null;
+
   /**
     * The initialize method creates the main spark session which MegaSparkDiff uses.
     * This needs to be called before any operation can be made using MegaSparkDiff.
@@ -286,6 +290,62 @@ object SparkFactory {
     */
   def parallelizeDynamoDBSource(tableName: String, tempViewName: String, jobConfMap: mutable.HashMap[String, String]): AppleTable = {
     parallelizeDynamoDBSource(tableName, tempViewName, jobConfMap, Option.apply(","))
+  }
+
+  /** This method will create an AppleTable for data in a CSV file
+    *
+    * @return
+    */
+  def parallelizeCSVSource(filePath: String, schemaDef: StructType , delimiter: String, tempViewName: String): AppleTable ={
+
+    var df: DataFrame = null
+
+    //Command to read the data from CSV into DataFrame
+    if(schemaDef != null) {
+      df = sparkSession.sqlContext.read
+        .option("multiLine", "true")
+        .option("delimiter", delimiter)
+        .schema(schemaDef)
+        .format("csv")
+        .load(filePath)
+    }
+    else {
+      //if caller does not pass in a schema, use the inferSchema option
+      df = sparkSession.sqlContext.read
+        .option("multiLine", "true")
+        .option("delimiter", delimiter)
+        .option("inferSchema", "true")
+        .format("csv")
+        .load(filePath)
+    }
+
+    val rowCollection: Array[Row] = df.rdd.collect()
+    println("ROW LENGTH: " + rowCollection{0}.length)
+
+      for (row <- rowCollection)
+      {
+        println(row.toString())
+          println(row.get(0))
+      }
+
+    df.printSchema()
+
+    df.createOrReplaceTempView(tempViewName)
+
+    val appleTable: AppleTable = new AppleTable(SourceType.CSV, df, delimiter, tempViewName)
+    return appleTable
+  }
+
+  /** This method will create an AppleTable for data in a CSV file. This method is the one that should be called
+    *
+    * @return
+    */
+  def parallelizeCSVSource(filePath: String, schemaDef: Option[StructType] , delimiter: Option[String], tempViewName: String): AppleTable ={
+
+    val schema: StructType = schemaDef.orNull
+    val delim = delimiter.getOrElse(",")
+
+    parallelizeCSVSource(filePath, schema, delim, tempViewName)
   }
 
   /**

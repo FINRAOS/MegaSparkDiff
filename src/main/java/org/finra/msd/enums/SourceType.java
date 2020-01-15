@@ -24,7 +24,8 @@ public enum SourceType {
     HIVE("HIVE"),
     FILE("FILE"),
     DYNAMODB("DYNAMODB"),
-    JSON("JSON");
+    JSON("JSON"),
+    CSV("CSV");
 
     /**
      * Represents the source type
