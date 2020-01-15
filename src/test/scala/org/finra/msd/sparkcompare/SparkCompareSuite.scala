@@ -200,11 +200,34 @@ class SparkCompareSuite extends SparkFunSuite {
 //  val leftAppleTable = SparkFactory.parallelizeCSVSource(file1Path, None, Option("|"), "left_table")
     val leftAppleTable = SparkFactory.parallelizeCSVSource(file1Path, Option(expectedSchema), Option("|"), "left_table")
 
+    //printing info for the 'left' table
+    val rowCollectionLeft: Array[Row] = leftAppleTable.getDataFrame.rdd.collect()
+    println("ROW LENGTH: " + rowCollectionLeft{0}.length)
+
+    for (row <- rowCollectionLeft)
+    {
+      println(row.toString())
+      println(row.get(0))
+    }
+
+    leftAppleTable.getDataFrame.printSchema()
     println(leftAppleTable.getDataFrame)
 
     val file2Path: String = this.getClass.getClassLoader.getResource("TestCSV_2.txt").getPath
 //  val rightAppleTable = SparkFactory.parallelizeCSVSource(file2Path, None, Option(","), "right_table")
     val rightAppleTable = SparkFactory.parallelizeCSVSource(file2Path, Option(expectedSchema), Option(","), "right_table")
+
+    //printing info for the 'right' table
+    val rowCollectionRight: Array[Row] = rightAppleTable.getDataFrame.rdd.collect()
+    println("ROW LENGTH: " + rowCollectionRight{0}.length)
+
+    for (row <- rowCollectionRight)
+    {
+      println(row.toString())
+      println(row.get(0))
+    }
+
+    rightAppleTable.getDataFrame.printSchema()
 
     println(rightAppleTable.getDataFrame)
 

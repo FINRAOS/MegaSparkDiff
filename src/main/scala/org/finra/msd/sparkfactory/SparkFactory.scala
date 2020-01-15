@@ -292,9 +292,13 @@ object SparkFactory {
     parallelizeDynamoDBSource(tableName, tempViewName, jobConfMap, Option.apply(","))
   }
 
-  /** This method will create an AppleTable for data in a CSV file
+  /** This method creates an AppleTable for data in a CSV file
     *
-    * @return
+    * @param filePath the relative path to the CSV file
+    * @param schemaDef optional schema definition for the data. If none is provided, the schema will be inferred by spark
+    * @param delimiter optional delimiter character for the data. If none is provided, comma (",") will be used as default
+    * @param tempViewName the name of the temporary view which gets created for source data
+    * @return custom table containing the data to be compared
     */
   def parallelizeCSVSource(filePath: String, schemaDef: StructType , delimiter: String, tempViewName: String): AppleTable ={
 
@@ -336,9 +340,13 @@ object SparkFactory {
     return appleTable
   }
 
-  /** This method will create an AppleTable for data in a CSV file. This method is the one that should be called
+  /** This method creates an AppleTable for data in a CSV file
     *
-    * @return
+    * @param filePath the relative path to the CSV file
+    * @param schemaDef optional schema definition for the data. If none is provided, the schema will be inferred by spark
+    * @param delimiter optional delimiter character for the data. If none is provided, comma (",") will be used as default
+    * @param tempViewName the name of the temporary view which gets created for source data
+    * @return custom table containing the data to be compared
     */
   def parallelizeCSVSource(filePath: String, schemaDef: Option[StructType] , delimiter: Option[String], tempViewName: String): AppleTable ={
 
