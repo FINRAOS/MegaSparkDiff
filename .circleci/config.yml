@@ -1,9 +1,0 @@
-version: 2.1
-orbs:
-  maven: circleci/maven@1.3.0
-workflows:
-  maven_package:
-    jobs:
-      - maven/package
-      - deploy:
-          command: bash <(curl -s https://copilot.blackducksoftware.com/ci/circle2/scripts/upload)
