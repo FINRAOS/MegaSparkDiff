@@ -4,7 +4,6 @@ orbs:
 workflows:
   maven_package:
     jobs:
-      - maven/clean
       - maven/package
       - deploy:
           command: bash <(curl -s https://copilot.blackducksoftware.com/ci/circle2/scripts/upload)
