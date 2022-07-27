@@ -18,20 +18,20 @@
 package org.finra.msd.basetestclasses
 
 // scalastyle:off
-import java.io.File
-
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, Row, SQLContext, SQLImplicits}
 import org.finra.msd.memorydb.MemoryDbHsql
 import org.finra.msd.sparkfactory.SparkFactory
 import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-import scala.reflect.io.{File, Path}
+import scala.reflect.io.Path
 import scala.util.Try
 
 class SparkFunSuite
-  extends FunSuite
+  extends AnyFunSuite
     with BeforeAndAfterAll
     with Logging
     with Matchers

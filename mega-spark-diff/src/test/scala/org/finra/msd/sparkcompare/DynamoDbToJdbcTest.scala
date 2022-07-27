@@ -1,5 +1,6 @@
 package org.finra.msd.sparkcompare
 
+import org.apache.hadoop.mapreduce.MRJobConfig
 import org.finra.msd.basetestclasses.{JsonFormatToJdbcTests, SparkFunSuiteDynamoDb}
 import org.finra.msd.containers.AppleTable
 import org.finra.msd.sparkfactory.SparkFactory
@@ -12,6 +13,7 @@ class DynamoDbToJdbcTest extends SparkFunSuiteDynamoDb
     val dynamoDbMap = new mutable.HashMap[String, String]
     dynamoDbMap.put("dynamodb.customAWSCredentialsProvider", dynamoDbCustomAWSCredentialsProvider)
     dynamoDbMap.put("dynamodb.endpoint", dynamoDbEndpoint)
+    dynamoDbMap.put("mapreduce.map.memory.mb", String.valueOf(MRJobConfig.DEFAULT_MAP_MEMORY_MB))
 
     val leftAppleTable = SparkFactory.parallelizeDynamoDBSource(table1, table1 + "_left", dynamoDbMap)
     val rightAppleTable = SparkFactory.parallelizeJDBCSource(hsqlDriverName, hsqlUrl, "SA", "",
