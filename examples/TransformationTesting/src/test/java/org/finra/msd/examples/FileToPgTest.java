@@ -1,13 +1,6 @@
 package org.finra.msd.examples;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -18,20 +11,23 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.finra.msd.containers.AppleTable;
+import org.finra.msd.containers.DiffResult;
 import org.finra.msd.examples.db.PostgresDatabase;
 import org.finra.msd.sparkcompare.SparkCompare;
 import org.finra.msd.sparkfactory.SparkFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FileToPgTest {
 
   @BeforeClass
-  public static void start() throws IOException {
+  public static void start() throws IOException, ClassNotFoundException {
     PostgresDatabase.startPostgres();
   }
 
@@ -190,10 +186,10 @@ public class FileToPgTest {
 
 
     // Comparison of transformed left dataframe and right dataframe
-    Pair<Dataset<Row>, Dataset<Row>> result = SparkCompare
+    DiffResult result = SparkCompare
         .compareAppleTables(leftTableTransform, rightTable);
 
-    Assert.assertEquals(0, result.getLeft().count());
-    Assert.assertEquals(0, result.getRight().count());
+    Assert.assertEquals(0, result.inLeftNotInRight().count());
+    Assert.assertEquals(0, result.inRightNotInLeft().count());
   }
 }

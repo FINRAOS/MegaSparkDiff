@@ -1,4 +1,4 @@
-[![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/master/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/master)
+[![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/develop/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/FINRAOS/MegaSparkDiff/branches/develop)
 
 <h1>MegaSparkDiff</h1>
     
@@ -7,9 +7,10 @@
 
     (HDFS, JDBC, S3, Hbase, Text Files, Hive). 
     
-    MegaSparkDiff can run on Amazon EMR (Elastic Map Reduce),
-    Amazon EC2 instances and cloud environments
-    with compatible Spark distributions.
+    MegaSparkDiff can run on 
+    (a) Amazon EMR (Elastic Map Reduce),
+    (b) Amazon EC2 instances and cloud environments with compatible Spark distributions.
+    (c) DataBricks Interactive Notebooks with Visualizations via displayhtml function.
 
 How to Use from Within a Java or Scala Project
 ----------------------------------------------
@@ -23,7 +24,7 @@ How to Use from Within a Java or Scala Project
 
 SparkFactory
 -----------
-    It parallelizes source/target data.
+    parallelizes source/target data.
 
     The data sources can be in following forms:
         Text File
