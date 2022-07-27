@@ -288,6 +288,59 @@ object SparkFactory {
     parallelizeDynamoDBSource(tableName, tempViewName, jobConfMap, Option.apply(","))
   }
 
+  /** This method creates an AppleTable for data in a CSV file
+    *
+    * @param filePath the relative path to the CSV file
+    * @param schemaDef optional schema definition for the data. If none is provided, the schema will be inferred by spark
+    * @param delimiter optional delimiter character for the data. If none is provided, comma (",") will be used as default
+    * @param tempViewName the name of the temporary view which gets created for source data
+    * @return custom table containing the data to be compared
+    */
+  def parallelizeCSVSource(filePath: String, schemaDef: StructType , delimiter: String, tempViewName: String): AppleTable ={
+
+    var df: DataFrame = null
+
+    //Command to read the data from CSV into DataFrame
+    if(schemaDef != null) {
+      df = sparkSession.sqlContext.read
+        .option("multiLine", "true")
+        .option("delimiter", delimiter)
+        .schema(schemaDef)
+        .format("csv")
+        .load(filePath)
+    }
+    else {
+      //if caller does not pass in a schema, use the inferSchema option
+      df = sparkSession.sqlContext.read
+        .option("multiLine", "true")
+        .option("delimiter", delimiter)
+        .option("inferSchema", "true")
+        .format("csv")
+        .load(filePath)
+    }
+
+    df.createOrReplaceTempView(tempViewName)
+
+    val appleTable: AppleTable = new AppleTable(SourceType.CSV, df, delimiter, tempViewName)
+    return appleTable
+  }
+
+  /** This method creates an AppleTable for data in a CSV file
+    *
+    * @param filePath the relative path to the CSV file
+    * @param schemaDef optional schema definition for the data. If none is provided, the schema will be inferred by spark
+    * @param delimiter optional delimiter character for the data. If none is provided, comma (",") will be used as default
+    * @param tempViewName the name of the temporary view which gets created for source data
+    * @return custom table containing the data to be compared
+    */
+  def parallelizeCSVSource(filePath: String, schemaDef: Option[StructType] , delimiter: Option[String], tempViewName: String): AppleTable ={
+
+    val schema: StructType = schemaDef.orNull
+    val delim = delimiter.getOrElse(",")
+
+    parallelizeCSVSource(filePath, schema, delim, tempViewName)
+  }
+
   /**
     * Flattens a DataFrame to only have a single column that contains the entire original row
     *
