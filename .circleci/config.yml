@@ -2,6 +2,19 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+commands:
+  early_return_for_forked_pull_requests:
+    description: >-
+      If this build is from a fork, stop executing the current job and return success.
+    steps:
+      - run:
+          name: Early return if this build is from a forked PR
+          command: |
+            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+              echo "Nothing else to do for forked PRs, so marking this step successful"
+              circleci step halt
+            fi
+
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
@@ -26,6 +39,7 @@ jobs:
       - run:
           name: Test
           command: mvn test
+      - early_return_for_forked_pull_requests
       - deploy:
           command: bash <(curl -s https://copilot.blackducksoftware.com/ci/circle2/scripts/upload)
 
