@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 MegaSparkDiff Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.finra.msd.visualization
 
 import org.apache.spark.sql._
@@ -13,14 +29,14 @@ object Visualizer {
   val ss = SparkFactory.sparkSession
 
   /**
-    * Generate template string which can be used by displayHTML() in databricks
-    *
-    * @param left
-    * @param right
-    * @param compositeKeyStrs : a sequence of strings used as keys to do full outer join. Case does not matter.
-    * @param maxRecords
-    * @return a template string
-    */
+   * Generate template string which can be used by displayHTML() in databricks
+   *
+   * @param left
+   * @param right
+   * @param compositeKeyStrs a sequence of strings used as keys to do full outer join. Case does not matter.
+   * @param maxRecords
+   * @return                 a template string
+   */
   def generateVisualizerTemplate(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String],
                                  maxRecords: Integer = 1000): String = {
 
@@ -166,17 +182,17 @@ object Visualizer {
   }
 
   /**
-    * Generate header, rows and a flag indicating the following scenarios:
-    * 1 - right is empty
-    * 2 - left is empty
-    * 3 - both are not empty
-    *
-    * @param left
-    * @param right
-    * @param compositeKeyStrs
-    * @param maxRecords
-    * @return a tuple containing header, rows and visualResultType
-    */
+   * Generate header, rows and a flag indicating the following scenarios:
+   * 1 - right is empty
+   * 2 - left is empty
+   * 3 - both are not empty
+   *
+   * @param left
+   * @param right
+   * @param compositeKeyStrs
+   * @param maxRecords
+   * @return a tuple containing header, rows and visualResultType
+   */
   def generateHeadersRows(left: DataFrame, right: DataFrame, compositeKeyStrs: Seq[String], maxRecords: Integer)
   : (Seq[String], Seq[Seq[String]], VisualResultType) = {
 
@@ -240,11 +256,11 @@ object Visualizer {
   }
 
   /**
-    * Helper method to map non-composite key cell value to desired value
-    *
-    * @param columnName : column name
-    * @return
-    */
+   * Helper method to map non-composite key cell value to desired value
+   *
+   * @param columnName : column name
+   * @return
+   */
   def mapHelper(columnName: String): Column = {
 
     val x: SparkSession = SparkFactory.sparkSession
@@ -263,11 +279,11 @@ object Visualizer {
   }
 
   /**
-    * Check whether passed sequence of keys are valid
-    *
-    * @param composite_key_strs
-    * @return
-    */
+   * Check whether passed sequence of keys are valid
+   *
+   * @param composite_key_strs
+   * @return
+   */
   def isValidKey(composite_key_strs: Seq[String]): Boolean = {
 
     var flag: Boolean = true;
@@ -282,11 +298,11 @@ object Visualizer {
   }
 
   /**
-    *
-    * @param df    the resulting dataframe from FULL OUTER JOIN operation by SparkCompare.fullOuterJoinDataFrames
-    * @param limit the maximum number of records to be displayed in the table
-    * @return HTML table as a String to be further used as placement inside the horizontalTemplate
-    */
+   *
+   * @param df    the resulting dataframe from FULL OUTER JOIN operation by SparkCompare.fullOuterJoinDataFrames
+   * @param limit the maximum number of records to be displayed in the table
+   * @return HTML table as a String to be further used as placement inside the horizontalTemplate
+   */
   def renderHorizontalTable(df: DataFrame, limit: Int): String = {
     val rows = df.take(limit).toSeq
     val header: Seq[String] = df.schema.fieldNames.toSeq
@@ -302,25 +318,25 @@ object Visualizer {
   }
 
   /**
-    *
-    * @param row    a single row of the full outer join dataframe created by SparkCompare.fullOuterJoinDataFrames
-    * @param header a sequence of strings having the header column names. expectation is that it is ordered like so
-    *               l_column1 l_column2 key1 key2 r_column1 r_column2
-    * @return a string having HTML representation of a single htmlt able row
-    */
+   *
+   * @param row    a single row of the full outer join dataframe created by SparkCompare.fullOuterJoinDataFrames
+   * @param header a sequence of strings having the header column names. expectation is that it is ordered like so
+   *               l_column1 l_column2 key1 key2 r_column1 r_column2
+   * @return       a string having HTML representation of a single htmlt able row
+   */
   private def convertRowToHtml(row: Row, header: Seq[String]): String = {
     val valuesMap: Map[String, Nothing] = row.getValuesMap(header)
     header.map(h => getValueFromRowAsCell(valuesMap, h)).mkString
   }
 
   /**
-    *
-    * @param valuesMap  a key value map extracted from the dataframe ROW object
-    * @param columnName the column name for which the caller wants to extract the value and render as html TD
-    * @return html TD encapsulating the column value. If the value between left and right are different then it will
-    *         have CSS class of "different" if the values are the same then the css class will have value of "same".
-    *         if the column is a key column it will have a css class of "same"
-    */
+   *
+   * @param valuesMap  a key value map extracted from the dataframe ROW object
+   * @param columnName the column name for which the caller wants to extract the value and render as html TD
+   * @return           html TD encapsulating the column value. If the value between left and right are different then it will
+   *                   have CSS class of "different" if the values are the same then the css class will have value of "same".
+   *                   if the column is a key column it will have a css class of "same"
+   */
   private def getValueFromRowAsCell(valuesMap: Map[String, Nothing], columnName: String): String = {
     val value = {
       val valueOption = valuesMap.get(columnName)

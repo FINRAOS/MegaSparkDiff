@@ -6,7 +6,7 @@
 
     <groupId>org.finra.megasparkdiff</groupId>
     <artifactId>mega-spark-diff-parent</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <packaging>pom</packaging>
 
     <name>MegaSparkDiffParent</name>
@@ -47,12 +47,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
-        <maven.dependency.plugin.version>3.3.0</maven.dependency.plugin.version>
-        <maven.jar.plugin.version>3.2.2</maven.jar.plugin.version>
-        <scala.maven.plugin.version>4.7.1</scala.maven.plugin.version>
-        <spark.version>3.1.3</spark.version>
-        <scala.version>2.12.16</scala.version>
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        <maven.dependency.plugin.version>3.6.1</maven.dependency.plugin.version>
+        <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
+        <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>
+        <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
+        <maven.site.plugin.version>3.12.1</maven.site.plugin.version>
+        <maven.project.info.reports.plugin.version>3.5.0</maven.project.info.reports.plugin.version>
+        <scala.maven.plugin.version>4.8.1</scala.maven.plugin.version>
+        <spark.version>3.4.2</spark.version>
+        <scala.version>2.12.18</scala.version>
         <scala.major.version>2.12</scala.major.version>
     </properties>
 
@@ -147,37 +151,10 @@
                         </configuration>
                     </plugin>
 
-                    <!--<plugin>-->
-                    <!--<groupId>org.apache.maven.plugins</groupId>-->
-                    <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
-                    <!--<version>2.15</version>-->
-                    <!--<executions>-->
-                    <!--<execution>-->
-                    <!--<id>test</id>-->
-                    <!--<phase>test</phase>-->
-                    <!--<configuration>-->
-                    <!--<configLocation>config/sun_checkstyle.xml</configLocation>-->
-                    <!--<headerLocation>config/java.header</headerLocation>-->
-                    <!--<includeTestSourceDirectory>true</includeTestSourceDirectory>-->
-                    <!--<includeResources>true</includeResources>-->
-                    <!--<includeTestResources>true</includeTestResources>-->
-                    <!--<resourceIncludes>**/*.*</resourceIncludes>-->
-                    <!--<encoding>UTF-8</encoding>-->
-                    <!--<consoleOutput>true</consoleOutput>-->
-                    <!--<failOnViolation>true</failOnViolation>-->
-                    <!--<failsOnError>true</failsOnError>-->
-                    <!--</configuration>-->
-                    <!--<goals>-->
-                    <!--<goal>check</goal>-->
-                    <!--</goals>-->
-                    <!--</execution>-->
-                    <!--</executions>-->
-                    <!--</plugin>-->
-
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>${maven.javadoc.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -192,7 +169,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <version>${maven.source.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -206,7 +183,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-site-plugin</artifactId>
-                        <version>3.8.2</version>
+                        <version>${maven.site.plugin.version}</version>
                     </plugin>
 
                     <plugin>
@@ -234,7 +211,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>${maven.project.info.reports.plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>

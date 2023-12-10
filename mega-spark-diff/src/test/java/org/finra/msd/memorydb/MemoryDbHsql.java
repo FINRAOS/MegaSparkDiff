@@ -16,6 +16,18 @@
 
 package org.finra.msd.memorydb;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.reflect.TypeToken;
+import java.net.URISyntaxException;
+import java.sql.PreparedStatement;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.finra.msd.helpers.FileHelper;
 import org.hsqldb.server.Server;
 
 import java.sql.Connection;
@@ -30,6 +42,9 @@ public class MemoryDbHsql {
     private static MemoryDbHsql instance = null;
     private Server hsqlDbServer = null;
 
+    public static final String hsqlDriverName = "org.hsqldb.jdbc.JDBCDriver";
+    public static final String hsqlUrl = "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb";
+
 
     protected MemoryDbHsql() {
         // Exists only to defeat instantiation.
@@ -42,7 +57,7 @@ public class MemoryDbHsql {
         return instance;
     }
 
-    public synchronized void  initializeMemoryDB()
+    public synchronized void  initializeMemoryDB() throws URISyntaxException, SQLException
     {
         if (hsqlDbServer == null)
         {
@@ -65,138 +80,87 @@ public class MemoryDbHsql {
         return hsqlDbServer.getState();
     }
 
-    private void stageTablesAndTestData()
+    private String getDataType(JsonElement element) {
+        if (element.isJsonPrimitive()) {
+            JsonPrimitive primitive = (JsonPrimitive) element;
+            if (primitive.isBoolean())
+                return "boolean";
+            else if (primitive.isNumber())
+                return "int";
+            else
+                return "varchar(255)";
+        } else
+            return "varchar(255)";
+    }
+
+    private String formatStringFromJson(JsonElement jsonElement) {
+        if (jsonElement == null) return null;
+        return jsonElement.toString().replaceAll("\\A\"(.*)\"\\z", "$1");
+    }
+
+    private void stageTablesAndTestData() throws URISyntaxException
     {
-        String url="jdbc:hsqldb:hsql://127.0.0.1:9001/testDb";
         try {
-            Class.forName("org.hsqldb.jdbc.JDBCDriver");
+            Class.forName(hsqlDriverName);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(url, "SA", "");
-            Statement stmt = conn.createStatement();
+        try (Connection conn = DriverManager.getConnection(hsqlUrl, "SA", "")) {
+            try (Statement stmt = conn.createStatement()) {
+                List<String> filenamesNew = FileHelper.getFilenames("jdbc", "", ".sql").stream()
+                    .sorted().collect(
+                        Collectors.toList());
+                filenamesNew.addAll(FileHelper.getFilenames("compare", "JsonTest", ".sql"));
 
-            stmt.execute("DROP TABLE IF EXISTS Persons1;");
+                for (String filename : filenamesNew) {
+                    String[] statements = FileHelper.getStringFromResource("/" + filename)
+                        .split(";");
+                    for (String statement : statements) {
+                        stmt.execute(statement);
+                    }
+                }
 
-            stmt.execute("CREATE TABLE Persons1 (\n" +
-                    "           PersonID int,\n" +
-                    "           LastName varchar(255),\n" +
-                    "           FirstName varchar(255),\n" +
-                    "           Address varchar(255),\n" +
-                    "           City varchar(255));");
-            String[] fruitTables = {"Test1","Test2","Test3","Test4","Test5"};
-            for (String fruitTable : fruitTables) {
-                stmt.execute("DROP TABLE IF EXISTS " + fruitTable + ";");
+                Set<String> filenames = FileHelper.getFilenames("dynamodb", "DynamoDbTest",
+                    ".json");
+                filenames.addAll(FileHelper.getFilenames("json", "JsonTest", ".json"));
 
-                stmt.execute("CREATE TABLE " + fruitTable + " (\n" +
-                    "           Fruit VARCHAR(255),\n" +
-                    "           Price INT,\n" +
-                    "           Ripeness INT,\n" +
-                    "           Color VARCHAR(255));");
+                for (String filename : filenames) {
+                    String tableName = filename
+                        .substring(0, filename.length() - 5).replace("/", "_");
+                    stmt.execute("DROP TABLE IF EXISTS " + tableName + ";");
+
+                    String json = FileHelper.getStringFromResource("/" + filename);
+
+                    List<JsonElement> jsonList = new Gson().fromJson(json,
+                        new TypeToken<Collection<JsonElement>>() {
+                        }.getType());
+
+                    stmt.execute("CREATE TABLE " + tableName + "(\n" +
+                        "           key1 varchar(255),\n" +
+                        "           key2 int,\n" +
+                        "           attribute1 varchar(255),\n" +
+                        "           attribute2 varchar(255),\n" +
+                        "           attribute3 varchar(255));");
+
+                    for (JsonElement jsonRow : jsonList) {
+                        JsonObject jsonObject = jsonRow.getAsJsonObject();
+                        try (PreparedStatement preparedStatement = conn.prepareStatement(
+                            "INSERT INTO " + tableName + " values(?, ?, ?, ?, ?)")) {
+                            String test = jsonObject.get("attribute1").toString();
+                            String key = jsonObject.get("key1").getAsString();
+                            preparedStatement.setString(1, jsonObject.get("key1").getAsString());
+                            preparedStatement.setInt(2, jsonObject.get("key2").getAsInt());
+                            preparedStatement.setString(3,
+                                formatStringFromJson(jsonObject.get("attribute1")));
+                            preparedStatement.setObject(4,
+                                formatStringFromJson(jsonObject.get("attribute2")));
+                            preparedStatement.setString(5,
+                                formatStringFromJson(jsonObject.get("attribute3")));
+                            preparedStatement.executeUpdate();
+                        }
+                    }
+                }
             }
-
-            String[] fruitEnhancedTables = {"Test6","Test7"};
-            for(String table : fruitEnhancedTables) {
-                stmt.execute("DROP TABLE IF EXISTS " + table + ";");
-
-                stmt.execute("CREATE TABLE " + table +  "(\n" +
-                        "           Fruit VARCHAR(255),\n" +
-                        "           Price DOUBLE,\n" +
-                        "           Ripeness INT,\n" +
-                        "           Color VARCHAR(255),\n" +
-                        "           ImportDate DATE, \n" +
-                        "           ImportTimeStamp TIMESTAMP, \n" +
-                        "           Status BOOLEAN, \n" +
-                        "           BValues BLOB, \n" +
-                        "           CValues CLOB);");
-            }
-
-            String[] dynamoDbTables = {"DynamoDbTest1", "DynamoDbTest2"};
-            for(String table : dynamoDbTables) {
-                stmt.execute("DROP TABLE IF EXISTS " + table + ";");
-
-                stmt.execute("CREATE TABLE " + table + "(\n" +
-                    "           key1 varchar(255),\n" +
-                    "           key2 int,\n" +
-                    "           attribute1 varchar(255),\n" +
-                    "           attribute2 varchar(255),\n" +
-                    "           attribute3 INT);");
-            }
-
-            String[] personRecords = {
-                    "insert into Persons1 values(1,'Garcia', 'Carlos', 'lives somewhere', 'Rockville') ",
-                    "insert into Persons1 values(2,'Patel', 'Shraddha', 'lives somewhere', 'Maryland') ",
-
-                    "insert into Test1 values('Apple', 5, 10, 'Red') ",
-                    "insert into Test1 values('Banana', 4, 8, 'Yellow') ",
-                    "insert into Test1 values('Orange', 2, 9, 'Blue') ",
-                    "insert into Test1 values('Kiwi', 8, 7, 'Fuzzy-Green') ",
-                    "insert into Test1 values('Watermelon', 3, 11, 'Green') ",
-                    "insert into Test1 values('Mango', 6, 12, 'Yellow') ",
-                    "insert into Test1 values('Papaya', 190534, 4, 'I forget') ",
-                    "insert into Test1 values('Strawberry', 5, 10, 'Acne') ",
-                    "insert into Test1 values('Plum', 8261, 6, 'Purple') ",
-                    "insert into Test1 values('Tomato', 0, 0, 'Red') ",
-
-                    "insert into Test2 values('Apple', 5, 10, 'Red') ",
-                    "insert into Test2 values('Banana', 4, 8, 'Yellow') ",
-                    "insert into Test2 values('Orange', 2, 9, 'Blue') ",
-                    "insert into Test2 values('Kiwi', 8, 7, 'Fuzzy-Green') ",
-                    "insert into Test2 values('Watermelon', 3, 11, 'Green') ",
-                    "insert into Test2 values('Mango', 6, 12, 'Yellow') ",
-                    "insert into Test2 values('Papaya', 190534, 4, 'I forget') ",
-                    "insert into Test2 values('Strawberry', 5, 10, 'Acne') ",
-                    "insert into Test2 values('Plum', 8261, 6, 'Purple') ",
-                    "insert into Test2 values('Tomato', 0, 0, 'Red') ",
-
-                    "insert into Test3 values('Apple', 5, 10, 'Red') ",
-                    "insert into Test3 values('Banana', 4, 8, 'Yellow') ",
-                    "insert into Test3 values('Orange', 2, -9, 'Blue') ", //diff
-                    "insert into Test3 values('Kiwi', 8, 7, 'Fuzzy-Green') ",
-                    "insert into Test3 values('Watermelon', 3, 11, 'Green') ",
-                    "insert into Test3 values('Mango', 6, 12, 'Yellow') ",
-                    "insert into Test3 values('Papaya', 190534, 4, 'I remember now') ", //diff
-                    "insert into Test3 values('Strawberry', 5, 10, 'Acne') ",
-                    "insert into Test3 values('Plum', 8261, 6, 'Purple') ",
-                    "insert into Test3 values('Tomato', 0, 0, 'Red') ",
-
-                    "insert into Test4 values('Apple', 5, 10, 'Red') ",
-                    "insert into Test4 values('Banana', 4, 8, 'Yellow') ",
-                    "insert into Test4 values('Orange', 2, 9, 'Blue') ",
-                    "insert into Test4 values('Kiwi', 8, 7, 'Fuzzy-Green') ",
-                    "insert into Test4 values('Watermelon', 3, 11, 'Green') ",
-
-                    "insert into Test5 values('Mango', 6, 12, 'Yellow') ",
-                    "insert into Test5 values('Papaya', 190534, 4, 'I forget') ",
-                    "insert into Test5 values('Strawberry', 5, 10, 'Acne') ",
-                    "insert into Test5 values('Plum', 8261, 6, 'Purple') ",
-                    "insert into Test5 values('Tomato', 0, 0, 'Red') ",
-
-                    "insert into Test6 values('Mango', 6.45, 12, 'Yellow', '2017-05-20', '2017-05-20 10:22:10', FALSE, X'01FF', 'clob')",
-                    "insert into Test6 values('Papaya', 190534.12, 4, 'I forget', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
-                    "insert into Test6 values('Kiwi', 8.83, 7, 'Fuzzy-Green', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
-                    "insert into Test6 values('Watermelon', null, 11, null, '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
-
-                    "insert into Test7 values('Mango', 6.11, 12, '', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
-                    "insert into Test7 values('Papaya', 190534.12, 4, 'I forget', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
-                    "insert into Test7 values('Strawberry', 5.89, 10, 'Acne', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
-                    "insert into Test7 values('Plum', 8261.05, 6, 'Purple', '2017-05-20', '2017-05-20 10:22:10', FALSE, X'01FF', 'clob')",
-                    "insert into Test7 values('Tomato', 0.9, 0, 'Red', '2017-05-20', '2017-05-20 10:22:10', TRUE, X'01FF', 'clob')",
-                    "insert into Test7 values('Watermelon', null, 11, null, '2017-05-21', '2017-05-21 8:10:18', FALSE, X'01FF', 'clob')",
-
-                    "insert into DynamoDbTest1 values('TEST1', 1, 'test number 1', '1', 1)",
-                    "insert into DynamoDbTest1 values('TEST2', 1, 'test number 2', '2', 2)",
-                    "insert into DynamoDbTest1 values('TEST3', 3, 'test number 3', 'true', 3)",
-
-                    "insert into DynamoDbTest2 values('TEST1', 1, 'test number 1', '1', 1)",
-                    "insert into DynamoDbTest2 values('TEST2', 1, 'test number 2', '2 ', 2)"
-            };
-
-            for (String record : personRecords)
-                stmt.executeUpdate(record);
-
         } catch (SQLException e) {
             e.printStackTrace();
         }

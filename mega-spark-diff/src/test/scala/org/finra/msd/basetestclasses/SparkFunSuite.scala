@@ -34,13 +34,10 @@ class SparkFunSuite
   extends AnyFunSuite
     with BeforeAndAfterAll
     with Logging
-    with Matchers
-    with SharedSqlContext {
+    with Matchers {
 
 
   protected val outputDirectory: String = System.getProperty("user.dir") + "/sparkOutputDirectory"
-  protected final val hsqlDriverName = "org.hsqldb.jdbc.JDBCDriver"
-  protected final val hsqlUrl = "jdbc:hsqldb:hsql://127.0.0.1:9001/testDb"
 
   private lazy val sparkSession = SparkFactory.sparkSession
 
@@ -48,11 +45,12 @@ class SparkFunSuite
     protected override def _sqlContext: SQLContext = SparkFactory.sparkSession.sqlContext
   }
 
+  val helpers = new TestHelpers()
+
   implicit class SequenceImprovements(seq: Seq[Row]) {
     def toDf(schema: StructType): DataFrame = {
       val rowRdd = sparkSession.sparkContext.parallelize(seq)
-      val df = sparkSession.createDataFrame(rowRdd, schema)
-      return df
+      sparkSession.createDataFrame(rowRdd, schema)
     }
   }
 
@@ -106,7 +104,7 @@ class SparkFunSuite
     Try(path.deleteRecursively())
   }
 
-def readSavedFile(folder : String): String = {
+  def readSavedFile(folder : String): String = {
     val file = new java.io.File(outputDirectory + "/" + folder + "/")
       .listFiles
       .filter(_.isFile)

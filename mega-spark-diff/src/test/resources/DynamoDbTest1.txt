@@ -1,3 +1,0 @@
-[test number 1],[1],[1],[TEST1],[1]
-[test number 2],[2],[2],[TEST2],[1]
-[test number 3],[true],[3],[TEST3],[3]
