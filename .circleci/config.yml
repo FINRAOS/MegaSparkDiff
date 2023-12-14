@@ -40,7 +40,8 @@ jobs:
           name: Test
           command: mvn test
       - early_return_for_forked_pull_requests
-      - deploy:
+      - run:
+          name: Scan
           command: bash <(curl -s https://copilot.blackducksoftware.com/ci/circle2/scripts/upload)
 
 # Invoke jobs via workflows
