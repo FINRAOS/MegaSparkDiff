@@ -49,11 +49,16 @@ class CountsSuite extends SparkFunSuite with BeforeAndAfterAll {
     ).toDF("key1" , "key2", "value1" , "value2")
     
     val comparisonResult: DiffResult = SparkCompare.compareSchemaDataFrames(left, right)
-    val joinedResults: DataFrame = comparisonResult.fullOuterJoinDataFrames(key)
     val stats = comparisonResult.discrepancyStats(key)
-    
-    joinedResults.show()
-    stats.show()
+
+    val result = stats.orderBy("COLUMN_NAME").collect()
+    val schemaResult = stats.schema
+
+    assert(result.length == 2)
+    assert(result.take(2)(0)(schemaResult.fieldIndex("COLUMN_NAME")).equals("VALUE1"))
+    assert(result.take(2)(0)(schemaResult.fieldIndex("DISCREPANCIES")) == 5)
+    assert(result.take(2)(1)(schemaResult.fieldIndex("COLUMN_NAME")).equals("VALUE2"))
+    assert(result.take(2)(1)(schemaResult.fieldIndex("DISCREPANCIES")) == 5)
   }
 
   test("A few discrepancies across two non-key columns") {
@@ -81,11 +86,18 @@ class CountsSuite extends SparkFunSuite with BeforeAndAfterAll {
     ).toDF("a_column","b_column","c_column","d_column")
     
     val comparisonResult: DiffResult = SparkCompare.compareSchemaDataFrames(left, right)
-    val joinedResults: DataFrame = comparisonResult.fullOuterJoinDataFrames(key)
     val stats = comparisonResult.discrepancyStats(key)
 
-    joinedResults.show()
-    stats.show()
+    val result = stats.orderBy("COLUMN_NAME").collect()
+    val schemaResult = stats.schema
+
+    assert(result.length == 3)
+    assert(result.take(3)(0)(schemaResult.fieldIndex("COLUMN_NAME")).equals("B_COLUMN"))
+    assert(result.take(3)(0)(schemaResult.fieldIndex("DISCREPANCIES")) == 2)
+    assert(result.take(3)(1)(schemaResult.fieldIndex("COLUMN_NAME")).equals("C_COLUMN"))
+    assert(result.take(3)(1)(schemaResult.fieldIndex("DISCREPANCIES")) == 0)
+    assert(result.take(3)(2)(schemaResult.fieldIndex("COLUMN_NAME")).equals("D_COLUMN"))
+    assert(result.take(3)(2)(schemaResult.fieldIndex("DISCREPANCIES")) == 1)
   }
 
   test("Discrepancies in the key columns") {
@@ -113,10 +125,17 @@ class CountsSuite extends SparkFunSuite with BeforeAndAfterAll {
     ).toDF("a_column","b_column","c_column","d_column")
 
     val comparisonResult: DiffResult = SparkCompare.compareSchemaDataFrames(left, right)
-    val joinedResults: DataFrame = comparisonResult.fullOuterJoinDataFrames(key)
     val stats = comparisonResult.discrepancyStats(key)
 
-    joinedResults.show()
-    stats.show()
+    val result = stats.orderBy("COLUMN_NAME").collect()
+    val schemaResult = stats.schema
+
+    assert(result.length == 3)
+    assert(result.take(3)(0)(schemaResult.fieldIndex("COLUMN_NAME")).equals("B_COLUMN"))
+    assert(result.take(3)(0)(schemaResult.fieldIndex("DISCREPANCIES")) == 4)
+    assert(result.take(3)(1)(schemaResult.fieldIndex("COLUMN_NAME")).equals("C_COLUMN"))
+    assert(result.take(3)(1)(schemaResult.fieldIndex("DISCREPANCIES")) == 4)
+    assert(result.take(3)(2)(schemaResult.fieldIndex("COLUMN_NAME")).equals("D_COLUMN"))
+    assert(result.take(3)(2)(schemaResult.fieldIndex("DISCREPANCIES")) == 4)
   }
 }
