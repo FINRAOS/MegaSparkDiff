@@ -35,7 +35,7 @@ object SparkFactory {
    * This needs to be called before any operation can be made using MegaSparkDiff.
    * It creates a spark app with the name "megasparkdiff" and enables hive support by default.
    */
-  def initializeSparkContext(): Unit = { //todo: need to refactor it to support spark-submit command
+  def initializeSparkContext(): Unit = {
     conf = new SparkConf().setAppName("megasparkdiff")
     sparkSession = SparkSession.builder.config(conf).enableHiveSupport().getOrCreate()
   }
@@ -116,7 +116,7 @@ object SparkFactory {
    * @return                       custom table containing the data to be compared
    */
   def parallelizeJSONSource(jsonFileLocation: String, tempViewName: String,
-                            firstLevelElementNames: Array[String], delimiter: Option[String]): AppleTable = {
+                            firstLevelElementNames: Array[String], delimiter: Option[String] = Option.apply(",")): AppleTable = {
     val expectedSchema = new StructType(firstLevelElementNames.map(x => StructField(x, StringType, nullable = true)))
 
     val df = sparkSession.sqlContext.read
@@ -127,18 +127,6 @@ object SparkFactory {
     df.createOrReplaceTempView(tempViewName)
 
     AppleTable(SourceType.JSON, df, delimiter.orNull, tempViewName)
-  }
-
-  /** This method will create an AppleTable for data in a JSON file.
-   *
-   * @param jsonFileLocation       path of a json file containing the data to be compared
-   * @param tempViewName           temporary table name for source data
-   * @param firstLevelElementNames Names of the first level elements in the file
-   * @return                       custom table containing the data to be compared
-   */
-  def parallelizeJSONSource(jsonFileLocation: String, tempViewName: String,
-                            firstLevelElementNames: Array[String]): AppleTable = {
-    parallelizeJSONSource(jsonFileLocation, tempViewName, firstLevelElementNames, Option.apply(","))
   }
 
   /**
@@ -180,6 +168,10 @@ object SparkFactory {
    * @param sqlQuery        Query to retrieve the desired data from database
    * @param tempViewName    temporary table name for source data
    * @param delimiter       source data separation character
+   * @param partitionColumn column to partition queries on
+   * @param lowerBound      lower bound of partition column values
+   * @param upperBound      upper bound of partition column values
+   * @param numPartitions   number of total queries to execute
    * @return                custom table containing the data to be compared
    */
   def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
@@ -212,7 +204,7 @@ object SparkFactory {
    * @param password        Password for database connection
    * @param sqlQuery        Query to retrieve the desired data from database
    * @param tempViewName    temporary table name for source data
-   * @return
+   * @return                custom table containing the data to be compared
    */
   def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
                             tempViewName: String): AppleTable = {
@@ -237,45 +229,55 @@ object SparkFactory {
   /**
    * This method will create an AppleTable for data in DynamoDB table.
    *
-   * @param tableName              name of DynamoDB table
-   * @param tempViewName           temporary table name for source data
-   * @param firstLevelElementNames names of the first level elements in the table
-   * @param delimiter              source data separation character
+   * @param tableName               name of DynamoDB table
+   * @param tempViewName            temporary table name for source data
+   * @param firstLevelElementNames  names of the first level elements in the table
+   * @param delimiter               source data separation character
+   * @param selectColumns           list of columns to select from table
+   * @param filter                  sql where condition
+   * @param region                  <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">region Spark parameter</a>
+   * @param roleArn                 <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">roleArn Spark parameter</a>
+   * @param readPartitions          <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">readPartitions Spark reader parameter</a>
+   * @param maxPartitionBytes       <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">maxPartitionBytes Spark reader parameter</a>
+   * @param defaultParallelism      <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">defaultParallelism Spark reader parameter</a>
+   * @param targetCapacity          <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">targetCapacity Spark reader parameter</a>
+   * @param stronglyConsistentReads <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">stronglyConsistentReads Spark reader parameter</a>
+   * @param bytesPerRCU             <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">bytesPerRCU Spark reader parameter</a>
+   * @param filterPushdown          <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">filterPushdown Spark reader parameter</a>
+   * @param throughput              <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">throughput Spark reader parameter</a>
+   *
    * @return custom table containing the data to be compared
    */
   def parallelizeDynamoDBSource(tableName: String, tempViewName: String,
-                                firstLevelElementNames: Array[String], delimiter: Option[String]): AppleTable = {
+                                firstLevelElementNames: Array[String], delimiter: Option[String] = Option.apply(","),
+                                selectColumns: Option[Array[String]] = Option.empty, filter: Option[String] = Option.empty,
+                                region: Option[String] = Option.empty, roleArn: Option[String] = Option.empty,
+                                readPartitions: Option[String] = Option.empty, maxPartitionBytes: Option[String] = Option.empty,
+                                defaultParallelism: Option[String] = Option.empty, targetCapacity: Option[String] = Option.empty,
+                                stronglyConsistentReads: Option[String] = Option.empty, bytesPerRCU: Option[String] = Option.empty,
+                                filterPushdown: Option[String] = Option.empty, throughput: Option[String] = Option.empty): AppleTable = {
     val expectedSchema = new StructType(firstLevelElementNames.map(x => StructField(x, StringType, nullable = true)))
 
-    val df = sparkSession.read.schema(expectedSchema)
-      .format("com.audienceproject.spark.dynamodb.msd.datasource")
-      .option("table", tableName).load
-
-    df.createOrReplaceTempView(tempViewName)
-
-    AppleTable(SourceType.DYNAMODB, df, delimiter.orNull, tempViewName)
-  }
-
-  /**
-   * This method will create an AppleTable for data in DynamoDB table.
-   *
-   * @param tableName              name of DynamoDB table
-   * @param tempViewName           temporary table name for source data
-   * @param firstLevelElementNames names of the first level elements in the table
-   * @param delimiter              source data separation character
-   * @param selectColumns          list of columns to select from table
-   * @param filter                 sql where condition
-   * @return                       custom table containing the data to be compared
-   */
-  def parallelizeDynamoDBSource(tableName: String, tempViewName: String,
-                                firstLevelElementNames: Array[String], delimiter: Option[String],
-                                selectColumns: Option[Array[String]], filter: Option[String]): AppleTable = {
-    val expectedSchema = new StructType(firstLevelElementNames.map(x => StructField(x, StringType, nullable = true)))
+    val options = (
+      Map("region" -> region) ++
+      Map("roleArn" -> roleArn) ++
+      Map("readPartitions" -> readPartitions) ++
+      Map("maxPartitionBytes" -> maxPartitionBytes) ++
+      Map("defaultParallelism" -> defaultParallelism) ++
+      Map("targetCapacity" -> targetCapacity) ++
+      Map("stronglyConsistentReads" -> stronglyConsistentReads) ++
+      Map("bytesPerRCU" -> bytesPerRCU) ++
+      Map("filterPushdown" -> filterPushdown) ++
+      Map("throughput" -> throughput)
+      ).filter(x => x._2.isDefined)
+      .map(x => x._1 -> x._2.get)
 
     var df = sparkSession.read.schema(expectedSchema)
       .format("com.audienceproject.spark.dynamodb.msd.datasource")
-      .option("table", tableName).load
-      .select(selectColumns.getOrElse(firstLevelElementNames).map(x => new Column(x)):_*)
+      .option("table", tableName)
+      .options(options)
+      .load
+      .select(selectColumns.getOrElse(firstLevelElementNames).map(x => new Column(x)): _*)
 
     if (filter.isDefined)
       df = df.filter(filter.get)
@@ -285,18 +287,6 @@ object SparkFactory {
     AppleTable(SourceType.DYNAMODB, df, delimiter.orNull, tempViewName)
   }
 
-  /**
-   * This method will create an AppleTable for data in DynamoDB table.
-   *
-   * @param tableName              name of DynamoDB table
-   * @param tempViewName           temporary table name for source data
-   * @param firstLevelElementNames names of the first level elements in the table
-   * @return                       custom table containing the data to be compared
-   */
-  def parallelizeDynamoDBSource(tableName: String, tempViewName: String, firstLevelElementNames: Array[String]): AppleTable = {
-    parallelizeDynamoDBSource(tableName, tempViewName, firstLevelElementNames, Option.apply(","))
-  }
-
   /** This method creates an AppleTable for data in a CSV file
    *
    * @param filePath     the relative path to the CSV file
@@ -305,16 +295,17 @@ object SparkFactory {
    * @param delimiter    optional delimiter character for the data. If none is provided, comma (",") will be used as default
    * @return             custom table containing the data to be compared
    */
-  def parallelizeCSVSource(filePath: String, tempViewName: String, schemaDef: StructType , delimiter: String): AppleTable ={
+  def parallelizeCSVSource(filePath: String, tempViewName: String, schemaDef: Option[StructType] = Option.empty,
+                           delimiter: Option[String] = Option.apply(",")): AppleTable ={
 
     var df: DataFrame = null
 
     //Command to read the data from CSV into DataFrame
-    if(schemaDef != null) {
+    if(schemaDef.isDefined) {
       df = sparkSession.sqlContext.read
         .option("multiLine", "true")
-        .option("delimiter", delimiter)
-        .schema(schemaDef)
+        .option("delimiter", delimiter.get)
+        .schema(schemaDef.get)
         .format("csv")
         .load(filePath)
     }
@@ -322,7 +313,7 @@ object SparkFactory {
       //if caller does not pass in a schema, use the inferSchema option
       df = sparkSession.sqlContext.read
         .option("multiLine", "true")
-        .option("delimiter", delimiter)
+        .option("delimiter", delimiter.get)
         .option("inferSchema", "true")
         .format("csv")
         .load(filePath)
@@ -330,23 +321,7 @@ object SparkFactory {
 
     df.createOrReplaceTempView(tempViewName)
 
-    AppleTable(SourceType.CSV, df, delimiter, tempViewName)
-  }
-
-  /** This method creates an AppleTable for data in a CSV file
-   *
-   * @param filePath     the relative path to the CSV file
-   * @param tempViewName the name of the temporary view which gets created for source data
-   * @param schemaDef    optional schema definition for the data. If none is provided, the schema will be inferred by spark
-   * @param delimiter    optional delimiter character for the data. If none is provided, comma (",") will be used as default
-   * @return             custom table containing the data to be compared
-   */
-  def parallelizeCSVSource(filePath: String, tempViewName: String, schemaDef: Option[StructType] , delimiter: Option[String]): AppleTable ={
-
-    val schema: StructType = schemaDef.orNull
-    val delim = delimiter.getOrElse(",")
-
-    parallelizeCSVSource(filePath, tempViewName, schema, delim)
+    AppleTable(SourceType.CSV, df, delimiter.get, tempViewName)
   }
 
   /**

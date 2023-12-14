@@ -66,7 +66,7 @@ class DynamoDbSuite extends SparkFunSuiteDynamoDb {
       .json(jsonPath).schema
 
     val appleTable = SparkFactory.parallelizeDynamoDBSource("json_JsonTestSimple", "dynamodb_test", schema.fieldNames,
-      Option.apply(","), Option.apply(Array("key1", "attribute1")), Option.empty)
+      Option.apply(","), selectColumns = Option.apply(Array("key1", "attribute1")))
     assert(appleTable.getSourceType.equals(expectedSourceType))
 
     val dataResult = appleTable.getDataFrame.orderBy("key1").collect()
@@ -92,7 +92,7 @@ class DynamoDbSuite extends SparkFunSuiteDynamoDb {
       .json(jsonPath).schema
 
     val appleTable = SparkFactory.parallelizeDynamoDBSource("json_JsonTestSimple", "dynamodb_test", schema.fieldNames,
-      Option.apply(","), Option.empty, Option.apply("key1 = 'TEST3'"))
+      delimiter = Option.apply(","), filter = Option.apply("key1 = 'TEST3'"))
     assert(appleTable.getSourceType.equals(expectedSourceType))
 
     val dataResult = appleTable.getDataFrame.collect()
@@ -117,7 +117,61 @@ class DynamoDbSuite extends SparkFunSuiteDynamoDb {
       .json(jsonPath).schema
 
     val appleTable = SparkFactory.parallelizeDynamoDBSource("json_JsonTestSimple", "dynamodb_test", schema.fieldNames,
-      Option.apply(","), Option.apply(Array("key1", "attribute1")), Option.apply("key1 = 'TEST2'"))
+      delimiter = Option.apply(","), selectColumns = Option.apply(Array("key1", "attribute1")), filter = Option.apply("key1 = 'TEST2'"))
+    assert(appleTable.getSourceType.equals(expectedSourceType))
+
+    val dataResult = appleTable.getDataFrame.collect()
+    assert(dataResult.length == 1)
+
+    val schemaResult = appleTable.getDataFrame.schema
+    assert(schemaResult.fields.length == 2)
+
+    assert(dataResult.take(1)(0)(schemaResult.fieldIndex("key1")).equals("\"TEST2\""))
+    assert(dataResult.take(1)(0)(schemaResult.fieldIndex("attribute1")).equals("\"test number 2\""))
+  }
+
+  test("Dynamodb row filter post scan") {
+    val jsonPath = this.getClass.getClassLoader.getResource("json/JsonTestSimple.json").getPath
+
+    val schema = sparkSession.sqlContext.read
+      .option("multiLine", "true")
+      .option("primitivesAsString", "true")
+      .json(jsonPath).schema
+
+    val appleTable = SparkFactory.parallelizeDynamoDBSource("json_JsonTestSimple", "dynamodb_test", schema.fieldNames,
+      delimiter = Option.apply(","), filter = Option.apply("key1 = '\"TEST3\"'"),
+      filterPushdown = Option.apply("false")
+    )
+    assert(appleTable.getSourceType.equals(expectedSourceType))
+
+    val dataResult = appleTable.getDataFrame.collect()
+    assert(dataResult.length == 1)
+
+    val schemaResult = appleTable.getDataFrame.schema
+    assert(schemaResult.fields.length == 5)
+
+    assert(dataResult.take(1)(0)(schemaResult.fieldIndex("key1")).equals("\"TEST3\""))
+    assert(dataResult.take(1)(0)(schemaResult.fieldIndex("key2")).equals("3"))
+    assert(dataResult.take(1)(0)(schemaResult.fieldIndex("attribute1")).equals("\"test number 3\""))
+    assert(dataResult.take(1)(0)(schemaResult.fieldIndex("attribute2")).equals("\"true\""))
+    assert(dataResult.take(1)(0)(schemaResult.fieldIndex("attribute3")).equals("\"3\""))
+  }
+
+  test("Dynamodb column and row filter with multiple options") {
+    val jsonPath = this.getClass.getClassLoader.getResource("json/JsonTestSimple.json").getPath
+
+    val schema = sparkSession.sqlContext.read
+      .option("multiLine", "true")
+      .option("primitivesAsString", "true")
+      .json(jsonPath).schema
+
+    val appleTable = SparkFactory.parallelizeDynamoDBSource("json_JsonTestSimple", "dynamodb_test", schema.fieldNames,
+      delimiter = Option.apply(","), selectColumns = Option.apply(Array("key1", "attribute1")), filter = Option.apply("key1 = 'TEST2'"),
+      region = Option.apply("us-east-1"), roleArn = Option.empty,
+      readPartitions = Option.apply("2"), maxPartitionBytes = Option.apply("64"),
+      defaultParallelism = Option.apply("2"), targetCapacity = Option.apply("0.6"),
+      stronglyConsistentReads = Option.apply("true"), bytesPerRCU = Option.apply("40"),
+      filterPushdown = Option.empty, throughput = Option.apply("10"))
     assert(appleTable.getSourceType.equals(expectedSourceType))
 
     val dataResult = appleTable.getDataFrame.collect()
