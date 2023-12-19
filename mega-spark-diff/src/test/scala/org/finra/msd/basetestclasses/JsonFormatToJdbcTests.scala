@@ -1,69 +1,34 @@
+/*
+ * Copyright 2017 MegaSparkDiff Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.finra.msd.basetestclasses
 
-import org.finra.msd.containers.DiffResult
+trait JsonFormatToJdbcTests extends JsonFormatTests {
+  this: SparkFunSuite =>
 
-trait JsonFormatToJdbcTests {
-  this: SparkFunSuiteDynamoDb =>
-  def returnDiff(tableLeft: String, tableRight: String): DiffResult
-
-  def testSameDataTypesJsonFormatToJdbc(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypes") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 0) fail("Expected 0 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 0) fail("Expected 0 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testMixedDataTypesSimpleJsonFormatToJdbc(tableLeft: String, tableRight: String): Unit = {
+  override def testMixedDataTypesSimpleJsonFormat(tableLeft: String, tableRight: String): Unit = {
     test("testMixedDataTypesSimple") {
+      val expectedDiffs = 2
       val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 0) fail("Expected 0 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 0) fail("Expected 0 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
+      helpers.reportDiffs(diffResult, expectedDiffs)
     }
   }
 
-  def testSameDataTypesDiffJsonFormatToJdbc(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 1) fail("Expected 1 difference coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testMixedDataTypesSimpleDiffJsonFormatToJdbc(tableLeft: String, tableRight: String): Unit = {
-    test("testMixedDataTypesSimpleDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 1) fail("Expected 1 difference coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testMixedDataTypesWithListDiffJsonFormatToJdbc(tableLeft: String, tableRight: String): Unit = {
-    test("testMixedDataTypesWithListDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 2) fail("Expected 2 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testMixedDataTypesWithSetDiffJsonFormatToJdbc(tableLeft: String, tableRight: String): Unit = {
-    test("testMixedDataTypesWithSetDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 2) fail("Expected 2 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testMixedDataTypesWithMapDiffJsonFormatToJdbc(tableLeft: String, tableRight: String): Unit = {
-    test("testMixedDataTypesWithMapDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 2) fail("Expected 2 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesExtraNullColumnJsonFormatToJdbc(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesExtraNullColumn") {
+  override def testSameDataTypesSimpleDiffExtraNullElementJsonFormat(tableLeft: String, tableRight: String): Unit = {
+    test("testSameDataTypesSimpleExtraNullElement") {
       val reason = "Expected \"Column Names Did Not Match\" exception."
       try {
         returnDiff(tableLeft, tableRight)

@@ -12,7 +12,7 @@ commands:
           command: |
             if [ -n "$CIRCLE_PR_NUMBER" ]; then
               echo "Nothing else to do for forked PRs, so marking this step successful"
-              circleci step halt
+              circleci-agent step halt
             fi
 
 # Define a job to be invoked later in a workflow.
@@ -40,7 +40,8 @@ jobs:
           name: Test
           command: mvn test
       - early_return_for_forked_pull_requests
-      - deploy:
+      - run:
+          name: Scan
           command: bash <(curl -s https://copilot.blackducksoftware.com/ci/circle2/scripts/upload)
 
 # Invoke jobs via workflows

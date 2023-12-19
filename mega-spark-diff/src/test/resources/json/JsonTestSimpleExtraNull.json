@@ -1,0 +1,24 @@
+[
+  {
+    "key1": "TEST1",
+    "key2": 1,
+    "attribute1": "test number 1",
+    "attribute2": "1",
+    "attribute3": "1"
+  },
+  {
+    "key1": "TEST2",
+    "key2": 1,
+    "attribute1": "test number 2",
+    "attribute2": "2",
+    "attribute3": "2",
+    "attribute4": null
+  },
+  {
+    "key1": "TEST3",
+    "key2": 3,
+    "attribute1": "test number 3",
+    "attribute2": "true",
+    "attribute3": "3"
+  }
+]

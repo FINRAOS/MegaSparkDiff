@@ -33,6 +33,8 @@ class SparkFunSuiteDynamoDb
 
     MemoryDbDynamo.getInstance().initializeMemoryDb()
 
+    System.setProperty("aws.dynamodb.endpoint", dynamoDbEndpoint)
+
     System.setProperty("aws.accessKeyId", "test")
     System.setProperty("aws.secretKey", "test")
   }

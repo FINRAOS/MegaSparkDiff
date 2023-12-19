@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 MegaSparkDiff Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.finra.msd.containers
 
 import org.apache.spark.sql.{Column, DataFrame, Row, SQLContext, SQLImplicits}
@@ -6,21 +22,21 @@ import org.apache.spark.sql.functions._
 import scala.beans.BeanProperty
 
 /***
-  * The container for the comparison result.
-  * @param inLeftNotInRight the data set that contains the results in left but not in right
-  * @param inRightNotInLeft the data set that contains the results in right but not in left
-  */
+ * The container for the comparison result.
+ * @param inLeftNotInRight the data set that contains the results in left but not in right
+ * @param inRightNotInLeft the data set that contains the results in right but not in left
+ */
 case class DiffResult(@BeanProperty inLeftNotInRight: DataFrame, @BeanProperty inRightNotInLeft: DataFrame) {
 
   import org.finra.msd.sparkfactory.SparkFactory.sparkImplicits._
 
   /**
-    * Order the result by the provided columns.
-    *
-    * @param orderByCols is the column provided for order
-    * @param isAsc       is the indicator for ascending or descending order.
-    * @return the ordered data set
-    */
+   * Order the result by the provided columns.
+   *
+   * @param orderByCols is the column provided for order
+   * @param isAsc       is the indicator for ascending or descending order.
+   * @return            the ordered data set
+   */
   def getOrderedResult(orderByCols: Array[String], isAsc: Boolean): DiffResult = {
     var cols: Array[Column] = orderByCols.map(str => col(str))
     if (!isAsc) {
@@ -32,11 +48,11 @@ case class DiffResult(@BeanProperty inLeftNotInRight: DataFrame, @BeanProperty i
   }
 
   /**
-    * Exclude some columns from the data set so that it won't be saved.
-    *
-    * @param excludeCols the column array that contains the columns to exclude from the data set
-    * @return the data set without the columns
-    */
+   * Exclude some columns from the data set so that it won't be saved.
+   *
+   * @param excludeCols the column array that contains the columns to exclude from the data set
+   * @return            the data set without the columns
+   */
   def removeCols(excludeCols: Array[String]) : DiffResult = {
     val left = inLeftNotInRight.drop(excludeCols:_*)
     val right = inRightNotInLeft.drop(excludeCols:_*)
@@ -44,10 +60,10 @@ case class DiffResult(@BeanProperty inLeftNotInRight: DataFrame, @BeanProperty i
   }
 
   /**
-    * Indicating whether there is difference in the comparison.
-    *
-    * @return true is no difference; false if there is difference.
-    */
+   * Indicating whether there is difference in the comparison.
+   *
+   * @return true if there is no difference; false if there is difference.
+   */
   def noDiff(): Boolean = {
     if (inLeftNotInRight.count() == 0 && inRightNotInLeft.count() == 0) {
       return true
@@ -56,14 +72,14 @@ case class DiffResult(@BeanProperty inLeftNotInRight: DataFrame, @BeanProperty i
   }
   
   /**
-    * This method does a full outer join between the resulting left and right DataFrames from the method
-    * SparkCompare.compareSchemaDataFrames. It will return a single DataFrame having the left columns prefixed with l_
-    * and the right columns prefixed with r_. the Key columns will not have prefixed. The resulting DataFrame will have
-    * all l_ columns on the left, then the Key columns in the middle, then the r_ columns on the right.
-    *
-    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both DataFrames
-    * @return a DataFrame having the resulting full outer join operation.
-    */
+   * This method does a full outer join between the resulting left and right DataFrames from the method
+   * SparkCompare.compareSchemaDataFrames. It will return a single DataFrame having the left columns prefixed with l_
+   * and the right columns prefixed with r_. the Key columns will not have prefixed. The resulting DataFrame will have
+   * all l_ columns on the left, then the Key columns in the middle, then the r_ columns on the right.
+   *
+   * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both DataFrames
+   * @return                 a DataFrame having the resulting full outer join operation.
+   */
   def fullOuterJoinDataFrames(compositeKeyStrs: Seq[String]): DataFrame = {
 
     val compositeKeysUpperCaseSeq = compositeKeyStrs.map(k => k.toUpperCase)
@@ -95,14 +111,14 @@ case class DiffResult(@BeanProperty inLeftNotInRight: DataFrame, @BeanProperty i
   }
 
   /**
-    * This method compares all "l_" with their corresponding "r_" columns from the joined table returned in
-    * fullOuterJoinDataFrames() and returns a DataFrame that maps column names with the amount of discrepant entries
-    * between those l_ and r_ columns. 
-    *
-    * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both DataFrames
-    * @return a DataFrame that maps between column names and the amount of discrepant entries for those "l_/r_" rows in
-    *         the full outer joined table.
-    */
+   * This method compares all "l_" with their corresponding "r_" columns from the joined table returned in
+   * fullOuterJoinDataFrames() and returns a DataFrame that maps column names with the amount of discrepant entries
+   * between those l_ and r_ columns.
+   *
+   * @param compositeKeyStrs a Sequence of Strings having the primary keys applicable for both DataFrames
+   * @return                 a DataFrame that maps between column names and the amount of discrepant entries for those "l_/r_" rows in
+   *                         the full outer joined table.
+   */
   def discrepancyStats(compositeKeyStrs: Seq[String]): DataFrame = {
 
     val joinedDf: DataFrame = fullOuterJoinDataFrames(compositeKeyStrs)

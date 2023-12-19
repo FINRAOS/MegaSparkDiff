@@ -1,128 +1,84 @@
+/*
+ * Copyright 2017 MegaSparkDiff Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.finra.msd.basetestclasses
 
 import org.finra.msd.containers.DiffResult
 
 trait JsonFormatTests {
-  this: SparkFunSuiteDynamoDb =>
-  def returnDiff(tableLeft: String, tableRight: String): DiffResult
+  this: SparkFunSuite =>
+  def returnDiff(tableLeft: String, tableRight: String, sameSchema: Boolean = false): DiffResult
 
-  def testSameDataTypesJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypes") {
+  def testSameDataTypesComplexJsonFormat(tableLeft: String, tableRight: String): Unit = {
+    test("testSameDataTypesComplex") {
+      val expectedDiffs = 0
       val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 0) fail("Expected 0 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 0) fail("Expected 0 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
+      helpers.reportDiffs(diffResult, expectedDiffs)
+    }
+  }
+
+  def testSameDataTypesComplexDiffValueJsonFormat(tableLeft: String, tableRight: String): Unit = {
+    test("testSameDataTypesComplexDiffValue") {
+      val expectedDiffs = 1
+      val diffResult = returnDiff(tableLeft, tableRight)
+      helpers.reportDiffs(diffResult, expectedDiffs)
     }
   }
 
   def testMixedDataTypesSimpleJsonFormat(tableLeft: String, tableRight: String): Unit = {
     test("testMixedDataTypesSimple") {
+      val expectedDiffs = 0
       val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 2) fail("Expected 2 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
+      helpers.reportDiffs(diffResult, expectedDiffs)
     }
   }
 
-  def testSameDataTypesWithListJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesWithList") {
+  def testMixedDataTypesSimpleDiffJsonFormat(tableLeft: String, tableRight: String): Unit = {
+    test("testMixedDataTypesSimpleDiff") {
+      val expectedDiffs = 2
       val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 0) fail("Expected 0 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 0) fail("Expected 0 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
+      helpers.reportDiffs(diffResult, expectedDiffs)
     }
   }
 
-  def testSameDataTypesWithListDiffJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesWithListDiff") {
+  def testSameDataTypesSimpleDiffMissingElementJsonFormat(tableLeft: String, tableRight: String): Unit = {
+    test("testSameDataTypesSimpleDiffMissingElement") {
+      val expectedDiffs = 1
       val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 2) fail("Expected 2 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
+      helpers.reportDiffs(diffResult, expectedDiffs)
     }
   }
 
-  def testSameDataTypesWithSetJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesWithSet") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 0) fail("Expected 0 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 0) fail("Expected 0 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
+  def testSameDataTypesSimpleDiffExtraNullElementJsonFormat(tableLeft: String, tableRight: String): Unit = {
+    test("testSameDataTypesSimpleDiffExtraNullElement") {
+      val expectedDiffs = 0
+      val diffResult = returnDiff(tableLeft, tableRight, sameSchema = true)
+      helpers.reportDiffs(diffResult, expectedDiffs)
 
-  def testSameDataTypesWithSetDiffJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesWithSetDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 2) fail("Expected 2 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesWithMapJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesWithMap") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 0) fail("Expected 0 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 0) fail("Expected 0 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesWithMapDiffJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesWithMapDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 2) fail("Expected 2 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesDiffJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 1) fail("Expected 1 difference coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesMixedColumnsSimpleDiffJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesMixedColumnsSimpleDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 1) fail("Expected 1 difference coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 1) fail("Expected 1 difference coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesExtraNullColumnJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesExtraNullColumn") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 0) fail("Expected 0 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 0) fail("Expected 0 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesExtraNullNestedListColumnJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesExtraNullNestedListColumn") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 1) fail("Expected 1 difference coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 1) fail("Expected 1 difference coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesExtraNullNestedMapColumnJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesExtraNullNestedMapColumn") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 0) fail("Expected 0 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 0) fail("Expected 0 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesWithMapListSetJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesWithMapListSet") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 0) fail("Expected 0 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 0) fail("Expected 0 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
-    }
-  }
-
-  def testSameDataTypesWithMapListSetDiffJsonFormat(tableLeft: String, tableRight: String): Unit = {
-    test("testSameDataTypesWithMapListSetDiff") {
-      val diffResult = returnDiff(tableLeft, tableRight)
-      if (diffResult.inLeftNotInRight.count != 2) fail("Expected 2 differences coming from left table." + "  Instead, found " + diffResult.inLeftNotInRight.count + ".")
-      if (diffResult.inRightNotInLeft.count != 2) fail("Expected 2 differences coming from right table." + "  Instead, found " + diffResult.inRightNotInLeft.count + ".")
+      val reason = "Expected \"Column Names Did Not Match\" exception."
+      try {
+        returnDiff(tableLeft, tableRight)
+        fail(reason)
+      }
+      catch {
+        case e: Exception =>
+          if (!e.getMessage.equals("Column Names Did Not Match")) fail(reason)
+        case _: Throwable =>
+          fail(reason)
+      }
     }
   }
 }
