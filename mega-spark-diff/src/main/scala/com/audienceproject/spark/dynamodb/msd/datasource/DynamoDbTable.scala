@@ -11,7 +11,10 @@ import java.util
 import scala.collection.JavaConverters._
 
 class DynamoDbTable(options: CaseInsensitiveStringMap, schema: StructType) extends Table with SupportsRead {
-  // code from com.audienceproject:spark.dynamodb
+  /**
+   * code from <a href="https://github.com/audienceproject/spark-dynamodb">com.audienceproject:spark.dynamodb</a>
+   * <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/src/main/scala/com/audienceproject/spark/dynamodb/datasource/DynamoTable.scala">DynamoTable</a>
+   */
   private val dynamoConnector = {
     val indexName = Option(options.get("indexname"))
     val defaultParallelism = Option(options.get("defaultparallelism")).map(_.toInt).getOrElse(getDefaultParallelism)
@@ -21,7 +24,12 @@ class DynamoDbTable(options: CaseInsensitiveStringMap, schema: StructType) exten
     else new TableConnector(name(), defaultParallelism, optionsMap)
   }
 
-  // code from com.audienceproject:spark.dynamodb
+  /**
+   * code from <a href="https://github.com/audienceproject/spark-dynamodb">com.audienceproject:spark.dynamodb</a>
+   * <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/src/main/scala/com/audienceproject/spark/dynamodb/datasource/DynamoTable.scala">DynamoTable</a>
+   *
+   * @return default parallelism
+   */
   private def getDefaultParallelism: Int =
     SparkSession.getActiveSession match {
       case Some(spark) => spark.sparkContext.defaultParallelism

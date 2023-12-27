@@ -14,10 +14,18 @@ class DynamoDbScanBuilder(connector: DynamoConnector, schema: StructType)
   private var pushedFilter = Array.empty[Filter]
   private var finalSchema = schema
 
-  // code from com.audienceproject:spark.dynamodb
+  /**
+   * code from <a href="https://github.com/audienceproject/spark-dynamodb">com.audienceproject:spark.dynamodb</a>
+   * <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/src/main/scala/com/audienceproject/spark/dynamodb/datasource/DynamoScanBuilder.scala">DynamoScanBuilder</a>
+   *
+   * @return DynamoDbScan instance
+   */
   override def build(): Scan = new DynamoDbScan(connector, pushedFilters(), finalSchema)
 
-  // code from com.audienceproject:spark.dynamodb
+  /**
+   * code from <a href="https://github.com/audienceproject/spark-dynamodb">com.audienceproject:spark.dynamodb</a>
+   * <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/src/main/scala/com/audienceproject/spark/dynamodb/datasource/DynamoScanBuilder.scala">DynamoScanBuilder</a>
+   */
   override def pruneColumns(requiredSchema: StructType): Unit = {
     val keyColumns = Seq(Some(connector.keySchema.hashKeyName), connector.keySchema.rangeKeyName).flatten
       .flatMap(keyName => finalSchema.fields.find(_.name == keyName))
@@ -26,7 +34,12 @@ class DynamoDbScanBuilder(connector: DynamoConnector, schema: StructType)
     finalSchema = StructType(newFields)
   }
 
-  // code from com.audienceproject:spark.dynamodb
+  /**
+   * code from <a href="https://github.com/audienceproject/spark-dynamodb">com.audienceproject:spark.dynamodb</a>
+   * <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/src/main/scala/com/audienceproject/spark/dynamodb/datasource/DynamoScanBuilder.scala">DynamoScanBuilder</a>
+   *
+   * @return array of filters
+   */
   override def pushFilters(filters: Array[Filter]): Array[Filter] = {
     if (connector.filterPushdownEnabled) {
       val (acceptedFilters, postScanFilters) = FilterPushdown.acceptFilters(filters)
@@ -37,6 +50,11 @@ class DynamoDbScanBuilder(connector: DynamoConnector, schema: StructType)
     }
   }
 
-  // code from com.audienceproject:spark.dynamodb
+  /**
+   * code from <a href="https://github.com/audienceproject/spark-dynamodb">com.audienceproject:spark.dynamodb</a>
+   * <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/src/main/scala/com/audienceproject/spark/dynamodb/datasource/DynamoScanBuilder.scala">DynamoScanBuilder</a>
+   *
+   * @return array of filters
+   */
   override def pushedFilters(): Array[Filter] = pushedFilter
 }

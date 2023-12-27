@@ -13,7 +13,10 @@ import scala.collection.JavaConverters.asScalaIteratorConverter
 
 class DynamoDbPartitionReader(connector: DynamoConnector, schema: StructType, partition: ScanPartition) extends PartitionReader[InternalRow] {
 
-  // code based on com.audienceproject:spark.dynamodb
+  /**
+   * code based on <a href="https://github.com/audienceproject/spark-dynamodb">com.audienceproject:spark.dynamodb</a>
+   * <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/src/main/scala/com/audienceproject/spark/dynamodb/datasource/DynamoReaderFactory.scala">DynamoReaderFactory</a>
+   */
   private val pageIterator =
     connector.scan(partition.partitionIndex, partition.requiredColumns, partition.filters).pages().iterator().asScala
 
@@ -23,14 +26,13 @@ class DynamoDbPartitionReader(connector: DynamoConnector, schema: StructType, pa
   override def next(): Boolean = {
     if (rowIterator.hasNext) {
       result = rowIterator.next()
-      return true
+      true
     }
     else if (pageIterator.hasNext) {
       rowIterator = pageIterator.next().getLowLevelResult.getItems.iterator().asScala
-      return next()
+      next()
     }
-    else return false
-    true
+    else false
   }
 
   override def get(): InternalRow = {

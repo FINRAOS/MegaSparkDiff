@@ -229,22 +229,46 @@ object SparkFactory {
   /**
    * This method will create an AppleTable for data in DynamoDB table.
    *
+   * The method uses the <a href="https://github.com/audienceproject/spark-dynamodb">spark-dynamodb</a> library, of which
+   * many of the parameters below are passed to, hence the inclusion of their descriptions from the
+   * <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">spark-dynamodb README file</a>
+   *
    * @param tableName               name of DynamoDB table
    * @param tempViewName            temporary table name for source data
    * @param firstLevelElementNames  names of the first level elements in the table
    * @param delimiter               source data separation character
    * @param selectColumns           list of columns to select from table
    * @param filter                  sql where condition
-   * @param region                  <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">region Spark parameter</a>
-   * @param roleArn                 <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">roleArn Spark parameter</a>
-   * @param readPartitions          <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">readPartitions Spark reader parameter</a>
-   * @param maxPartitionBytes       <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">maxPartitionBytes Spark reader parameter</a>
-   * @param defaultParallelism      <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">defaultParallelism Spark reader parameter</a>
-   * @param targetCapacity          <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">targetCapacity Spark reader parameter</a>
-   * @param stronglyConsistentReads <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">stronglyConsistentReads Spark reader parameter</a>
-   * @param bytesPerRCU             <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">bytesPerRCU Spark reader parameter</a>
-   * @param filterPushdown          <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">filterPushdown Spark reader parameter</a>
-   * @param throughput              <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">throughput Spark reader parameter</a>
+   * @param region                  region Spark parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "sets the region where the dynamodb table. Default is environment specific."
+   * @param roleArn                 roleArn Spark parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "sets an IAM role to assume. This allows for access to a DynamoDB in a different account than the Spark cluster. Defaults to the standard role configuration."
+   * @param readPartitions          readPartitions Spark reader parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "number of partitions to split the initial RDD when loading the data into Spark. Defaults to the size of the DynamoDB table divided into chunks of maxPartitionBytes"
+   * @param maxPartitionBytes       maxPartitionBytes Spark reader parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "the maximum size of a single input partition. Default 128 MB"
+   * @param defaultParallelism      defaultParallelism Spark reader parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "the number of input partitions that can be read from DynamoDB simultaneously. Defaults to sparkContext.defaultParallelism"
+   * @param targetCapacity          targetCapacity Spark reader parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "fraction of provisioned read capacity on the table (or index) to consume for reading. Default 1 (i.e. 100% capacity)."
+   * @param stronglyConsistentReads stronglyConsistentReads Spark reader parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "whether or not to use strongly consistent reads. Default false."
+   * @param bytesPerRCU             bytesPerRCU Spark reader parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "number of bytes that can be read per second with a single Read Capacity Unit. Default 4000 (4 KB). This value is multiplied by two when stronglyConsistentReads=false"
+   * @param filterPushdown          filterPushdown Spark reader parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "whether or not to use filter pushdown to DynamoDB on scan requests. Default true."
+   * @param throughput              throughput Spark reader  parameter with the following description from the
+   *                                <a href="https://github.com/audienceproject/spark-dynamodb/blob/master/README.md">source README</a>:
+   *                                "the desired read throughput to use. It overwrites any calculation used by the package. It is intended to be used with tables that are on-demand. Defaults to 100 for on-demand."
    *
    * @return custom table containing the data to be compared
    */
