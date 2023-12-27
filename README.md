@@ -5,7 +5,7 @@
     MegaSparkDiff is an open source tool that helps you compare any pair
     combination of data sets that are of the following types: 
 
-    (HDFS, JDBC, S3, Hbase, Text Files, Hive). 
+    (HDFS, JDBC, S3, Hbase, Text Files, Hive, Json, DynamoDb). 
     
     MegaSparkDiff can run on 
     (a) Amazon EMR (Elastic Map Reduce),
@@ -31,6 +31,8 @@ SparkFactory
         HDFS File
         SQL query over a JDBC data source
         Hive Table
+        Json File
+        DynamoDb Table
 
 SparkCompare
 ------------
