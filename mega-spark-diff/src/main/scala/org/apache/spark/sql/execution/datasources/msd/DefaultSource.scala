@@ -25,6 +25,19 @@ import java.util.Collections
 
     override def prepareWrite(sparkSession: SparkSession, job: Job, options: Map[String, String], dataSchema: StructType): OutputWriterFactory = null
 
+    /**
+     * code based on <a href="https://github.com/apache/spark">org.apache.spark:spark-core</a>
+     * <a href="https://github.com/apache/spark/blob/master/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/json/JsonFileFormat.scala">JsonFileFormat</a>
+     *
+     * @param sparkSession sparkSession
+     * @param dataSchema dataSchema
+     * @param partitionSchema partitionSchema
+     * @param requiredSchema requiredSchema
+     * @param filters filters
+     * @param options options
+     * @param hadoopConf hadoopConf
+     * @return PartitionedFile => Iterator[InternalRow]
+     */
     override protected def buildReader(sparkSession: SparkSession,
                                        dataSchema: StructType,
                                        partitionSchema: StructType,
@@ -33,7 +46,6 @@ import java.util.Collections
                                        options: Map[String, String],
                                        hadoopConf: Configuration
                                       ): PartitionedFile => Iterator[InternalRow] = {
-      // Based off of Spark's JsonFileFormat
       val broadcastedHadoopConf =
         sparkSession.sparkContext.broadcast(new SerializableConfiguration(hadoopConf))
       (file: PartitionedFile) => {
