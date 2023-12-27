@@ -1,11 +1,3 @@
-package org.finra.msd.containers;
-
-import org.finra.msd.util.FileUtil;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 /*
  * Copyright 2017 MegaSparkDiff Contributors
  *
@@ -21,6 +13,15 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.finra.msd.containers;
+
+import org.finra.msd.util.FileUtil;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Extracts the database connection details
