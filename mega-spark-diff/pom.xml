@@ -46,6 +46,11 @@
             <name>Shraddha Patel</name>
             <email>shraddhakpatel12@gmail.com</email>
         </developer>
+        <developer>
+            <id>matthewgillett</id>
+            <name>Matthew Gillett</name>
+            <email>msgille@gmail.com</email>
+        </developer>
     </developers>
 
 
