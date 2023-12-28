@@ -44,7 +44,7 @@ jobs:
           command: mvn javadoc:javadoc
       - run:
           name: Generate Scaladocs
-          command: mvn scaladocs:scaladocs
+          command: mvn scala:doc
       - early_return_for_forked_pull_requests
       - persist_to_workspace:
           root: mega-spark-diff/target/site
