@@ -39,10 +39,68 @@ jobs:
       - run:
           name: Test
           command: mvn test
+      - run:
+          name: Generate Javadocs
+          command: |
+            cd mega-spark-diff
+            mvn javadoc:javadoc
+      - run:
+          name: Generate Scaladocs
+          command: |
+            cd mega-spark-diff
+            mvn scala:doc
       - early_return_for_forked_pull_requests
+      - persist_to_workspace:
+          root: mega-spark-diff/target/site
+          paths:
+            - apidocs
+            - scaladocs
       - run:
           name: Scan
           command: bash <(curl -s https://copilot.blackducksoftware.com/ci/circle2/scripts/upload)
+  docs-deploy:
+    docker:
+      - image: cimg/openjdk:8.0
+    steps:
+      - run:
+          name: add known_hosts
+          command: |
+            mkdir ~/.ssh
+            echo 'github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+            ' >> ~/.ssh/known_hosts
+      - run:
+          name: Checkout main
+          command: |
+            git clone $CIRCLE_REPOSITORY_URL --depth 1 -b main main
+            cd main
+            git config --global user.email "$(git log --format=%ae -n 1)"
+            git config --global user.name "$(git log --format=%an -n 1)"
+            echo "export msg="\"$(git log --format=%B -n 1)\" >> $BASH_ENV
+      - run:
+          name: Checkout gh-pages
+          command: |
+            git clone $CIRCLE_REPOSITORY_URL --depth 1 -b gh-pages gh-pages
+            rm -rf gh-pages/apidocs
+            rm -rf gh-pages/scaladocs
+      - attach_workspace:
+          at: gh-pages
+      - run:
+          name: Copy CircleCI config
+          command: |
+            mkdir -p gh-pages/.circleci
+            cp main/.circleci/config.yml gh-pages/.circleci/config.yml
+      - add_ssh_keys:
+          fingerprints:
+            - "08:56:e3:f6:88:8d:30:f7:c3:df:dc:23:9c:91:eb:5f"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: |
+            cd gh-pages
+            git add .circleci/config.yml
+            git add -A -- apidocs/
+            git add -A -- scaladocs/
+            git commit -am "$msg"
+            git push origin gh-pages
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -50,4 +108,13 @@ workflows:
   maven_test: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - build-and-test
+      - build-and-test:
+          filters:
+            branches:
+              ignore: gh-pages
+      - docs-deploy:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: main
