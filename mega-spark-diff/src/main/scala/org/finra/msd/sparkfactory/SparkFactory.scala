@@ -140,18 +140,31 @@ object SparkFactory {
    * @param sqlQuery        Query to retrieve the desired data from database
    * @param tempViewName    temporary table name for source data
    * @param delimiter       source data separation character
+   * @param iamAuth         flag indicating whether to use IAM authentication
+   * @param region          AWS region for IAM authentication
    * @return                custom table containing the data to be compared
    */
-  def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
-                            tempViewName: String, delimiter: Option[String]): AppleTable = {
-    val jdbcDF: DataFrame = sparkSession.sqlContext.read
+  def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String,
+                            sqlQuery: String, tempViewName: String, delimiter: Option[String],
+                            iamAuth: Option[String], region: Option[String]): AppleTable = {
+    val reader = sparkSession.sqlContext.read
       .format("jdbc")
       .option("driver", driverClassName)
       .option("url", jdbcUrl)
       .option("dbtable", sqlQuery)
       .option("user", username)
       .option("password", password)
-      .load()
+      .option("iamAuth", iamAuth.getOrElse("false"))
+      .option("region", region.getOrElse(""))
+
+    // Only add connectionProvider for PostgreSQL driver
+    val readerWithProvider = if (driverClassName == "org.postgresql.Driver") {
+      reader.option("connectionProvider", "PostgresIamAuthConnectionProvider")
+    } else {
+      reader
+    }
+
+    val jdbcDF: DataFrame = readerWithProvider.load()
     jdbcDF.createOrReplaceTempView(tempViewName)
 
     AppleTable(SourceType.JDBC, jdbcDF, delimiter.orNull, tempViewName)
@@ -168,6 +181,8 @@ object SparkFactory {
    * @param sqlQuery        Query to retrieve the desired data from database
    * @param tempViewName    temporary table name for source data
    * @param delimiter       source data separation character
+   * @param iamAuth         flag indicating whether to use IAM authentication
+   * @param region          AWS region for IAM authentication
    * @param partitionColumn column to partition queries on
    * @param lowerBound      lower bound of partition column values
    * @param upperBound      upper bound of partition column values
@@ -175,9 +190,9 @@ object SparkFactory {
    * @return                custom table containing the data to be compared
    */
   def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
-                            tempViewName: String, delimiter: Option[String], partitionColumn: String
-                            , lowerBound: String, upperBound: String, numPartitions: String): AppleTable = {
-    val jdbcDF: DataFrame = sparkSession.sqlContext.read
+                            tempViewName: String, delimiter: Option[String], iamAuth: Option[String], region: Option[String],
+                            partitionColumn: String, lowerBound: String, upperBound: String, numPartitions: String): AppleTable = {
+    val reader = sparkSession.sqlContext.read
       .format("jdbc")
       .option("driver", driverClassName)
       .option("url", jdbcUrl)
@@ -188,7 +203,17 @@ object SparkFactory {
       .option("lowerBound", lowerBound)
       .option("upperBound", upperBound)
       .option("numPartitions", numPartitions)
-      .load()
+      .option("iamAuth", iamAuth.getOrElse("false"))
+      .option("region", region.getOrElse(""))
+
+    // Only add connectionProvider for PostgreSQL driver
+    val readerWithProvider = if (driverClassName == "org.postgresql.Driver") {
+      reader.option("connectionProvider", "PostgresIamAuthConnectionProvider")
+    } else {
+      reader
+    }
+
+    val jdbcDF: DataFrame = readerWithProvider.load()
     jdbcDF.createOrReplaceTempView(tempViewName)
 
     AppleTable(SourceType.JDBC, jdbcDF, delimiter.orNull, tempViewName)
@@ -208,7 +233,7 @@ object SparkFactory {
    */
   def parallelizeJDBCSource(driverClassName: String, jdbcUrl: String, username: String, password: String, sqlQuery: String,
                             tempViewName: String): AppleTable = {
-    parallelizeJDBCSource(driverClassName, jdbcUrl, username, password, sqlQuery, tempViewName, Option.apply(","))
+    parallelizeJDBCSource(driverClassName, jdbcUrl, username, password, sqlQuery, tempViewName, Option.apply(","), Option.empty, Option.empty)
   }
 
   /**

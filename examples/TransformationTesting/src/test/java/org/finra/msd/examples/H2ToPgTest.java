@@ -71,6 +71,7 @@ public class H2ToPgTest {
       .option("dbtable", "(select * from appliance) a")
       .option("user", PostgresDatabase.getProperties().getProperty("user"))
       .option("password", PostgresDatabase.getProperties().getProperty("password"))
+      .option("connectionProvider", "PostgresIamAuthConnectionProvider")
       .option("partitionColumn", "price") // A numeric column
       .option("lowerBound", "0") // Typically you want this to be the minimum value
       .option("upperBound", "500") // Typically you want this to be the maximum value

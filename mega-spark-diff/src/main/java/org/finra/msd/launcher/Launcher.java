@@ -36,7 +36,7 @@ public class Launcher {
         /** Parse **/
         CmdLine values = new CmdLine(args);
         SourceVars sv1 = new SourceVars(values.getSource1()),
-                   sv2 = new SourceVars(values.getSource2());
+                sv2 = new SourceVars(values.getSource2());
 
         /** Generate AppleTables from inputs **/
         SparkFactory.initializeSparkContext();
@@ -72,7 +72,9 @@ public class Launcher {
                                     sv.getVar("password"),
                                     sv.getQuery(dataSetName),
                                     tempViewName,
-                                    Option.apply(sv.getVar("delimiter")));
+                                    Option.apply(sv.getVar("delimiter")),
+                                    Option.apply(sv.getVar("iamAuth")),
+                                    Option.apply(sv.getVar("region")));
             case "hive": return SparkFactory.parallelizeHiveSource(
                                     sv.getQuery(dataSetName),
                                     tempViewName);
