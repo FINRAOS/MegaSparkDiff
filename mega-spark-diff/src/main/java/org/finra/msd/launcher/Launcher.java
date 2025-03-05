@@ -36,7 +36,7 @@ public class Launcher {
         /** Parse **/
         CmdLine values = new CmdLine(args);
         SourceVars sv1 = new SourceVars(values.getSource1()),
-                sv2 = new SourceVars(values.getSource2());
+                   sv2 = new SourceVars(values.getSource2());
 
         /** Generate AppleTables from inputs **/
         SparkFactory.initializeSparkContext();
