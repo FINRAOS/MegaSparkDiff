@@ -18,7 +18,7 @@ class PostgresIamAuthConnectionProvider extends JdbcConnectionProvider with Logg
   logInfo("PostgresIamAuthConnectionProvider instantiated")
 
   private val tokenCache: LoadingCache[(String, String, String, String), String] = CacheBuilder.newBuilder()
-    .expireAfterWrite(11, TimeUnit.MINUTES)  // Token expires after 11 minutes
+    .expireAfterWrite(1, TimeUnit.MINUTES)  // Token expires after 11 minutes
     .build(new CacheLoader[(String, String, String, String), String] {
       override def load(key: (String, String, String, String)): String = {
         val (region, hostName, port, username) = key
