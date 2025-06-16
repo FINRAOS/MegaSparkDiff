@@ -76,7 +76,7 @@ jobs:
           command: |
             GPG_TTY=$(tty)
             export GPG_TTY
-            echo -e "$GPG_KEY" | gpg --batch --import
+            echo -e "$GPG_KEY_NEWLINE" | gpg --batch --import
       - run:
           name: Deploy
           command: mvn -B -Pmavencentral clean deploy --settings ../.circleci/settings.xml
