@@ -49,12 +49,47 @@ jobs:
           command: |
             cd mega-spark-diff
             mvn scala:doc
+      - early_return_for_forked_pull_requests
+      - persist_to_workspace:
+          root: mega-spark-diff/target/site
+          paths:
+            - apidocs
+            - scaladocs
+      - run:
+          name: Scan
+          command: bash <(curl -s https://copilot.blackducksoftware.com/ci/circle2/scripts/upload)
+  deploy:
+    # These next lines define a Docker executor: https://circleci.com/docs/2.0/executor-types/
+    # You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # Be sure to update the Docker image tag below to openjdk version of your application.
+    # A list of available CircleCI Docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/openjdk
+    docker:
+      - image: cimg/openjdk:8.0
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+    steps:
+      # Checkout the code as the first step.
+      - checkout
+      # Use mvn clean and package as the standard maven build phase
       - run:
           name: Import GPG key
           command: |
             GPG_TTY=$(tty)
             export GPG_TTY
             echo -e "$GPG_KEY" | gpg --batch --import
+      - run:
+          name: Deploy
+          command: mvn -B -Pmavencentral clean deploy --settings ../.circleci/settings.xml
+      - run:
+          name: Generate Javadocs
+          command: |
+            cd mega-spark-diff
+            mvn javadoc:javadoc
+      - run:
+          name: Generate Scaladocs
+          command: |
+            cd mega-spark-diff
+            mvn scala:doc
       - early_return_for_forked_pull_requests
       - persist_to_workspace:
           root: mega-spark-diff/target/site
@@ -121,6 +156,16 @@ workflows:
       - docs-deploy:
           requires:
             - build-and-test
+          filters:
+            branches:
+              only: main
+
+  maven_deploy:
+    jobs:
+      - deploy
+      - docs-deploy:
+          requires:
+            - deploy
           filters:
             branches:
               only: main
