@@ -49,6 +49,12 @@ jobs:
           command: |
             cd mega-spark-diff
             mvn scala:doc
+      - run:
+          name: Import GPG key
+          command: |
+            GPG_TTY=$(tty)
+            export GPG_TTY
+            echo -e "$GPG_KEY" | gpg --batch --import
       - early_return_for_forked_pull_requests
       - persist_to_workspace:
           root: mega-spark-diff/target/site
