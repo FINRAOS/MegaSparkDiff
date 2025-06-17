@@ -2,6 +2,11 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+parameters:
+  deploy:
+    type: boolean
+    default: false
+
 commands:
   early_return_for_forked_pull_requests:
     description: >-
