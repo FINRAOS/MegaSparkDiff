@@ -19,4 +19,8 @@
         </profile>
     </profiles>
 
+    <activeProfiles>
+        <activeProfile>gpg</activeProfile>
+    </activeProfiles>
+
 </settings>
