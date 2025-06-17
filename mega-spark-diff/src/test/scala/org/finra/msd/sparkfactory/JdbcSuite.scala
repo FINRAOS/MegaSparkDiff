@@ -52,7 +52,7 @@ class JdbcSuite extends SparkFunSuite {
     if (appleTable.getDataFrame.count == 0) fail("dataset was empty")
   }
 
-  test("parrallelizeSqlQueryWithPartitioning") {
+  test("parallelizeSqlQueryWithPartitioning") {
     val rightAppleTable = SparkFactory.parallelizeJDBCSource(MemoryDbHsql.hsqlDriverName, MemoryDbHsql.hsqlUrl, "SA", "",
       "(select * from Fruit1 )", "my_partition_test", Option.empty, "Price", "0", "200000", "2")
     if (rightAppleTable.getDataFrame.rdd.getNumPartitions != 2) fail("expected 2 partitions but received " + rightAppleTable.getDataFrame.rdd.getNumPartitions)

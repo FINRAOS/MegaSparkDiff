@@ -72,7 +72,9 @@ public class Launcher {
                                     sv.getVar("password"),
                                     sv.getQuery(dataSetName),
                                     tempViewName,
-                                    Option.apply(sv.getVar("delimiter")));
+                                    Option.apply(sv.getVar("delimiter")),
+                                    Option.apply(sv.getVar("iamAuth")),
+                                    Option.apply(sv.getVar("region")));
             case "hive": return SparkFactory.parallelizeHiveSource(
                                     sv.getQuery(dataSetName),
                                     tempViewName);
