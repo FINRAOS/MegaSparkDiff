@@ -102,9 +102,6 @@ jobs:
           paths:
             - apidocs
             - scaladocs
-      - run:
-          name: Scan
-          command: bash <(curl -s https://copilot.blackducksoftware.com/ci/circle2/scripts/upload)
   docs-deploy:
     docker:
       - image: cimg/openjdk:8.0
