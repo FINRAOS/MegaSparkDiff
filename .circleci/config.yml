@@ -81,7 +81,7 @@ jobs:
           command: |
             GPG_TTY=$(tty)
             export GPG_TTY
-            echo -e "$GPG_KEY" | gpg --batch --import
+            echo -e "$GPG_KEY_NEWLINE" | gpg --batch --import
             gpg --list-keys
       - run:
           name: Deploy
