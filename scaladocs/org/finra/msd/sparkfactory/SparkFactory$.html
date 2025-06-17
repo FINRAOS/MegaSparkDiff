@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>MegaSparkDiff 0.4.0 API  - org.finra.msd.sparkfactory.SparkFactory</title>
-          <meta name="description" content="MegaSparkDiff 0.4.0 API - org.finra.msd.sparkfactory.SparkFactory" />
-          <meta name="keywords" content="MegaSparkDiff 0.4.0 API org.finra.msd.sparkfactory.SparkFactory" />
+          <title>MegaSparkDiff 0.5.0 API  - org.finra.msd.sparkfactory.SparkFactory</title>
+          <meta name="description" content="MegaSparkDiff 0.5.0 API - org.finra.msd.sparkfactory.SparkFactory" />
+          <meta name="keywords" content="MegaSparkDiff 0.5.0 API org.finra.msd.sparkfactory.SparkFactory" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">MegaSparkDiff 0.4.0 API<span id="doc-version"></span></span>
+        <span id="doc-title">MegaSparkDiff 0.5.0 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -661,6 +661,25 @@ accessed through JDBC connection; passes in &quot;,&quot; as a default delimiter
 accessed through JDBC connection; passes in &quot;,&quot; as a default delimiter
 </p></div><dl class="paramcmts block"><dt class="param">driverClassName</dt><dd class="cmt"><p>JDBC driver name</p></dd><dt class="param">jdbcUrl</dt><dd class="cmt"><p>JDBC URL</p></dd><dt class="param">username</dt><dd class="cmt"><p>Username for database connection</p></dd><dt class="param">password</dt><dd class="cmt"><p>Password for database connection</p></dd><dt class="param">sqlQuery</dt><dd class="cmt"><p>Query to retrieve the desired data from database</p></dd><dt class="param">tempViewName</dt><dd class="cmt"><p>temporary table name for source data</p></dd><dt>returns</dt><dd class="cmt"><p>custom table containing the data to be compared</p></dd></dl></div>
     </li><li name="org.finra.msd.sparkfactory.SparkFactory#parallelizeJDBCSource" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="parallelizeJDBCSource(driverClassName:String,jdbcUrl:String,username:String,password:String,sqlQuery:String,tempViewName:String,delimiter:Option[String],iamAuth:Option[String],region:Option[String],partitionColumn:String,lowerBound:String,upperBound:String,numPartitions:String):org.finra.msd.containers.AppleTable"></a><a id="parallelizeJDBCSource(String,String,String,String,String,String,Option[String],Option[String],Option[String],String,String,String,String):AppleTable"></a>
+      <span class="permalink">
+      <a href="../../../../org/finra/msd/sparkfactory/SparkFactory$.html#parallelizeJDBCSource(driverClassName:String,jdbcUrl:String,username:String,password:String,sqlQuery:String,tempViewName:String,delimiter:Option[String],iamAuth:Option[String],region:Option[String],partitionColumn:String,lowerBound:String,upperBound:String,numPartitions:String):org.finra.msd.containers.AppleTable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">parallelizeJDBCSource</span><span class="params">(<span name="driverClassName">driverClassName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="jdbcUrl">jdbcUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="username">username: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="password">password: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="sqlQuery">sqlQuery: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="tempViewName">tempViewName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="delimiter">delimiter: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="iamAuth">iamAuth: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="region">region: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="partitionColumn">partitionColumn: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="lowerBound">lowerBound: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="upperBound">upperBound: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="numPartitions">numPartitions: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../containers/AppleTable.html" class="extype" name="org.finra.msd.containers.AppleTable">AppleTable</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">This method will create an AppleTable from a query that retrieves data from a database
+accessed through JDBC connection.</p><div class="fullcomment"><div class="comment cmt"><p>This method will create an AppleTable from a query that retrieves data from a database
+accessed through JDBC connection.
+</p></div><dl class="paramcmts block"><dt class="param">driverClassName</dt><dd class="cmt"><p>JDBC driver name</p></dd><dt class="param">jdbcUrl</dt><dd class="cmt"><p>JDBC URL</p></dd><dt class="param">username</dt><dd class="cmt"><p>Username for database connection</p></dd><dt class="param">password</dt><dd class="cmt"><p>Password for database connection</p></dd><dt class="param">sqlQuery</dt><dd class="cmt"><p>Query to retrieve the desired data from database</p></dd><dt class="param">tempViewName</dt><dd class="cmt"><p>temporary table name for source data</p></dd><dt class="param">delimiter</dt><dd class="cmt"><p>source data separation character</p></dd><dt class="param">iamAuth</dt><dd class="cmt"><p>flag indicating whether to use IAM authentication</p></dd><dt class="param">region</dt><dd class="cmt"><p>AWS region for IAM authentication</p></dd><dt class="param">partitionColumn</dt><dd class="cmt"><p>column to partition queries on</p></dd><dt class="param">lowerBound</dt><dd class="cmt"><p>lower bound of partition column values</p></dd><dt class="param">upperBound</dt><dd class="cmt"><p>upper bound of partition column values</p></dd><dt class="param">numPartitions</dt><dd class="cmt"><p>number of total queries to execute</p></dd><dt>returns</dt><dd class="cmt"><p>custom table containing the data to be compared</p></dd></dl></div>
+    </li><li name="org.finra.msd.sparkfactory.SparkFactory#parallelizeJDBCSource" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="parallelizeJDBCSource(driverClassName:String,jdbcUrl:String,username:String,password:String,sqlQuery:String,tempViewName:String,delimiter:Option[String],partitionColumn:String,lowerBound:String,upperBound:String,numPartitions:String):org.finra.msd.containers.AppleTable"></a><a id="parallelizeJDBCSource(String,String,String,String,String,String,Option[String],String,String,String,String):AppleTable"></a>
       <span class="permalink">
       <a href="../../../../org/finra/msd/sparkfactory/SparkFactory$.html#parallelizeJDBCSource(driverClassName:String,jdbcUrl:String,username:String,password:String,sqlQuery:String,tempViewName:String,delimiter:Option[String],partitionColumn:String,lowerBound:String,upperBound:String,numPartitions:String):org.finra.msd.containers.AppleTable" title="Permalink">
@@ -679,6 +698,25 @@ accessed through JDBC connection; passes in &quot;,&quot; as a default delimiter
 accessed through JDBC connection.</p><div class="fullcomment"><div class="comment cmt"><p>This method will create an AppleTable from a query that retrieves data from a database
 accessed through JDBC connection.
 </p></div><dl class="paramcmts block"><dt class="param">driverClassName</dt><dd class="cmt"><p>JDBC driver name</p></dd><dt class="param">jdbcUrl</dt><dd class="cmt"><p>JDBC URL</p></dd><dt class="param">username</dt><dd class="cmt"><p>Username for database connection</p></dd><dt class="param">password</dt><dd class="cmt"><p>Password for database connection</p></dd><dt class="param">sqlQuery</dt><dd class="cmt"><p>Query to retrieve the desired data from database</p></dd><dt class="param">tempViewName</dt><dd class="cmt"><p>temporary table name for source data</p></dd><dt class="param">delimiter</dt><dd class="cmt"><p>source data separation character</p></dd><dt class="param">partitionColumn</dt><dd class="cmt"><p>column to partition queries on</p></dd><dt class="param">lowerBound</dt><dd class="cmt"><p>lower bound of partition column values</p></dd><dt class="param">upperBound</dt><dd class="cmt"><p>upper bound of partition column values</p></dd><dt class="param">numPartitions</dt><dd class="cmt"><p>number of total queries to execute</p></dd><dt>returns</dt><dd class="cmt"><p>custom table containing the data to be compared</p></dd></dl></div>
+    </li><li name="org.finra.msd.sparkfactory.SparkFactory#parallelizeJDBCSource" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="parallelizeJDBCSource(driverClassName:String,jdbcUrl:String,username:String,password:String,sqlQuery:String,tempViewName:String,delimiter:Option[String],iamAuth:Option[String],region:Option[String]):org.finra.msd.containers.AppleTable"></a><a id="parallelizeJDBCSource(String,String,String,String,String,String,Option[String],Option[String],Option[String]):AppleTable"></a>
+      <span class="permalink">
+      <a href="../../../../org/finra/msd/sparkfactory/SparkFactory$.html#parallelizeJDBCSource(driverClassName:String,jdbcUrl:String,username:String,password:String,sqlQuery:String,tempViewName:String,delimiter:Option[String],iamAuth:Option[String],region:Option[String]):org.finra.msd.containers.AppleTable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">parallelizeJDBCSource</span><span class="params">(<span name="driverClassName">driverClassName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="jdbcUrl">jdbcUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="username">username: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="password">password: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="sqlQuery">sqlQuery: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="tempViewName">tempViewName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="delimiter">delimiter: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="iamAuth">iamAuth: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="region">region: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="../containers/AppleTable.html" class="extype" name="org.finra.msd.containers.AppleTable">AppleTable</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">This method will create an AppleTable from a query that retrieves data from a database
+accessed through JDBC connection.</p><div class="fullcomment"><div class="comment cmt"><p>This method will create an AppleTable from a query that retrieves data from a database
+accessed through JDBC connection.
+</p></div><dl class="paramcmts block"><dt class="param">driverClassName</dt><dd class="cmt"><p>JDBC driver name</p></dd><dt class="param">jdbcUrl</dt><dd class="cmt"><p>JDBC URL</p></dd><dt class="param">username</dt><dd class="cmt"><p>Username for database connection</p></dd><dt class="param">password</dt><dd class="cmt"><p>Password for database connection</p></dd><dt class="param">sqlQuery</dt><dd class="cmt"><p>Query to retrieve the desired data from database</p></dd><dt class="param">tempViewName</dt><dd class="cmt"><p>temporary table name for source data</p></dd><dt class="param">delimiter</dt><dd class="cmt"><p>source data separation character</p></dd><dt class="param">iamAuth</dt><dd class="cmt"><p>flag indicating whether to use IAM authentication</p></dd><dt class="param">region</dt><dd class="cmt"><p>AWS region for IAM authentication</p></dd><dt>returns</dt><dd class="cmt"><p>custom table containing the data to be compared</p></dd></dl></div>
     </li><li name="org.finra.msd.sparkfactory.SparkFactory#parallelizeJDBCSource" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="parallelizeJDBCSource(driverClassName:String,jdbcUrl:String,username:String,password:String,sqlQuery:String,tempViewName:String,delimiter:Option[String]):org.finra.msd.containers.AppleTable"></a><a id="parallelizeJDBCSource(String,String,String,String,String,String,Option[String]):AppleTable"></a>
       <span class="permalink">

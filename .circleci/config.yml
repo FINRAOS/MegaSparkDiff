@@ -2,6 +2,11 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+parameters:
+  deploy:
+    type: boolean
+    default: false
+
 commands:
   early_return_for_forked_pull_requests:
     description: >-
@@ -55,9 +60,45 @@ jobs:
           paths:
             - apidocs
             - scaladocs
+  deploy:
+    # These next lines define a Docker executor: https://circleci.com/docs/2.0/executor-types/
+    # You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # Be sure to update the Docker image tag below to openjdk version of your application.
+    # A list of available CircleCI Docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/openjdk
+    docker:
+      - image: cimg/openjdk:8.0
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+    steps:
+      # Checkout the code as the first step.
+      - checkout
+      # Use mvn clean and package as the standard maven build phase
       - run:
-          name: Scan
-          command: bash <(curl -s https://copilot.blackducksoftware.com/ci/circle2/scripts/upload)
+          name: Import GPG key
+          command: |
+            GPG_TTY=$(tty)
+            export GPG_TTY
+            echo -e "$GPG_KEY_NEWLINE" | gpg --batch --import
+            gpg --list-keys
+      - run:
+          name: Deploy
+          command: mvn -B -Pmavencentral clean deploy --settings .circleci/settings.xml
+      - run:
+          name: Generate Javadocs
+          command: |
+            cd mega-spark-diff
+            mvn javadoc:javadoc
+      - run:
+          name: Generate Scaladocs
+          command: |
+            cd mega-spark-diff
+            mvn scala:doc
+      - early_return_for_forked_pull_requests
+      - persist_to_workspace:
+          root: mega-spark-diff/target/site
+          paths:
+            - apidocs
+            - scaladocs
   docs-deploy:
     docker:
       - image: cimg/openjdk:8.0
@@ -91,7 +132,7 @@ jobs:
             cp main/.circleci/config.yml gh-pages/.circleci/config.yml
       - add_ssh_keys:
           fingerprints:
-            - "08:56:e3:f6:88:8d:30:f7:c3:df:dc:23:9c:91:eb:5f"
+            - "SHA256:noZtQzUrR3ZzCNtGJQtsGTj1DE+nO4jE8Kz4dwpPYbs"
       - run:
           name: Deploy docs to gh-pages branch
           command: |
@@ -107,6 +148,8 @@ jobs:
 workflows:
   maven_test: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
+    when:
+        equal: [ false, <<pipeline.parameters.deploy>> ]
     jobs:
       - build-and-test:
           filters:
@@ -115,6 +158,18 @@ workflows:
       - docs-deploy:
           requires:
             - build-and-test
+          filters:
+            branches:
+              only: main
+
+  maven_deploy:
+    when:
+      equal: [ true, <<pipeline.parameters.deploy>> ]
+    jobs:
+      - deploy
+      - docs-deploy:
+          requires:
+            - deploy
           filters:
             branches:
               only: main

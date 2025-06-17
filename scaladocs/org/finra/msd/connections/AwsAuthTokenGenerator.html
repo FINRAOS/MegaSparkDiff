@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>MegaSparkDiff 0.5.0 API  - org.finra.msd.containers.CmdLine</title>
-          <meta name="description" content="MegaSparkDiff 0.5.0 API - org.finra.msd.containers.CmdLine" />
-          <meta name="keywords" content="MegaSparkDiff 0.5.0 API org.finra.msd.containers.CmdLine" />
+          <title>MegaSparkDiff 0.5.0 API  - org.finra.msd.connections.AwsAuthTokenGenerator</title>
+          <meta name="description" content="MegaSparkDiff 0.5.0 API - org.finra.msd.connections.AwsAuthTokenGenerator" />
+          <meta name="keywords" content="MegaSparkDiff 0.5.0 API org.finra.msd.connections.AwsAuthTokenGenerator" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       
@@ -117,10 +117,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="org.finra">finra</a></dd></dl></div>
-    </li><li name="org.finra.msd.containers" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="containers"></a><a id="containers:containers"></a>
+    </li><li name="org.finra.msd.connections" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="connections"></a><a id="connections:connections"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/index.html" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/index.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -129,30 +129,22 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <a title="" href="index.html"><span class="name">containers</span></a>
+        <a title="" href="index.html"><span class="name">connections</span></a>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="org.finra.msd">msd</a></dd></dl></div>
     </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="AppleTable.html" title="Custom container class that stores all data gotten from any source"></a>
-                        <a href="AppleTable.html" title="Custom container class that stores all data gotten from any source">AppleTable</a>
+                        <a class="trait" href="AuthTokenGenerator.html" title="Trait that defines token generation functionality for authentication purposes."></a>
+                        <a href="AuthTokenGenerator.html" title="Trait that defines token generation functionality for authentication purposes.">AuthTokenGenerator</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="" title="Runner class parsing command line arguments"></a>
-                        <a href="" title="Runner class parsing command line arguments">CmdLine</a>
+                        <a class="class" href="" title="Generates an AWS IAM authentication token for RDS PostgreSQL."></a>
+                        <a href="" title="Generates an AWS IAM authentication token for RDS PostgreSQL.">AwsAuthTokenGenerator</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="CountResult.html" title=""></a>
-                        <a href="CountResult.html" title="">CountResult</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="DiffResult.html" title="* The container for the comparison result."></a>
-                        <a href="DiffResult.html" title="* The container for the comparison result.">DiffResult</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="SourceVars.html" title="Extracts the database connection details"></a>
-                        <a href="SourceVars.html" title="Extracts the database connection details">SourceVars</a>
+                        <a class="class" href="PostgresIamAuthConnectionProvider.html" title="A connection provider that enables IAM authentication for PostgreSQL databases."></a>
+                        <a href="PostgresIamAuthConnectionProvider.html" title="A connection provider that enables IAM authentication for PostgreSQL databases.">PostgresIamAuthConnectionProvider</a>
                       </li>
               </ul>
             </div>
@@ -161,9 +153,9 @@
             <body class="class type">
       <div id="definition">
         <div class="big-circle class">c</div>
-        <p id="owner"><a href="../../../index.html" class="extype" name="org">org</a>.<a href="../../index.html" class="extype" name="org.finra">finra</a>.<a href="../index.html" class="extype" name="org.finra.msd">msd</a>.<a href="index.html" class="extype" name="org.finra.msd.containers">containers</a></p>
-        <h1>CmdLine<span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html" title="Permalink">
+        <p id="owner"><a href="../../../index.html" class="extype" name="org">org</a>.<a href="../../index.html" class="extype" name="org.finra">finra</a>.<a href="../index.html" class="extype" name="org.finra.msd">msd</a>.<a href="index.html" class="extype" name="org.finra.msd.connections">connections</a></p>
+        <h1>AwsAuthTokenGenerator<span class="permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -176,17 +168,17 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">CmdLine</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">AwsAuthTokenGenerator</span><span class="result"> extends <a href="AuthTokenGenerator.html" class="extype" name="org.finra.msd.connections.AuthTokenGenerator">AuthTokenGenerator</a></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Runner class parsing command line arguments
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Generates an AWS IAM authentication token for RDS PostgreSQL.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>An authentication token for RDS IAM authentication</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="AuthTokenGenerator.html" class="extype" name="org.finra.msd.connections.AuthTokenGenerator">AuthTokenGenerator</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -212,7 +204,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="org.finra.msd.containers.CmdLine"><span>CmdLine</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="org.finra.msd.connections.AwsAuthTokenGenerator"><span>AwsAuthTokenGenerator</span></li><li class="in" name="org.finra.msd.connections.AuthTokenGenerator"><span>AuthTokenGenerator</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -232,10 +224,10 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="org.finra.msd.containers.CmdLine#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(args:Array[String]):org.finra.msd.containers.CmdLine"></a><a id="&lt;init&gt;:CmdLine"></a>
+              <ol><li name="org.finra.msd.connections.AwsAuthTokenGenerator#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;():org.finra.msd.connections.AwsAuthTokenGenerator"></a><a id="&lt;init&gt;:AwsAuthTokenGenerator"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#&lt;init&gt;(args:Array[String]):org.finra.msd.containers.CmdLine" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#&lt;init&gt;():org.finra.msd.connections.AwsAuthTokenGenerator" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -244,10 +236,10 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">CmdLine</span><span class="params">(<span name="args">args: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="java.lang.String">String</span>]</span>)</span>
+        <span class="name">AwsAuthTokenGenerator</span><span class="params">()</span>
       </span>
       
-      
+      <p class="shortcomment cmt"></p>
     </li></ol>
             </div>
 
@@ -261,7 +253,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -277,7 +269,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html###():Int" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -293,7 +285,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -309,7 +301,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -325,7 +317,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#clone():Object" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -349,7 +341,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -365,7 +357,7 @@
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -381,7 +373,7 @@
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#finalize():Unit" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -400,10 +392,26 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="org.finra.msd.connections.AwsAuthTokenGenerator#generateToken" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="generateToken(region:String,hostname:String,port:String,username:String):String"></a><a id="generateToken(String,String,String,String):String"></a>
+      <span class="permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#generateToken(region:String,hostname:String,port:String,username:String):String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">generateToken</span><span class="params">(<span name="region">region: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="hostname">hostname: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="username">username: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="org.finra.msd.connections.AwsAuthTokenGenerator">AwsAuthTokenGenerator</a> → <a href="AuthTokenGenerator.html" class="extype" name="org.finra.msd.connections.AuthTokenGenerator">AuthTokenGenerator</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -419,314 +427,10 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="org.finra.msd.containers.CmdLine#getClusterId" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getClusterId():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getClusterId():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getClusterId</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the cluster Id if the execution mode is EMR</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getClusterName" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getClusterName():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getClusterName():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getClusterName</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the cluster name is the execution mode is EMR</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getControllerRAM" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getControllerRAM():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getControllerRAM():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getControllerRAM</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets controller RAM passed in the configuration file</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getData1" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getData1():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getData1():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getData1</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the data retrieval query for source 1</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getData2" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getData2():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getData2():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getData2</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the data retrieval query for source 2</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getDataSourceFolder" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getDataSourceFolder():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getDataSourceFolder():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getDataSourceFolder</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the location of source data</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getDelimiter" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getDelimiter():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getDelimiter():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getDelimiter</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      
-    </li><li name="org.finra.msd.containers.CmdLine#getExecutorMemory" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getExecutorMemory():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getExecutorMemory():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getExecutorMemory</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets executor memory passed in the configuration file</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getLowerBound" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getLowerBound():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getLowerBound():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getLowerBound</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the lower bound in case of partitioning</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getNumExecutors" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getNumExecutors():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getNumExecutors():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getNumExecutors</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the number of executors passed in the configuration file</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getNumPartitions" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getNumPartitions():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getNumPartitions():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getNumPartitions</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the number of partitions passed in the configuration file</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getOutputDirectory" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getOutputDirectory():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getOutputDirectory():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getOutputDirectory</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets location of output directory</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getPartitionByColumn" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getPartitionByColumn():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getPartitionByColumn():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getPartitionByColumn</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the the partition column name</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getRunConfigName" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getRunConfigName():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getRunConfigName():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getRunConfigName</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the file name of the configuration file</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getSource1" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getSource1():java.io.File"></a><a id="getSource1():File"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getSource1():java.io.File" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getSource1</span><span class="params">()</span><span class="result">: <span class="extype" name="java.io.File">File</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the file where the data retrieval queries can be found</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getSource2" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getSource2():java.io.File"></a><a id="getSource2():File"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getSource2():java.io.File" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getSource2</span><span class="params">()</span><span class="result">: <span class="extype" name="java.io.File">File</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the file where the data retrieval queries can be found</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getType1" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getType1():org.finra.msd.enums.SourceType"></a><a id="getType1():SourceType"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getType1():org.finra.msd.enums.SourceType" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getType1</span><span class="params">()</span><span class="result">: <a href="../enums/SourceType.html" class="extype" name="org.finra.msd.enums.SourceType">SourceType</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the type of source 1</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getType2" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getType2():org.finra.msd.enums.SourceType"></a><a id="getType2():SourceType"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getType2():org.finra.msd.enums.SourceType" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getType2</span><span class="params">()</span><span class="result">: <a href="../enums/SourceType.html" class="extype" name="org.finra.msd.enums.SourceType">SourceType</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the type of source 2</p>
-    </li><li name="org.finra.msd.containers.CmdLine#getUpperBound" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getUpperBound():String"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#getUpperBound():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getUpperBound</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Gets the upper bound in case of partitioning</p>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#hashCode():Int" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -745,7 +449,7 @@
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -758,26 +462,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="org.finra.msd.containers.CmdLine#isLocal" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isLocal():Boolean"></a>
-      <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#isLocal():Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">isLocal</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Returns true if the execution mode is local</p>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -793,7 +481,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#notify():Unit" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -812,7 +500,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -831,7 +519,7 @@
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -847,7 +535,7 @@
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#toString():String" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -863,7 +551,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#wait():Unit" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -885,7 +573,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -907,7 +595,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../org/finra/msd/containers/CmdLine.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../org/finra/msd/connections/AwsAuthTokenGenerator.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -938,7 +626,9 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="org.finra.msd.connections.AuthTokenGenerator">
+              <h3>Inherited from <a href="AuthTokenGenerator.html" class="extype" name="org.finra.msd.connections.AuthTokenGenerator">AuthTokenGenerator</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
