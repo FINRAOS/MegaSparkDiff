@@ -4,7 +4,7 @@
     <servers>
         <server>
             <id>central</id>
-            <username>$CENTRAL_USER</username>
+            <username>${CENTRAL_USER}</username>
             <password>$CENTRAL_TOKEN</password>
         </server>
     </servers>
