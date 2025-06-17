@@ -148,7 +148,7 @@ workflows:
   maven_test: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     when:
-        - equal: [ false, <<pipeline.parameters.release>> ]
+        equal: [ false, <<pipeline.parameters.deploy>> ]
     jobs:
       - build-and-test:
           filters:
@@ -163,7 +163,7 @@ workflows:
 
   maven_deploy:
     when:
-      - equal: [ true, <<pipeline.parameters.release>> ]
+      equal: [ true, <<pipeline.parameters.deploy>> ]
     jobs:
       - deploy
       - docs-deploy:
