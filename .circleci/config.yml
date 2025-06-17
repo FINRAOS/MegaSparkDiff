@@ -75,9 +75,7 @@ jobs:
           name: Import GPG key
           command: |
             GPG_TTY=$(tty)
-            echo $TEST
-            echo ${TEST}
-            echo -e "$TEST" | gpg --batch --import
+            echo -e "$GPG_KEY_NEWLINE" | gpg --batch --import
       - run:
           name: Deploy
           command: mvn -B -Pmavencentral clean deploy --settings ../.circleci/settings.xml
@@ -149,6 +147,8 @@ jobs:
 workflows:
   maven_test: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
+    when:
+        - equal: [ false, <<pipeline.parameters.release>> ]
     jobs:
       - build-and-test:
           filters:
@@ -162,6 +162,8 @@ workflows:
               only: main
 
   maven_deploy:
+    when:
+      - equal: [ true, <<pipeline.parameters.release>> ]
     jobs:
       - deploy
       - docs-deploy:
