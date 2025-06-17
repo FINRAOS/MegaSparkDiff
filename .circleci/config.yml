@@ -135,7 +135,7 @@ jobs:
             cp main/.circleci/config.yml gh-pages/.circleci/config.yml
       - add_ssh_keys:
           fingerprints:
-            - "08:56:e3:f6:88:8d:30:f7:c3:df:dc:23:9c:91:eb:5f"
+            - "SHA256:noZtQzUrR3ZzCNtGJQtsGTj1DE+nO4jE8Kz4dwpPYbs"
       - run:
           name: Deploy docs to gh-pages branch
           command: |
