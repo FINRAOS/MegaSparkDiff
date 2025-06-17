@@ -83,7 +83,7 @@ jobs:
             echo -e "$GPG_KEY_NEWLINE" | gpg --batch --import
       - run:
           name: Deploy
-          command: mvn -B -Pmavencentral clean deploy --settings ../.circleci/settings.xml
+          command: mvn -B -Pmavencentral clean deploy --settings .circleci/settings.xml
       - run:
           name: Generate Javadocs
           command: |
