@@ -75,7 +75,8 @@ jobs:
           name: Import GPG key
           command: |
             GPG_TTY=$(tty)
-            echo -e "$TEST"
+            echo "$TEST"
+            echo "${TEST}"
             echo -e "$TEST" | gpg --batch --import
       - run:
           name: Deploy
